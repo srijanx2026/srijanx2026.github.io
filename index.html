@@ -1,0 +1,1491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SrijanX — Bringing Stories To Life</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+<!-- Firebase -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  // ─────────────────────────────────────────────
+  // 🔧 PASTE YOUR FIREBASE CONFIG HERE
+  // (You'll get this from Firebase Console → Project Settings)
+  // ─────────────────────────────────────────────
+  const firebaseConfig = {
+    apiKey: "AIzaSyDYBpoOfcXQGRQ-bstduxpI9V07g5oWRJo",
+    authDomain: "srijanx-sap.firebaseapp.com",
+    projectId: "srijanx-sap",
+    storageBucket: "srijanx-sap.firebasestorage.app",
+    messagingSenderId: "248764886768",
+    appId: "1:248764886768:web:9a7a70b9a0b4ea3ce91c35",
+    measurementId: "G-BC1Y2J1SMR"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  window._db = db;
+  window._fbFns = { collection, addDoc, getDocs, deleteDoc, doc };
+  window.dispatchEvent(new Event("firebaseReady"));
+</script>
+
+<style>
+  :root {
+    --black: #07020f;
+    --deep: #0d0520;
+    --purple: #7b2fff;
+    --purple-glow: #9d5bff;
+    --purple-dim: #3d1a7a;
+    --gold: #f0b429;
+    --gold-light: #ffd166;
+    --white: #f5f0ff;
+    --grey: #9b93b0;
+    --font-display: 'Bebas Neue', sans-serif;
+    --font-heading: 'Rajdhani', sans-serif;
+    --font-body: 'Inter', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: var(--font-body);
+    overflow-x: hidden;
+  }
+
+  /* ── CANVAS BACKGROUND ── */
+  #starfield {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; width: 100%;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 3rem;
+    background: linear-gradient(to bottom, rgba(7,2,15,0.95), transparent);
+    backdrop-filter: blur(6px);
+  }
+
+  .nav-logo {
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    letter-spacing: 0.1em;
+    color: var(--white);
+  }
+
+  .nav-logo span { color: var(--purple-glow); }
+
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+
+  .nav-links a {
+    color: var(--grey);
+    text-decoration: none;
+    font-family: var(--font-heading);
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: color 0.3s;
+  }
+
+  .nav-links a:hover { color: var(--purple-glow); }
+
+  .nav-admin-btn {
+    background: transparent;
+    border: 1px solid var(--purple-dim);
+    color: var(--purple-glow);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.4rem 1.2rem;
+    cursor: pointer;
+    border-radius: 3px;
+    font-size: 0.85rem;
+    transition: all 0.3s;
+  }
+
+  .nav-admin-btn:hover {
+    background: var(--purple-dim);
+    box-shadow: 0 0 12px var(--purple);
+  }
+
+  /* ── SECTIONS ── */
+  section {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── HERO ── */
+  #home {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+  }
+
+  .hero-eyebrow {
+    font-family: var(--font-heading);
+    font-size: 0.9rem;
+    letter-spacing: 0.4em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 1.2rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.3s forwards;
+  }
+
+  .hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(4rem, 12vw, 9rem);
+    line-height: 0.95;
+    letter-spacing: 0.04em;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.5s forwards;
+  }
+
+  .hero-title .line-purple { color: var(--purple-glow); text-shadow: 0 0 40px var(--purple); }
+  .hero-title .line-gold { color: var(--gold); text-shadow: 0 0 30px var(--gold); }
+
+  .hero-sub {
+    font-family: var(--font-heading);
+    font-size: clamp(1rem, 2.5vw, 1.4rem);
+    color: var(--grey);
+    margin-top: 1.5rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.7s forwards;
+  }
+
+  .hero-sub em { color: var(--purple-glow); font-style: normal; }
+
+  .hero-cta {
+    margin-top: 3rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.9s forwards;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--purple), #4a00c8);
+    color: white;
+    border: none;
+    padding: 1rem 2.5rem;
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 4px;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s;
+    box-shadow: 0 0 30px rgba(123,47,255,0.5);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 50px rgba(123,47,255,0.8);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--gold);
+    border: 1.5px solid var(--gold);
+    padding: 1rem 2.5rem;
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 4px;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s;
+  }
+
+  .btn-secondary:hover {
+    background: rgba(240,180,41,0.1);
+    box-shadow: 0 0 30px rgba(240,180,41,0.3);
+    transform: translateY(-2px);
+  }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    opacity: 0.5;
+    animation: bounce 2s infinite;
+  }
+
+  .scroll-hint span {
+    font-family: var(--font-heading);
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--grey);
+  }
+
+  .scroll-hint .arrow { width: 1px; height: 40px; background: linear-gradient(to bottom, var(--purple-glow), transparent); }
+
+  /* ── SECTION COMMON ── */
+  .section-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 6rem 2rem;
+  }
+
+  .section-label {
+    font-family: var(--font-heading);
+    font-size: 0.8rem;
+    letter-spacing: 0.5em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 0.8rem;
+  }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    letter-spacing: 0.04em;
+    line-height: 1;
+    margin-bottom: 1rem;
+  }
+
+  .section-title span { color: var(--purple-glow); }
+
+  .divider {
+    width: 60px;
+    height: 2px;
+    background: linear-gradient(to right, var(--purple), var(--gold));
+    margin: 1.5rem 0 2.5rem;
+  }
+
+  /* ── CATEGORIES STRIP ── */
+  .categories {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 3rem;
+  }
+
+  .cat-tag {
+    background: rgba(123,47,255,0.12);
+    border: 1px solid var(--purple-dim);
+    color: var(--purple-glow);
+    padding: 0.4rem 1rem;
+    border-radius: 2px;
+    font-family: var(--font-heading);
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.25s;
+  }
+
+  .cat-tag:hover, .cat-tag.active {
+    background: var(--purple);
+    border-color: var(--purple-glow);
+    box-shadow: 0 0 15px rgba(123,47,255,0.5);
+    color: white;
+  }
+
+  /* ── CATALOG GRID ── */
+  #catalog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .product-card {
+    background: linear-gradient(145deg, rgba(13,5,32,0.9), rgba(30,10,60,0.5));
+    border: 1px solid rgba(123,47,255,0.2);
+    border-radius: 6px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.35s;
+    position: relative;
+  }
+
+  .product-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--purple-glow);
+    box-shadow: 0 8px 40px rgba(123,47,255,0.35);
+  }
+
+  .product-card img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s;
+  }
+
+  .product-card:hover img { transform: scale(1.05); }
+
+  .product-card-body {
+    padding: 1rem;
+  }
+
+  .product-card-category {
+    font-family: var(--font-heading);
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.3rem;
+  }
+
+  .product-card-name {
+    font-family: var(--font-heading);
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+  }
+
+  .product-card-desc {
+    font-size: 0.8rem;
+    color: var(--grey);
+    line-height: 1.5;
+    margin-bottom: 1rem;
+  }
+
+  .btn-order {
+    width: 100%;
+    background: linear-gradient(135deg, var(--purple), #4a00c8);
+    color: white;
+    border: none;
+    padding: 0.65rem;
+    font-family: var(--font-heading);
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.3s;
+  }
+
+  .btn-order:hover { box-shadow: 0 0 20px rgba(123,47,255,0.6); }
+
+  .empty-catalog {
+    grid-column: 1/-1;
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--grey);
+  }
+
+  .empty-catalog .icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.4; }
+  .empty-catalog p { font-family: var(--font-heading); font-size: 1.1rem; letter-spacing: 0.1em; }
+
+  /* ── ABOUT ── */
+  #about { background: linear-gradient(to bottom, transparent, rgba(123,47,255,0.04), transparent); }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+  }
+
+  .about-text p {
+    color: var(--grey);
+    line-height: 1.9;
+    font-size: 1rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .about-text p strong { color: var(--white); }
+  .about-text p em { color: var(--purple-glow); font-style: normal; }
+
+  .about-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+
+  .stat-box {
+    background: linear-gradient(145deg, rgba(13,5,32,0.9), rgba(30,10,60,0.5));
+    border: 1px solid rgba(123,47,255,0.2);
+    border-radius: 6px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s;
+  }
+
+  .stat-box:hover {
+    border-color: var(--purple-glow);
+    box-shadow: 0 0 25px rgba(123,47,255,0.25);
+  }
+
+  .stat-box .num {
+    font-family: var(--font-display);
+    font-size: 3rem;
+    color: var(--purple-glow);
+    line-height: 1;
+    text-shadow: 0 0 20px var(--purple);
+  }
+
+  .stat-box .label {
+    font-family: var(--font-heading);
+    font-size: 0.8rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--grey);
+    margin-top: 0.3rem;
+  }
+
+  /* ── CONTACT ── */
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: start;
+  }
+
+  .contact-info p {
+    color: var(--grey);
+    line-height: 1.8;
+    margin-bottom: 2rem;
+  }
+
+  .contact-links { display: flex; flex-direction: column; gap: 1rem; }
+
+  .contact-link {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(123,47,255,0.08);
+    border: 1px solid rgba(123,47,255,0.2);
+    border-radius: 4px;
+    padding: 1rem 1.5rem;
+    text-decoration: none;
+    color: var(--white);
+    font-family: var(--font-heading);
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    transition: all 0.3s;
+  }
+
+  .contact-link:hover {
+    border-color: var(--purple-glow);
+    background: rgba(123,47,255,0.15);
+    box-shadow: 0 0 20px rgba(123,47,255,0.2);
+    transform: translateX(4px);
+  }
+
+  .contact-link .icon { font-size: 1.4rem; }
+
+  .order-box {
+    background: linear-gradient(145deg, rgba(13,5,32,0.95), rgba(30,10,60,0.6));
+    border: 1px solid rgba(240,180,41,0.3);
+    border-radius: 6px;
+    padding: 2rem;
+  }
+
+  .order-box h3 {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    color: var(--gold);
+    margin-bottom: 0.5rem;
+  }
+
+  .order-box p {
+    color: var(--grey);
+    font-size: 0.9rem;
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+  }
+
+  .order-steps { list-style: none; margin-bottom: 1.5rem; }
+
+  .order-steps li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+    margin-bottom: 0.8rem;
+    color: var(--grey);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .order-steps li .step-num {
+    background: var(--purple-dim);
+    color: var(--purple-glow);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.75rem;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 2.5rem;
+    border-top: 1px solid rgba(123,47,255,0.15);
+  }
+
+  footer .logo {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    letter-spacing: 0.1em;
+    color: var(--white);
+    margin-bottom: 0.5rem;
+  }
+
+  footer .logo span { color: var(--purple-glow); }
+
+  footer p {
+    color: var(--grey);
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+  }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(7,2,15,0.92);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: linear-gradient(145deg, #0d0520, #1a0840);
+    border: 1px solid rgba(123,47,255,0.4);
+    border-radius: 8px;
+    padding: 2.5rem;
+    width: 90%;
+    max-width: 480px;
+    position: relative;
+    box-shadow: 0 0 60px rgba(123,47,255,0.3);
+  }
+
+  .modal-title {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    color: var(--white);
+    margin-bottom: 0.3rem;
+  }
+
+  .modal-sub {
+    color: var(--grey);
+    font-size: 0.85rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .modal input, .modal textarea, .modal select {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(123,47,255,0.3);
+    color: var(--white);
+    padding: 0.8rem 1rem;
+    border-radius: 4px;
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+    transition: border-color 0.3s;
+    resize: vertical;
+  }
+
+  .modal input:focus, .modal textarea:focus {
+    outline: none;
+    border-color: var(--purple-glow);
+    box-shadow: 0 0 10px rgba(123,47,255,0.2);
+  }
+
+  .modal label {
+    display: block;
+    font-family: var(--font-heading);
+    font-size: 0.8rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--grey);
+    margin-bottom: 0.4rem;
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 1rem; right: 1.2rem;
+    background: none; border: none;
+    color: var(--grey);
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: color 0.3s;
+  }
+
+  .modal-close:hover { color: var(--white); }
+
+  .modal-error {
+    color: #ff6b6b;
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+    display: none;
+    font-family: var(--font-heading);
+    letter-spacing: 0.05em;
+  }
+
+  /* ── ADMIN PANEL ── */
+  #admin-panel {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: var(--black);
+    z-index: 2000;
+    overflow-y: auto;
+  }
+
+  #admin-panel.open { display: block; }
+
+  .admin-header {
+    background: linear-gradient(to right, var(--deep), #1a0840);
+    border-bottom: 1px solid rgba(123,47,255,0.3);
+    padding: 1.5rem 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .admin-header h1 {
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    letter-spacing: 0.1em;
+  }
+
+  .admin-header h1 span { color: var(--purple-glow); }
+
+  .admin-body { max-width: 900px; margin: 0 auto; padding: 2rem; }
+
+  .admin-section {
+    background: rgba(13,5,32,0.8);
+    border: 1px solid rgba(123,47,255,0.2);
+    border-radius: 8px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .admin-section h2 {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    letter-spacing: 0.08em;
+    color: var(--gold);
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(240,180,41,0.2);
+    padding-bottom: 0.8rem;
+  }
+
+  .admin-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .admin-form-grid .full { grid-column: 1/-1; }
+
+  .admin-form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+
+  .admin-form-group label {
+    font-family: var(--font-heading);
+    font-size: 0.8rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--grey);
+  }
+
+  .admin-form-group input,
+  .admin-form-group textarea,
+  .admin-form-group select {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(123,47,255,0.3);
+    color: var(--white);
+    padding: 0.7rem 1rem;
+    border-radius: 4px;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    transition: border-color 0.3s;
+    resize: vertical;
+  }
+
+  .admin-form-group input:focus,
+  .admin-form-group textarea:focus,
+  .admin-form-group select:focus {
+    outline: none;
+    border-color: var(--purple-glow);
+  }
+
+  .admin-form-group select option { background: #1a0840; }
+
+  .scrape-row {
+    display: flex;
+    gap: 0.8rem;
+    align-items: flex-end;
+  }
+
+  .scrape-row input { flex: 1; }
+
+  .btn-scrape {
+    background: linear-gradient(135deg, var(--gold), #c8860a);
+    color: var(--black);
+    border: none;
+    padding: 0.7rem 1.5rem;
+    font-family: var(--font-heading);
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 4px;
+    white-space: nowrap;
+    transition: all 0.3s;
+  }
+
+  .btn-scrape:hover { box-shadow: 0 0 20px rgba(240,180,41,0.4); }
+  .btn-scrape:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .scrape-preview {
+    display: none;
+    margin-top: 1rem;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .scrape-preview.show { display: flex; }
+
+  .scrape-preview img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid rgba(123,47,255,0.3);
+  }
+
+  .scrape-preview-info { flex: 1; }
+  .scrape-preview-info strong { color: var(--white); font-family: var(--font-heading); display: block; margin-bottom: 0.3rem; }
+  .scrape-preview-info small { color: var(--grey); font-size: 0.8rem; }
+
+  .btn-add-product {
+    background: linear-gradient(135deg, var(--purple), #4a00c8);
+    color: white;
+    border: none;
+    padding: 0.8rem 2rem;
+    font-family: var(--font-heading);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 4px;
+    width: 100%;
+    margin-top: 1rem;
+    transition: all 0.3s;
+  }
+
+  .btn-add-product:hover { box-shadow: 0 0 25px rgba(123,47,255,0.5); }
+
+  .admin-status {
+    padding: 0.8rem 1rem;
+    border-radius: 4px;
+    margin-top: 1rem;
+    font-family: var(--font-heading);
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+    display: none;
+  }
+
+  .admin-status.success { background: rgba(0,255,100,0.1); border: 1px solid rgba(0,255,100,0.3); color: #4fffaa; display: block; }
+  .admin-status.error { background: rgba(255,50,50,0.1); border: 1px solid rgba(255,50,50,0.3); color: #ff6b6b; display: block; }
+
+  .admin-product-list { display: flex; flex-direction: column; gap: 0.8rem; }
+
+  .admin-product-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(123,47,255,0.15);
+    border-radius: 4px;
+    padding: 0.8rem;
+  }
+
+  .admin-product-item img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 3px;
+  }
+
+  .admin-product-item-info { flex: 1; }
+  .admin-product-item-info strong { color: var(--white); font-family: var(--font-heading); display: block; }
+  .admin-product-item-info small { color: var(--grey); font-size: 0.8rem; }
+
+  .btn-delete {
+    background: rgba(255,50,50,0.1);
+    border: 1px solid rgba(255,50,50,0.3);
+    color: #ff6b6b;
+    padding: 0.4rem 0.8rem;
+    border-radius: 3px;
+    cursor: pointer;
+    font-family: var(--font-heading);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    transition: all 0.3s;
+  }
+
+  .btn-delete:hover { background: rgba(255,50,50,0.25); }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(8px); }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    .about-grid, .contact-grid { grid-template-columns: 1fr; gap: 2rem; }
+    .about-stats { grid-template-columns: 1fr 1fr; }
+    .admin-form-grid { grid-template-columns: 1fr; }
+    .admin-header { padding: 1rem 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Animated starfield -->
+<canvas id="starfield"></canvas>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">SRIJAN<span>X</span></div>
+  <ul class="nav-links">
+    <li><a href="#home">Home</a></li>
+    <li><a href="#catalog">Catalog</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <button class="nav-admin-btn" onclick="openAdminLogin()">Admin</button>
+</nav>
+
+<!-- ═══════════════════ HERO ═══════════════════ -->
+<section id="home">
+  <p class="hero-eyebrow">✦ Bringing Stories To Life ✦</p>
+  <h1 class="hero-title">
+    <div>TURN YOUR</div>
+    <div class="line-purple">FAVOURITES</div>
+    <div class="line-gold">INTO ART</div>
+  </h1>
+  <p class="hero-sub">Custom 3D Miniatures · <em>Inspired by moments you love</em></p>
+  <div class="hero-cta">
+    <a href="#catalog" class="btn-primary">Explore Catalog</a>
+    <a href="#contact" class="btn-secondary">Order Custom</a>
+  </div>
+  <div class="scroll-hint">
+    <span>Scroll</span>
+    <div class="arrow"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════ CATALOG ═══════════════════ -->
+<section id="catalog">
+  <div class="section-inner">
+    <p class="section-label reveal">Our Collection</p>
+    <h2 class="section-title reveal">THE <span>CATALOG</span></h2>
+    <div class="divider reveal"></div>
+
+    <div class="categories reveal" id="category-filter">
+      <button class="cat-tag active" data-cat="all">All</button>
+      <button class="cat-tag" data-cat="Anime">Anime</button>
+      <button class="cat-tag" data-cat="Home Decor">Home Decor</button>
+      <button class="cat-tag" data-cat="Custom">Custom</button>
+      <button class="cat-tag" data-cat="Chibi">Chibi</button>
+      <button class="cat-tag" data-cat="Gift">Gift</button>
+    </div>
+
+    <div id="catalog-grid">
+      <div class="empty-catalog">
+        <div class="icon">✦</div>
+        <p>Loading catalog…</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ ABOUT ═══════════════════ -->
+<section id="about">
+  <div class="section-inner">
+    <p class="section-label reveal">Our Story</p>
+    <h2 class="section-title reveal">ABOUT <span>SRIJANX</span></h2>
+    <div class="divider reveal"></div>
+
+    <div class="about-grid reveal">
+      <div class="about-text">
+        <p>
+          <strong>SrijanX</strong> was born from a simple obsession: that the things we love most — the characters that shaped us, the moments that moved us, the idols that inspired us — deserve to <em>exist in the real world</em>.
+        </p>
+        <p>
+          Every piece we create is a bridge between a screen and a shelf. We design, print, paint, and finish each miniature by hand — giving it weight, texture, and life that no digital image can match.
+        </p>
+        <p>
+          From <em>anime figures and chibi collectibles</em> to wedding keepsakes and custom fan gifts — if you can dream it, we can build it. Powered by precision 3D printing, painted with care, delivered with pride.
+        </p>
+        <p>
+          <strong>Your faves. Our creation.</strong>
+        </p>
+      </div>
+      <div class="about-stats">
+        <div class="stat-box">
+          <div class="num">3D</div>
+          <div class="label">Printed & Painted</div>
+        </div>
+        <div class="stat-box">
+          <div class="num">∞</div>
+          <div class="label">Custom Options</div>
+        </div>
+        <div class="stat-box">
+          <div class="num">100%</div>
+          <div class="label">Handcrafted</div>
+        </div>
+        <div class="stat-box">
+          <div class="num">✦</div>
+          <div class="label">Made With Love</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ CONTACT ═══════════════════ -->
+<section id="contact">
+  <div class="section-inner">
+    <p class="section-label reveal">Get In Touch</p>
+    <h2 class="section-title reveal">CONTACT <span>US</span></h2>
+    <div class="divider reveal"></div>
+
+    <div class="contact-grid reveal">
+      <div class="contact-info">
+        <p>Have a custom idea? Want to order something from the catalog? Reach out on Instagram or WhatsApp — we respond fast and love talking about anything 3D print related.</p>
+        <div class="contact-links">
+          <a href="https://instagram.com/srijanx202" target="_blank" class="contact-link">
+            <span class="icon">📸</span>
+            <span>@srijanx202 on Instagram</span>
+          </a>
+          <a href="https://wa.me/91XXXXXXXXXX?text=Hi%20SrijanX!%20I%20want%20to%20place%20an%20order." target="_blank" class="contact-link">
+            <!-- 
+              ──────────────────────────────────────────
+              📱 WHATSAPP NUMBER — UPDATE THIS!
+              Replace 91XXXXXXXXXX with your WhatsApp
+              number in international format.
+              Example: 919876543210 (India +91)
+              ──────────────────────────────────────────
+            -->
+            <span class="icon">💬</span>
+            <span>WhatsApp Us (Coming Soon)</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="order-box">
+        <h3>HOW TO ORDER</h3>
+        <p>We currently accept orders via WhatsApp. All payments are cash on delivery or in person.</p>
+        <ul class="order-steps">
+          <li><span class="step-num">1</span> Browse the catalog and pick your design</li>
+          <li><span class="step-num">2</span> Click "Order on WhatsApp" on any product</li>
+          <li><span class="step-num">3</span> We confirm details, size & colour options</li>
+          <li><span class="step-num">4</span> We print, paint & deliver — cash on delivery</li>
+        </ul>
+        <a href="#catalog" class="btn-primary" style="display:block;text-align:center;text-decoration:none;">Browse Catalog</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ FOOTER ═══════════════════ -->
+<footer>
+  <div class="logo">SRIJAN<span>X</span></div>
+  <p>Bringing Stories To Life · @srijanx202 · Your Faves. Our Creation.</p>
+</footer>
+
+<!-- ═══════════════════ ORDER MODAL ═══════════════════ -->
+<div class="modal-overlay" id="order-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeOrderModal()">✕</button>
+    <div class="modal-title">ORDER NOW</div>
+    <p class="modal-sub">You'll be redirected to WhatsApp with your order details.</p>
+    <p id="order-product-name" style="font-family:var(--font-heading);font-size:1.1rem;color:var(--purple-glow);margin-bottom:1rem;"></p>
+    <label>Your Name</label>
+    <input type="text" id="order-name" placeholder="e.g. Akshay" />
+    <label>Any custom notes?</label>
+    <textarea id="order-notes" rows="3" placeholder="Colour preference, size, special request…"></textarea>
+    <div class="modal-error" id="order-error">Please enter your name.</div>
+    <button class="btn-primary" style="width:100%" onclick="submitOrder()">Send via WhatsApp</button>
+  </div>
+</div>
+
+<!-- ═══════════════════ ADMIN LOGIN MODAL ═══════════════════ -->
+<div class="modal-overlay" id="admin-login-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('admin-login-modal')">✕</button>
+    <div class="modal-title">ADMIN ACCESS</div>
+    <p class="modal-sub">Enter your password to manage the catalog.</p>
+    <label>Password</label>
+    <input type="password" id="admin-password-input" placeholder="Enter password" onkeyup="if(event.key==='Enter')verifyAdmin()" />
+    <div class="modal-error" id="admin-error">Incorrect password. Try again.</div>
+    <button class="btn-primary" style="width:100%;margin-top:0.5rem" onclick="verifyAdmin()">Enter</button>
+  </div>
+</div>
+
+<!-- ═══════════════════ ADMIN PANEL ═══════════════════ -->
+<div id="admin-panel">
+  <div class="admin-header">
+    <h1>SRIJAN<span>X</span> ADMIN</h1>
+    <button class="nav-admin-btn" onclick="closeAdmin()">← Exit Admin</button>
+  </div>
+  <div class="admin-body">
+
+    <!-- Add Product -->
+    <div class="admin-section">
+      <h2>✦ ADD NEW PRODUCT</h2>
+
+      <div class="admin-form-group full" style="margin-bottom:1rem">
+        <label>Auto-fetch from URL (Thingiverse / Printables / Bambu)</label>
+        <div class="scrape-row">
+          <input type="url" id="scrape-url" placeholder="https://www.thingiverse.com/thing:..." />
+          <button class="btn-scrape" onclick="scrapeUrl()" id="scrape-btn">Fetch →</button>
+        </div>
+        <div class="scrape-preview" id="scrape-preview">
+          <img id="scrape-img" src="" alt="" />
+          <div class="scrape-preview-info">
+            <strong id="scrape-title-preview"></strong>
+            <small>Review and edit the fields below before saving.</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-form-grid">
+        <div class="admin-form-group full">
+          <label>Product Name *</label>
+          <input type="text" id="p-name" placeholder="e.g. Naruto Chibi Figurine" />
+        </div>
+        <div class="admin-form-group full">
+          <label>Image URL *</label>
+          <input type="url" id="p-img" placeholder="https://..." />
+        </div>
+        <div class="admin-form-group">
+          <label>Category</label>
+          <select id="p-cat">
+            <option value="Anime">Anime</option>
+            <option value="Home Decor">Home Decor</option>
+            <option value="Custom">Custom</option>
+            <option value="Chibi">Chibi</option>
+            <option value="Gift">Gift</option>
+          </select>
+        </div>
+        <div class="admin-form-group">
+          <label>Source URL (optional)</label>
+          <input type="url" id="p-source" placeholder="Original design link" />
+        </div>
+        <div class="admin-form-group full">
+          <label>Short Description</label>
+          <textarea id="p-desc" rows="2" placeholder="A short punchy description…"></textarea>
+        </div>
+      </div>
+
+      <button class="btn-add-product" onclick="addProduct()">✦ Add to Catalog</button>
+      <div class="admin-status" id="add-status"></div>
+    </div>
+
+    <!-- Product List -->
+    <div class="admin-section">
+      <h2>✦ MANAGE CATALOG</h2>
+      <div class="admin-product-list" id="admin-product-list">
+        <p style="color:var(--grey);font-family:var(--font-heading);letter-spacing:0.1em">Loading…</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════ SCRIPTS ═══════════════════ -->
+<script>
+// ─── STARFIELD ───
+const canvas = document.getElementById('starfield');
+const ctx = canvas.getContext('2d');
+let stars = [], spotlights = [];
+
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+
+function initStars() {
+  stars = Array.from({length: 180}, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    r: Math.random() * 1.4 + 0.2,
+    a: Math.random(),
+    speed: Math.random() * 0.003 + 0.001,
+    twinkle: Math.random() * Math.PI * 2
+  }));
+
+  spotlights = Array.from({length: 3}, (_, i) => ({
+    x: (canvas.width / 4) * (i + 1),
+    y: 0,
+    angle: -0.3 + i * 0.3,
+    color: i === 1 ? '123,47,255' : '157,91,255',
+    speed: 0.0003 + i * 0.0002
+  }));
+}
+
+function drawStarfield(t) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Spotlights
+  spotlights.forEach(s => {
+    s.angle = Math.sin(t * s.speed) * 0.4 + (s === spotlights[1] ? 0 : s.angle > 0 ? 0.2 : -0.2);
+    const len = canvas.height * 1.1;
+    const endX = s.x + Math.sin(s.angle) * len;
+    const endY = len;
+    const grad = ctx.createLinearGradient(s.x, 0, endX, endY);
+    grad.addColorStop(0, `rgba(${s.color},0.13)`);
+    grad.addColorStop(1, `rgba(${s.color},0)`);
+    ctx.beginPath();
+    ctx.moveTo(s.x, 0);
+    ctx.lineTo(endX - 60, endY);
+    ctx.lineTo(endX + 60, endY);
+    ctx.closePath();
+    ctx.fillStyle = grad;
+    ctx.fill();
+  });
+
+  // Stars
+  stars.forEach(s => {
+    s.twinkle += s.speed * 2;
+    const alpha = 0.3 + Math.sin(s.twinkle) * 0.5;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(245,240,255,${Math.max(0, alpha)})`;
+    ctx.fill();
+  });
+
+  requestAnimationFrame(drawStarfield);
+}
+
+resize();
+initStars();
+requestAnimationFrame(drawStarfield);
+window.addEventListener('resize', () => { resize(); initStars(); });
+
+// ─── SCROLL REVEAL ───
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+reveals.forEach(r => observer.observe(r));
+
+// ─── FIREBASE STATE ───
+let db = null, fbFns = null, allProducts = [], currentProduct = null;
+
+window.addEventListener('firebaseReady', () => {
+  db = window._db;
+  fbFns = window._fbFns;
+  loadCatalog();
+});
+
+// ─── LOAD CATALOG ───
+async function loadCatalog() {
+  const grid = document.getElementById('catalog-grid');
+  if (!db) {
+    grid.innerHTML = `<div class="empty-catalog"><div class="icon">⚙️</div><p>Firebase not connected yet.<br>Add your config to see the catalog.</p></div>`;
+    return;
+  }
+  try {
+    const snap = await fbFns.getDocs(fbFns.collection(db, 'products'));
+    allProducts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderCatalog('all');
+  } catch(e) {
+    grid.innerHTML = `<div class="empty-catalog"><div class="icon">⚠️</div><p>Could not load catalog. Check Firebase config.</p></div>`;
+  }
+}
+
+function renderCatalog(cat) {
+  const grid = document.getElementById('catalog-grid');
+  const filtered = cat === 'all' ? allProducts : allProducts.filter(p => p.category === cat);
+  if (!filtered.length) {
+    grid.innerHTML = `<div class="empty-catalog"><div class="icon">✦</div><p>No products in this category yet.</p></div>`;
+    return;
+  }
+  grid.innerHTML = filtered.map(p => `
+    <div class="product-card">
+      <img src="${p.image}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/300x300/0d0520/7b2fff?text=SrijanX'" loading="lazy"/>
+      <div class="product-card-body">
+        <div class="product-card-category">${p.category || 'Custom'}</div>
+        <div class="product-card-name">${p.name}</div>
+        <div class="product-card-desc">${p.description || 'Custom 3D printed & hand-painted piece.'}</div>
+        <button class="btn-order" onclick="openOrderModal('${p.id}', '${p.name.replace(/'/g,"\\'")}')">Order on WhatsApp</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// Category filter
+document.getElementById('category-filter').addEventListener('click', e => {
+  if (!e.target.classList.contains('cat-tag')) return;
+  document.querySelectorAll('.cat-tag').forEach(t => t.classList.remove('active'));
+  e.target.classList.add('active');
+  renderCatalog(e.target.dataset.cat);
+});
+
+// ─── ORDER MODAL ───
+function openOrderModal(id, name) {
+  currentProduct = { id, name };
+  document.getElementById('order-product-name').textContent = '✦ ' + name;
+  document.getElementById('order-name').value = '';
+  document.getElementById('order-notes').value = '';
+  document.getElementById('order-error').style.display = 'none';
+  document.getElementById('order-modal').classList.add('open');
+}
+
+function closeOrderModal() {
+  document.getElementById('order-modal').classList.remove('open');
+}
+
+function submitOrder() {
+  const name = document.getElementById('order-name').value.trim();
+  const notes = document.getElementById('order-notes').value.trim();
+  if (!name) { document.getElementById('order-error').style.display = 'block'; return; }
+  document.getElementById('order-error').style.display = 'none';
+
+  const msg = encodeURIComponent(
+    `Hi SrijanX! 👋\n\nI'd like to order:\n*${currentProduct.name}*\n\nName: ${name}\nNotes: ${notes || 'None'}\n\nPlease let me know the details!`
+  );
+
+  // ──────────────────────────────────────────────────
+  // 📱 WHATSAPP NUMBER — UPDATE BELOW!
+  // Replace 91XXXXXXXXXX with your number (India = 91 + 10 digits)
+  // Example: 919876543210
+  // ──────────────────────────────────────────────────
+  const waNumber = '91XXXXXXXXXX';
+
+  window.open(`https://wa.me/${waNumber}?text=${msg}`, '_blank');
+  closeOrderModal();
+}
+
+// ─── ADMIN LOGIN ───
+const ADMIN_PASSWORD = 'Srijanx@143';
+
+function openAdminLogin() {
+  document.getElementById('admin-password-input').value = '';
+  document.getElementById('admin-error').style.display = 'none';
+  document.getElementById('admin-login-modal').classList.add('open');
+  setTimeout(() => document.getElementById('admin-password-input').focus(), 100);
+}
+
+function verifyAdmin() {
+  const pw = document.getElementById('admin-password-input').value;
+  if (pw === ADMIN_PASSWORD) {
+    closeModal('admin-login-modal');
+    openAdmin();
+  } else {
+    document.getElementById('admin-error').style.display = 'block';
+  }
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+// ─── ADMIN PANEL ───
+function openAdmin() {
+  document.getElementById('admin-panel').classList.add('open');
+  loadAdminList();
+}
+
+function closeAdmin() {
+  document.getElementById('admin-panel').classList.remove('open');
+}
+
+async function loadAdminList() {
+  const list = document.getElementById('admin-product-list');
+  if (!db) { list.innerHTML = '<p style="color:var(--grey)">Firebase not connected.</p>'; return; }
+  try {
+    const snap = await fbFns.getDocs(fbFns.collection(db, 'products'));
+    const products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (!products.length) {
+      list.innerHTML = '<p style="color:var(--grey);font-family:var(--font-heading);letter-spacing:0.1em">No products yet. Add some above!</p>';
+      return;
+    }
+    list.innerHTML = products.map(p => `
+      <div class="admin-product-item">
+        <img src="${p.image}" onerror="this.src='https://via.placeholder.com/60x60/0d0520/7b2fff?text=X'" />
+        <div class="admin-product-item-info">
+          <strong>${p.name}</strong>
+          <small>${p.category} · ${p.description ? p.description.substring(0,60)+'…' : 'No description'}</small>
+        </div>
+        <button class="btn-delete" onclick="deleteProduct('${p.id}')">Delete</button>
+      </div>
+    `).join('');
+  } catch(e) {
+    list.innerHTML = '<p style="color:#ff6b6b">Error loading products.</p>';
+  }
+}
+
+// ─── SCRAPE URL ───
+async function scrapeUrl() {
+  const url = document.getElementById('scrape-url').value.trim();
+  if (!url) return;
+  const btn = document.getElementById('scrape-btn');
+  btn.disabled = true;
+  btn.textContent = 'Fetching…';
+
+  try {
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+    const res = await fetch(proxyUrl);
+    const data = await res.json();
+    const html = data.contents;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+
+    // Try to extract title
+    let title = doc.querySelector('meta[property="og:title"]')?.content
+      || doc.querySelector('title')?.textContent
+      || '';
+    title = title.replace(' - Thingiverse','').replace(' | Printables','').replace(' | MakerWorld','').trim();
+
+    // Try to extract image
+    let img = doc.querySelector('meta[property="og:image"]')?.content
+      || doc.querySelector('meta[name="twitter:image"]')?.content
+      || '';
+
+    document.getElementById('p-name').value = title;
+    document.getElementById('p-img').value = img;
+    document.getElementById('p-source').value = url;
+
+    if (img || title) {
+      document.getElementById('scrape-img').src = img || '';
+      document.getElementById('scrape-title-preview').textContent = title || 'No title found';
+      document.getElementById('scrape-preview').classList.add('show');
+    }
+
+  } catch(e) {
+    showAdminStatus('Could not fetch URL. Try pasting the image URL manually.', 'error');
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Fetch →';
+}
+
+// ─── ADD PRODUCT ───
+async function addProduct() {
+  const name = document.getElementById('p-name').value.trim();
+  const img = document.getElementById('p-img').value.trim();
+  const cat = document.getElementById('p-cat').value;
+  const desc = document.getElementById('p-desc').value.trim();
+  const source = document.getElementById('p-source').value.trim();
+
+  if (!name || !img) { showAdminStatus('Name and Image URL are required.', 'error'); return; }
+  if (!db) { showAdminStatus('Firebase not connected!', 'error'); return; }
+
+  try {
+    await fbFns.addDoc(fbFns.collection(db, 'products'), {
+      name, image: img, category: cat, description: desc, source,
+      createdAt: new Date().toISOString()
+    });
+    showAdminStatus(`✦ "${name}" added successfully!`, 'success');
+    ['p-name','p-img','p-desc','p-source','scrape-url'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('scrape-preview').classList.remove('show');
+    loadAdminList();
+    loadCatalog();
+  } catch(e) {
+    showAdminStatus('Error adding product: ' + e.message, 'error');
+  }
+}
+
+// ─── DELETE PRODUCT ───
+async function deleteProduct(id) {
+  if (!confirm('Delete this product?')) return;
+  try {
+    await fbFns.deleteDoc(fbFns.doc(db, 'products', id));
+    loadAdminList();
+    loadCatalog();
+  } catch(e) {
+    alert('Error deleting: ' + e.message);
+  }
+}
+
+function showAdminStatus(msg, type) {
+  const el = document.getElementById('add-status');
+  el.textContent = msg;
+  el.className = 'admin-status ' + type;
+  setTimeout(() => el.className = 'admin-status', 4000);
+}
+</script>
+
+</body>
+</html>
