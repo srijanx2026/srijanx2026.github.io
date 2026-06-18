@@ -407,10 +407,10 @@ footer p{color:var(--white);opacity:.4;font-family:var(--orb);font-size:.5rem;le
   <div class="md">
     <button class="mc" onclick="cM('alm')">✕</button>
     <div class="mt">ADMIN ACCESS</div>
-    <p class="ms">Enter password to manage the forge catalog.</p>
-    <label>Password</label>
-    <input type="password" id="apw" placeholder="Enter password" onkeyup="if(event.key==='Enter')vAdmin()" />
-    <div class="me" id="ae">Incorrect password.</div>
+    <p class="ms" id="alm-subtitle">Enter your email to access the forge catalog.</p>
+    <label id="alm-label">Email</label>
+    <input type="text" id="apw" placeholder="srijanx2026@gmail.com" onkeyup="if(event.key==='Enter')vAdmin()" />
+    <div class="me" id="ae">Only srijanx2026@gmail.com can access admin.</div>
     <button class="vb vm" style="width:100%;border:none;margin-top:.5rem;" onclick="vAdmin()" id="admin-btn">Enter</button>
   </div>
 </div>
@@ -568,9 +568,9 @@ function cM(id){document.getElementById(id).classList.remove('open');}
 
 let lc=0,lt=null;
 document.getElementById('nav-logo').addEventListener('click',()=>{lc++;clearTimeout(lt);lt=setTimeout(()=>{lc=0;},1500);if(lc>=5){lc=0;oAL();}});
-const APW='storyteller@2026';
+const APW='Storyteller@2026';
 function oAL(){document.getElementById('apw').value='';document.getElementById('ae').style.display='none';document.getElementById('alm').classList.add('open');setTimeout(()=>document.getElementById('apw').focus(),100);}
-function vAdmin(){const em=document.getElementById('apw').value.trim();if(em==='srijanx2026@gmail.com'){document.getElementById('apw').value='';document.getElementById('apw').placeholder='Enter password';document.getElementById('apw').onkeyup=e=>{if(e.key==='Enter')vAdminPW();};document.getElementById('ae').style.display='none';return;}document.getElementById('ae').textContent='Only srijanx2026@gmail.com can access admin.';document.getElementById('ae').style.display='block';}function vAdminPW(){if(document.getElementById('apw').value===APW){cM('alm');oAdmin();}else{document.getElementById('ae').textContent='Incorrect password.';document.getElementById('ae').style.display='block';}}
+function vAdmin(){const em=document.getElementById('apw').value.trim();if(em==='srijanx2026@gmail.com'){document.getElementById('apw').value='';document.getElementById('apw').type='password';document.getElementById('apw').placeholder='Enter password';document.getElementById('alm-label').textContent='Password';document.getElementById('alm-subtitle').textContent='Enter your password.';document.getElementById('ae').style.display='none';document.getElementById('apw').onkeyup=e=>{if(e.key==='Enter')vAdminPW();};document.getElementById('admin-btn').onclick=vAdminPW;return;}document.getElementById('ae').textContent='Only srijanx2026@gmail.com can access admin.';document.getElementById('ae').style.display='block';}function vAdminPW(){if(document.getElementById('apw').value===APW){cM('alm');oAdmin();}else{document.getElementById('ae').textContent='Incorrect password.';document.getElementById('ae').style.display='block';}}
 function oAdmin(){document.getElementById('admin-panel').classList.add('open');sessionStorage.setItem('sx_admin','1');loadAdminList();initBML();}
 function closeAdmin(){document.getElementById('admin-panel').classList.remove('open');sessionStorage.removeItem('sx_admin');}
 function restAdmin(){if(sessionStorage.getItem('sx_admin')==='1'){document.getElementById('admin-panel').classList.add('open');initBML();}}
