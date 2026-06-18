@@ -10,7 +10,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-  import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+  import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
   // ─────────────────────────────────────────────
   // 🔧 PASTE YOUR FIREBASE CONFIG HERE
@@ -32,7 +32,7 @@
   window._db = db;
   window._storage = storage;
   window._fbFns = { collection, addDoc, getDocs, deleteDoc, doc };
-  window._storageFns = { ref, uploadBytes, getDownloadURL };
+  window._storageFns = { ref, uploadBytes, getDownloadURL, deleteObject };
   window.dispatchEvent(new Event("firebaseReady"));
 </script>
 
@@ -685,8 +685,10 @@
     inset: 0;
     background: var(--black);
     z-index: 2000;
-    overflow-y: auto;
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
   }
+  #admin-panel.open { display: block; overflow-y: scroll; }
 
   #admin-panel.open { display: block; }
 
@@ -1009,6 +1011,81 @@
   .img-tab-panel { display: none; }
   .img-tab-panel.active { display: block; }
 
+
+  .product-disclaimer {
+    font-size: 0.72rem;
+    color: rgba(155,147,176,0.8);
+    line-height: 1.5;
+    margin-bottom: 0.8rem;
+    padding: 0.5rem 0.7rem;
+    border-left: 2px solid var(--purple-dim);
+    background: rgba(123,47,255,0.05);
+    border-radius: 0 3px 3px 0;
+  }
+  .product-disclaimer strong { color: var(--gold); font-weight: 600; }
+
+
+  /* ── FAQ ── */
+  #faq { background: linear-gradient(to bottom, transparent, rgba(123,47,255,0.03), transparent); }
+
+  .faq-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .faq-item {
+    background: linear-gradient(145deg, rgba(20,8,45,0.9), rgba(13,5,32,0.7));
+    border: 1px solid rgba(123,47,255,0.2);
+    border-radius: 6px;
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+
+  .faq-item:hover { border-color: rgba(123,47,255,0.4); }
+
+  .faq-question {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.2rem 1.5rem;
+    cursor: pointer;
+    font-family: var(--font-heading);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: 0.03em;
+    transition: color 0.3s;
+    user-select: none;
+  }
+
+  .faq-question:hover { color: var(--purple-glow); }
+
+  .faq-icon {
+    font-size: 1.4rem;
+    color: var(--purple-glow);
+    transition: transform 0.3s;
+    flex-shrink: 0;
+    margin-left: 1rem;
+  }
+
+  .faq-item.open .faq-icon { transform: rotate(45deg); }
+
+  .faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, padding 0.3s;
+    color: var(--grey);
+    font-size: 0.9rem;
+    line-height: 1.8;
+    padding: 0 1.5rem;
+  }
+
+  .faq-item.open .faq-answer {
+    max-height: 200px;
+    padding: 0 1.5rem 1.2rem;
+  }
+
 </style>
 </head>
 <body>
@@ -1024,6 +1101,7 @@
     <li><a href="#catalog">Catalog</a></li>
     <li><a href="#about">About</a></li>
     <li><a href="#contact">Contact</a></li>
+    <li><a href="#faq">FAQ</a></li>
   </ul>
   <!-- Admin: click logo 5x to access -->
 </nav>
@@ -1037,6 +1115,7 @@
     <div class="line-gold">INTO ART</div>
   </h1>
   <p class="hero-sub">Custom 3D Miniatures · <em>Inspired by moments you love</em></p>
+  <p style="font-family:var(--font-heading);font-size:0.8rem;letter-spacing:0.2em;color:rgba(155,147,176,0.6);margin-top:0.5rem;text-transform:uppercase;opacity:0;animation:fadeUp 0.8s 1.1s forwards;">Pricing confirmed on WhatsApp · Cash on Delivery · Max size 10.08³ in</p>
   <div class="hero-cta">
     <a href="#catalog" class="btn-primary">Explore Catalog</a>
     <a href="#contact" class="btn-secondary">Order Custom</a>
@@ -1166,6 +1245,83 @@
 </section>
 
 <!-- ═══════════════════ FOOTER ═══════════════════ -->
+
+<!-- ═══════════════════ FAQ ═══════════════════ -->
+<section id="faq">
+  <div class="section-inner">
+    <p class="section-label reveal">Got Questions?</p>
+    <h2 class="section-title reveal">FAQ</h2>
+    <div class="divider reveal"></div>
+    <div class="faq-grid reveal" id="faq-grid">
+
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <span>What are the prints made of?</span>
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-answer">All prints are made using FDM 3D printing with PLA/PETG filament. They are durable, lightweight and can be painted in any color.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <span>Do the prints come painted?</span>
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-answer">By default prints are colorless (single filament color). You can choose to: get them painted by us (additional cost), specify colors on WhatsApp, or paint them yourself.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <span>What is the maximum print size?</span>
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-answer">Maximum print size is 10.08 × 10.08 × 10.08 inches (256mm³). For larger items, we can print in multiple parts and assemble. Let us know your requirements on WhatsApp.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <span>How is pricing decided?</span>
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-answer">Pricing depends on the model complexity, size, color requirements and finishing. We discuss and confirm the final price on WhatsApp before printing — no surprises.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <span>Can I request a fully custom design?</span>
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-answer">Yes! We do fully custom work — wedding figurines, portraits, fan gifts, anything. Share a reference image on WhatsApp and we'll work it out together.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <span>How do I pay?</span>
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-answer">Currently cash on delivery or in-person payment only. We'll confirm payment details on WhatsApp before dispatch.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <span>How long does an order take?</span>
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-answer">Typical turnaround is 3-7 days depending on complexity, size and painting requirements. We'll give you an accurate timeline on WhatsApp after confirming your order.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <span>Do you ship or only deliver locally?</span>
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-answer">Currently we are based in Bengaluru and offer local delivery. Shipping options will be available soon — reach out on WhatsApp to discuss.</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
 <footer>
   <div class="logo">SRIJAN<span>X</span></div>
   <p>Bringing Stories To Life · @srijanx2026 · Your Faves. Our Creation.</p>
@@ -1403,6 +1559,14 @@ initStars();
 requestAnimationFrame(drawStarfield);
 window.addEventListener('resize', () => { resize(); initStars(); });
 
+// ─── FAQ TOGGLE ───
+function toggleFaq(el) {
+  const item = el.parentElement;
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+  if (!isOpen) item.classList.add('open');
+}
+
 // ─── SCROLL REVEAL ───
 const reveals = document.querySelectorAll('.reveal');
 const observer = new IntersectionObserver(entries => {
@@ -1443,13 +1607,18 @@ function checkQuickSave() {
   document.querySelector('nav').style.display = 'none';
   document.getElementById('starfield').style.display = 'none';
   document.body.style.background = 'var(--deep)';
-  // Make modal scrollable in small popup window
+  // Make body scrollable in popup mode
+  document.body.style.overflow = 'auto';
+  document.body.style.height = 'auto';
   const overlay = document.getElementById('quicksave-modal');
-  overlay.style.alignItems = 'flex-start';
-  overlay.style.overflowY = 'auto';
+  overlay.style.position = 'relative';
+  overlay.style.inset = 'auto';
+  overlay.style.display = 'block';
+  overlay.style.background = 'transparent';
+  overlay.style.backdropFilter = 'none';
   overlay.style.padding = '1rem';
-  overlay.querySelector('.modal').style.margin = 'auto';
-  overlay.querySelector('.modal').style.maxHeight = 'none';
+  overlay.querySelector('.modal').style.margin = '0 auto';
+  overlay.querySelector('.modal').style.maxWidth = '440px';
 }
 
 async function submitQuickSave() {
@@ -1529,8 +1698,12 @@ function renderCatalog(cat) {
       <div class="product-card-body">
         <div class="product-card-category">${p.category || 'Custom'}</div>
         <div class="product-card-name">${p.name}</div>
-        <div class="product-card-desc">${p.description || 'Custom 3D printed & hand-painted piece.'}</div>
-        <button class="btn-order" onclick="openOrderModal('${p.id}', '${p.name.replace(/'/g,"\\'")}')">Order on WhatsApp</button>
+        <div class="product-card-desc">${p.description || 'Custom 3D printed piece.'}</div>
+        <div class="product-disclaimer">
+          ⚠️ Reference image only — prints are colorless. Choose colors on WhatsApp or paint yourself.
+          Max size: 10.08³ in. <strong>Pricing decided after size, color & model confirmation.</strong>
+        </div>
+        <button class="btn-order" onclick="openOrderModal('${p.id}', '${p.name.replace(/'/g,"\\'")}', '${p.image.replace(/'/g,"\\'")}')">Order on WhatsApp</button>
       </div>
     </div>
   `).join('');
@@ -1545,8 +1718,8 @@ document.getElementById('category-filter').addEventListener('click', e => {
 });
 
 // ─── ORDER MODAL ───
-function openOrderModal(id, name) {
-  currentProduct = { id, name };
+function openOrderModal(id, name, image) {
+  currentProduct = { id, name, image };
   document.getElementById('order-product-name').textContent = '✦ ' + name;
   document.getElementById('order-name').value = '';
   document.getElementById('order-notes').value = '';
@@ -1564,8 +1737,9 @@ function submitOrder() {
   if (!name) { document.getElementById('order-error').style.display = 'block'; return; }
   document.getElementById('order-error').style.display = 'none';
 
+  const productImg = currentProduct.image ? `\nProduct Image: ${currentProduct.image}` : '';
   const msg = encodeURIComponent(
-    `Hi SrijanX! 👋\n\nI'd like to order:\n*${currentProduct.name}*\n\nName: ${name}\nNotes: ${notes || 'None'}\n\nPlease let me know the details!`
+    `Hello! SrijanX 👋\n\nI'd like to order:\n*${currentProduct.name}*${productImg}\n\nName: ${name}\nNotes: ${notes || 'None'}\n\nPlease let me know the details, color options, size and pricing!`
   );
 
   // ──────────────────────────────────────────────────
@@ -1640,7 +1814,7 @@ async function loadAdminList() {
           <strong>${p.name}</strong>
           <small>${p.category} · ${p.description ? p.description.substring(0,60)+'…' : 'No description'}</small>
         </div>
-        <button class="btn-delete" onclick="deleteProduct('${p.id}')">Delete</button>
+        <button class="btn-delete" data-id="${p.id}" data-img="${(p.image||'').replace(/"/g,'&quot;')}" onclick="deleteProduct(this.dataset.id, this.dataset.img)">Delete</button>
       </div>
     `).join('');
   } catch(e) {
@@ -1809,10 +1983,28 @@ async function addProduct() {
 }
 
 // ─── DELETE PRODUCT ───
-async function deleteProduct(id) {
+async function deleteProduct(id, imageUrl) {
   if (!confirm('Delete this product?')) return;
   try {
+    // Delete Firestore document
     await fbFns.deleteDoc(fbFns.doc(db, 'products', id));
+
+    // If image is hosted on Firebase Storage, delete it too
+    if (imageUrl && imageUrl.includes('firebasestorage.googleapis.com') && window._storage && window._storageFns) {
+      try {
+        const { ref: sRef, deleteObject } = window._storageFns;
+        // Extract path from URL
+        const pathMatch = imageUrl.match(/o\/(.+?)\?/);
+        if (pathMatch) {
+          const filePath = decodeURIComponent(pathMatch[1]);
+          const fileRef = sRef(window._storage, filePath);
+          await deleteObject(fileRef);
+        }
+      } catch(e) {
+        console.log('Storage delete skipped:', e.message);
+      }
+    }
+
     loadAdminList();
     loadCatalog();
   } catch(e) {
