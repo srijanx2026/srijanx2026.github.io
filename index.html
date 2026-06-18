@@ -4,2056 +4,637 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SrijanX — Bringing Stories To Life</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
-
-<!-- Firebase -->
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cinzel:wght@400;700;900&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
   import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
-
-  // ─────────────────────────────────────────────
-  // 🔧 PASTE YOUR FIREBASE CONFIG HERE
-  // (You'll get this from Firebase Console → Project Settings)
-  // ─────────────────────────────────────────────
   const firebaseConfig = {
     apiKey: "AIzaSyDYBpoOfcXQGRQ-bstduxpI9V07g5oWRJo",
     authDomain: "srijanx-sap.firebaseapp.com",
     projectId: "srijanx-sap",
     storageBucket: "srijanx-sap.firebasestorage.app",
     messagingSenderId: "248764886768",
-    appId: "1:248764886768:web:9a7a70b9a0b4ea3ce91c35",
-    measurementId: "G-BC1Y2J1SMR"
+    appId: "1:248764886768:web:9a7a70b9a0b4ea3ce91c35"
   };
-
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
   const storage = getStorage(app);
-  window._db = db;
-  window._storage = storage;
+  window._db = db; window._storage = storage;
   window._fbFns = { collection, addDoc, getDocs, deleteDoc, doc };
   window._storageFns = { ref, uploadBytes, getDownloadURL, deleteObject };
   window.dispatchEvent(new Event("firebaseReady"));
 </script>
 
 <style>
-  :root {
-    --black: #07020f;
-    --deep: #0d0520;
-    --purple: #7b2fff;
-    --purple-glow: #9d5bff;
-    --purple-dim: #3d1a7a;
-    --gold: #f0b429;
-    --gold-light: #ffd166;
-    --white: #f5f0ff;
-    --grey: #9b93b0;
-    --font-display: 'Bebas Neue', sans-serif;
-    --font-heading: 'Rajdhani', sans-serif;
-    --font-body: 'Inter', sans-serif;
-  }
-
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  html { scroll-behavior: smooth; }
-
-  body {
-    background: var(--black);
-    color: var(--white);
-    font-family: var(--font-body);
-    overflow-x: hidden;
-  }
-
-  /* ── CANVAS BACKGROUND ── */
-  #starfield {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    z-index: 0;
-    pointer-events: none;
-  }
-
-  /* ── NAV ── */
-  nav {
-    position: fixed;
-    top: 0; width: 100%;
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1rem 3rem;
-    background: linear-gradient(to bottom, rgba(7,2,15,0.95), transparent);
-    backdrop-filter: blur(6px);
-  }
-
-  .nav-logo {
-    font-family: var(--font-display);
-    font-size: 1.8rem;
-    letter-spacing: 0.1em;
-    color: var(--white);
-  }
-
-  .nav-logo span { color: var(--purple-glow); }
-
-  .nav-links { display: flex; gap: 2rem; list-style: none; }
-
-  .nav-links a {
-    color: var(--grey);
-    text-decoration: none;
-    font-family: var(--font-heading);
-    font-size: 1rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    transition: color 0.3s;
-  }
-
-  .nav-links a:hover { color: var(--purple-glow); }
-
-  .nav-admin-btn {
-    background: transparent;
-    border: 1px solid var(--purple-dim);
-    color: var(--purple-glow);
-    font-family: var(--font-heading);
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    padding: 0.4rem 1.2rem;
-    cursor: pointer;
-    border-radius: 3px;
-    font-size: 0.85rem;
-    transition: all 0.3s;
-  }
-
-  .nav-admin-btn:hover {
-    background: var(--purple-dim);
-    box-shadow: 0 0 12px var(--purple);
-  }
-
-  /* ── SECTIONS ── */
-  section {
-    position: relative;
-    z-index: 1;
-  }
-
-  /* ── HERO ── */
-  #home {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 2rem;
-  }
-
-  .hero-eyebrow {
-    font-family: var(--font-heading);
-    font-size: 0.9rem;
-    letter-spacing: 0.4em;
-    color: var(--gold);
-    text-transform: uppercase;
-    margin-bottom: 1.2rem;
-    opacity: 0;
-    animation: fadeUp 0.8s 0.3s forwards;
-  }
-
-  .hero-title {
-    font-family: var(--font-display);
-    font-size: clamp(4rem, 12vw, 9rem);
-    line-height: 0.95;
-    letter-spacing: 0.04em;
-    opacity: 0;
-    animation: fadeUp 0.8s 0.5s forwards;
-  }
-
-  .hero-title .line-purple { color: var(--purple-glow); text-shadow: 0 0 40px var(--purple); }
-  .hero-title .line-gold { color: var(--gold); text-shadow: 0 0 30px var(--gold); }
-
-  .hero-sub {
-    font-family: var(--font-heading);
-    font-size: clamp(1rem, 2.5vw, 1.4rem);
-    color: var(--grey);
-    margin-top: 1.5rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    opacity: 0;
-    animation: fadeUp 0.8s 0.7s forwards;
-  }
-
-  .hero-sub em { color: var(--purple-glow); font-style: normal; }
-
-  .hero-cta {
-    margin-top: 3rem;
-    opacity: 0;
-    animation: fadeUp 0.8s 0.9s forwards;
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .btn-primary {
-    background: linear-gradient(135deg, var(--purple), #4a00c8);
-    color: white;
-    border: none;
-    padding: 1rem 2.5rem;
-    font-family: var(--font-heading);
-    font-size: 1.1rem;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    cursor: pointer;
-    border-radius: 4px;
-    text-decoration: none;
-    display: inline-block;
-    transition: all 0.3s;
-    box-shadow: 0 0 30px rgba(123,47,255,0.5);
-  }
-
-  .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0 50px rgba(123,47,255,0.8);
-  }
-
-  .btn-secondary {
-    background: transparent;
-    color: var(--gold);
-    border: 1.5px solid var(--gold);
-    padding: 1rem 2.5rem;
-    font-family: var(--font-heading);
-    font-size: 1.1rem;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    cursor: pointer;
-    border-radius: 4px;
-    text-decoration: none;
-    display: inline-block;
-    transition: all 0.3s;
-  }
-
-  .btn-secondary:hover {
-    background: rgba(240,180,41,0.1);
-    box-shadow: 0 0 30px rgba(240,180,41,0.3);
-    transform: translateY(-2px);
-  }
-
-  .scroll-hint {
-    position: absolute;
-    bottom: 2rem;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.4rem;
-    opacity: 0.5;
-    animation: bounce 2s infinite;
-  }
-
-  .scroll-hint span {
-    font-family: var(--font-heading);
-    font-size: 0.7rem;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: var(--grey);
-  }
-
-  .scroll-hint .arrow { width: 1px; height: 40px; background: linear-gradient(to bottom, var(--purple-glow), transparent); }
-
-  /* ── SECTION COMMON ── */
-  .section-inner {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 6rem 2rem;
-  }
-
-  .section-label {
-    font-family: var(--font-heading);
-    font-size: 0.8rem;
-    letter-spacing: 0.5em;
-    color: var(--gold);
-    text-transform: uppercase;
-    margin-bottom: 0.8rem;
-  }
-
-  .section-title {
-    font-family: var(--font-display);
-    font-size: clamp(2.5rem, 6vw, 5rem);
-    letter-spacing: 0.04em;
-    line-height: 1;
-    margin-bottom: 1rem;
-  }
-
-  .section-title span { color: var(--purple-glow); }
-
-  .divider {
-    width: 60px;
-    height: 2px;
-    background: linear-gradient(to right, var(--purple), var(--gold));
-    margin: 1.5rem 0 2.5rem;
-  }
-
-  /* ── CATEGORIES STRIP ── */
-  .categories {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-    margin-bottom: 3rem;
-  }
-
-  .cat-tag {
-    background: rgba(123,47,255,0.12);
-    border: 1px solid var(--purple-dim);
-    color: var(--purple-glow);
-    padding: 0.4rem 1rem;
-    border-radius: 2px;
-    font-family: var(--font-heading);
-    font-size: 0.85rem;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: all 0.25s;
-  }
-
-  .cat-tag:hover, .cat-tag.active {
-    background: var(--purple);
-    border-color: var(--purple-glow);
-    box-shadow: 0 0 15px rgba(123,47,255,0.5);
-    color: white;
-  }
-
-  /* ── CATALOG GRID ── */
-  #catalog-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 1.5rem;
-  }
-
-  .product-card {
-    background: linear-gradient(145deg, rgba(13,5,32,0.9), rgba(30,10,60,0.5));
-    border: 1px solid rgba(123,47,255,0.2);
-    border-radius: 6px;
-    overflow: hidden;
-    cursor: pointer;
-    transition: all 0.35s;
-    position: relative;
-  }
-
-  .product-card:hover {
-    transform: translateY(-6px);
-    border-color: var(--purple-glow);
-    box-shadow: 0 8px 40px rgba(123,47,255,0.35);
-  }
-
-  .product-card img {
-    width: 100%;
-    aspect-ratio: 1;
-    object-fit: cover;
-    display: block;
-    transition: transform 0.4s;
-  }
-
-  .product-card:hover img { transform: scale(1.05); }
-
-  .product-card-body {
-    padding: 1rem;
-  }
-
-  .product-card-category {
-    font-family: var(--font-heading);
-    font-size: 0.7rem;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 0.3rem;
-  }
-
-  .product-card-name {
-    font-family: var(--font-heading);
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: var(--white);
-    margin-bottom: 0.5rem;
-    line-height: 1.3;
-  }
-
-  .product-card-desc {
-    font-size: 0.8rem;
-    color: var(--grey);
-    line-height: 1.5;
-    margin-bottom: 1rem;
-  }
-
-  .btn-order {
-    width: 100%;
-    background: linear-gradient(135deg, var(--purple), #4a00c8);
-    color: white;
-    border: none;
-    padding: 0.65rem;
-    font-family: var(--font-heading);
-    font-size: 0.9rem;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    cursor: pointer;
-    border-radius: 3px;
-    transition: all 0.3s;
-  }
-
-  .btn-order:hover { box-shadow: 0 0 20px rgba(123,47,255,0.6); }
-
-  .empty-catalog {
-    grid-column: 1/-1;
-    text-align: center;
-    padding: 4rem 2rem;
-    color: var(--grey);
-  }
-
-  .empty-catalog .icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.4; }
-  .empty-catalog p { font-family: var(--font-heading); font-size: 1.1rem; letter-spacing: 0.1em; }
-
-  /* ── ABOUT ── */
-  #about { background: linear-gradient(to bottom, transparent, rgba(123,47,255,0.04), transparent); }
-
-  .about-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4rem;
-    align-items: center;
-  }
-
-  .about-text p {
-    color: var(--grey);
-    line-height: 1.9;
-    font-size: 1rem;
-    margin-bottom: 1.2rem;
-  }
-
-  .about-text p strong { color: var(--white); }
-  .about-text p em { color: var(--purple-glow); font-style: normal; }
-
-  .about-stats {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
-  }
-
-  .stat-box {
-    background: linear-gradient(145deg, rgba(13,5,32,0.9), rgba(30,10,60,0.5));
-    border: 1px solid rgba(123,47,255,0.2);
-    border-radius: 6px;
-    padding: 1.5rem;
-    text-align: center;
-    transition: all 0.3s;
-  }
-
-  .stat-box:hover {
-    border-color: var(--purple-glow);
-    box-shadow: 0 0 25px rgba(123,47,255,0.25);
-  }
-
-  .stat-box .num {
-    font-family: var(--font-display);
-    font-size: 3rem;
-    color: var(--purple-glow);
-    line-height: 1;
-    text-shadow: 0 0 20px var(--purple);
-  }
-
-  .stat-box .label {
-    font-family: var(--font-heading);
-    font-size: 0.8rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--grey);
-    margin-top: 0.3rem;
-  }
-
-  /* ── CONTACT ── */
-  .contact-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 3rem;
-    align-items: start;
-  }
-
-  .contact-info p {
-    color: var(--grey);
-    line-height: 1.8;
-    margin-bottom: 2rem;
-  }
-
-  .contact-links { display: flex; flex-direction: column; gap: 1rem; }
-
-  .contact-link {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    background: rgba(123,47,255,0.08);
-    border: 1px solid rgba(123,47,255,0.2);
-    border-radius: 4px;
-    padding: 1rem 1.5rem;
-    text-decoration: none;
-    color: var(--white);
-    font-family: var(--font-heading);
-    font-size: 1rem;
-    font-weight: 600;
-    letter-spacing: 0.05em;
-    transition: all 0.3s;
-  }
-
-  .contact-link:hover {
-    border-color: var(--purple-glow);
-    background: rgba(123,47,255,0.15);
-    box-shadow: 0 0 20px rgba(123,47,255,0.2);
-    transform: translateX(4px);
-  }
-
-  .contact-link .icon { font-size: 1.4rem; }
-
-  .order-box {
-    background: linear-gradient(145deg, rgba(13,5,32,0.95), rgba(30,10,60,0.6));
-    border: 1px solid rgba(240,180,41,0.3);
-    border-radius: 6px;
-    padding: 2rem;
-  }
-
-  .order-box h3 {
-    font-family: var(--font-display);
-    font-size: 2rem;
-    color: var(--gold);
-    margin-bottom: 0.5rem;
-  }
-
-  .order-box p {
-    color: var(--grey);
-    font-size: 0.9rem;
-    line-height: 1.7;
-    margin-bottom: 1.5rem;
-  }
-
-  .order-steps { list-style: none; margin-bottom: 1.5rem; }
-
-  .order-steps li {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.8rem;
-    margin-bottom: 0.8rem;
-    color: var(--grey);
-    font-size: 0.9rem;
-    line-height: 1.5;
-  }
-
-  .order-steps li .step-num {
-    background: var(--purple-dim);
-    color: var(--purple-glow);
-    font-family: var(--font-heading);
-    font-weight: 700;
-    font-size: 0.75rem;
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    margin-top: 1px;
-  }
-
-  /* ── FOOTER ── */
-  footer {
-    position: relative;
-    z-index: 1;
-    text-align: center;
-    padding: 2.5rem;
-    border-top: 1px solid rgba(123,47,255,0.15);
-  }
-
-  footer .logo {
-    font-family: var(--font-display);
-    font-size: 1.5rem;
-    letter-spacing: 0.1em;
-    color: var(--white);
-    margin-bottom: 0.5rem;
-  }
-
-  footer .logo span { color: var(--purple-glow); }
-
-  footer p {
-    color: var(--grey);
-    font-size: 0.8rem;
-    letter-spacing: 0.15em;
-    font-family: var(--font-heading);
-    text-transform: uppercase;
-  }
-
-  /* ── MODAL ── */
-  .modal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(7,2,15,0.92);
-    z-index: 1000;
-    align-items: center;
-    justify-content: center;
-    backdrop-filter: blur(10px);
-  }
-
-  .modal-overlay.open { display: flex; }
-
-  .modal {
-    background: linear-gradient(145deg, #0d0520, #1a0840);
-    border: 1px solid rgba(123,47,255,0.4);
-    border-radius: 8px;
-    padding: 2.5rem;
-    width: 90%;
-    max-width: 480px;
-    position: relative;
-    box-shadow: 0 0 60px rgba(123,47,255,0.3);
-  }
-
-  .modal-title {
-    font-family: var(--font-display);
-    font-size: 2rem;
-    color: var(--white);
-    margin-bottom: 0.3rem;
-  }
-
-  .modal-sub {
-    color: var(--grey);
-    font-size: 0.85rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .modal input, .modal textarea, .modal select {
-    width: 100%;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(123,47,255,0.3);
-    color: var(--white);
-    padding: 0.8rem 1rem;
-    border-radius: 4px;
-    font-family: var(--font-body);
-    font-size: 0.95rem;
-    margin-bottom: 1rem;
-    transition: border-color 0.3s;
-    resize: vertical;
-  }
-
-  .modal input:focus, .modal textarea:focus {
-    outline: none;
-    border-color: var(--purple-glow);
-    box-shadow: 0 0 10px rgba(123,47,255,0.2);
-  }
-
-  .modal label {
-    display: block;
-    font-family: var(--font-heading);
-    font-size: 0.8rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--grey);
-    margin-bottom: 0.4rem;
-  }
-
-  .modal-close {
-    position: absolute;
-    top: 1rem; right: 1.2rem;
-    background: none; border: none;
-    color: var(--grey);
-    font-size: 1.5rem;
-    cursor: pointer;
-    transition: color 0.3s;
-  }
-
-  .modal-close:hover { color: var(--white); }
-
-  .modal-error {
-    color: #ff6b6b;
-    font-size: 0.85rem;
-    margin-bottom: 1rem;
-    display: none;
-    font-family: var(--font-heading);
-    letter-spacing: 0.05em;
-  }
-
-  /* ── ADMIN PANEL ── */
-  #admin-panel {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: var(--black);
-    z-index: 2000;
-    overflow-y: scroll;
-    -webkit-overflow-scrolling: touch;
-  }
-  #admin-panel.open { display: block; overflow-y: scroll; }
-
-  #admin-panel.open { display: block; }
-
-  .admin-header {
-    background: linear-gradient(to right, var(--deep), #1a0840);
-    border-bottom: 1px solid rgba(123,47,255,0.3);
-    padding: 1.5rem 3rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .admin-header h1 {
-    font-family: var(--font-display);
-    font-size: 1.8rem;
-    letter-spacing: 0.1em;
-  }
-
-  .admin-header h1 span { color: var(--purple-glow); }
-
-  .admin-body { max-width: 900px; margin: 0 auto; padding: 2rem; }
-
-  .admin-section {
-    background: rgba(13,5,32,0.8);
-    border: 1px solid rgba(123,47,255,0.2);
-    border-radius: 8px;
-    padding: 2rem;
-    margin-bottom: 2rem;
-  }
-
-  .admin-section h2 {
-    font-family: var(--font-display);
-    font-size: 1.5rem;
-    letter-spacing: 0.08em;
-    color: var(--gold);
-    margin-bottom: 1.5rem;
-    border-bottom: 1px solid rgba(240,180,41,0.2);
-    padding-bottom: 0.8rem;
-  }
-
-  .admin-form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-  }
-
-  .admin-form-grid .full { grid-column: 1/-1; }
-
-  .admin-form-group { display: flex; flex-direction: column; gap: 0.4rem; }
-
-  .admin-form-group label {
-    font-family: var(--font-heading);
-    font-size: 0.8rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--grey);
-  }
-
-  .admin-form-group input,
-  .admin-form-group textarea,
-  .admin-form-group select {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(123,47,255,0.3);
-    color: var(--white);
-    padding: 0.7rem 1rem;
-    border-radius: 4px;
-    font-family: var(--font-body);
-    font-size: 0.9rem;
-    transition: border-color 0.3s;
-    resize: vertical;
-  }
-
-  .admin-form-group input:focus,
-  .admin-form-group textarea:focus,
-  .admin-form-group select:focus {
-    outline: none;
-    border-color: var(--purple-glow);
-  }
-
-  .admin-form-group select option { background: #1a0840; }
-
-  .scrape-row {
-    display: flex;
-    gap: 0.8rem;
-    align-items: flex-end;
-  }
-
-  .scrape-row input { flex: 1; }
-
-  .btn-scrape {
-    background: linear-gradient(135deg, var(--gold), #c8860a);
-    color: var(--black);
-    border: none;
-    padding: 0.7rem 1.5rem;
-    font-family: var(--font-heading);
-    font-size: 0.9rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    cursor: pointer;
-    border-radius: 4px;
-    white-space: nowrap;
-    transition: all 0.3s;
-  }
-
-  .btn-scrape:hover { box-shadow: 0 0 20px rgba(240,180,41,0.4); }
-  .btn-scrape:disabled { opacity: 0.5; cursor: not-allowed; }
-
-  .scrape-preview {
-    display: none;
-    margin-top: 1rem;
-    gap: 1rem;
-    align-items: flex-start;
-  }
-
-  .scrape-preview.show { display: flex; }
-
-  .scrape-preview img {
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
-    border-radius: 4px;
-    border: 1px solid rgba(123,47,255,0.3);
-  }
-
-  .scrape-preview-info { flex: 1; }
-  .scrape-preview-info strong { color: var(--white); font-family: var(--font-heading); display: block; margin-bottom: 0.3rem; }
-  .scrape-preview-info small { color: var(--grey); font-size: 0.8rem; }
-
-  .btn-add-product {
-    background: linear-gradient(135deg, var(--purple), #4a00c8);
-    color: white;
-    border: none;
-    padding: 0.8rem 2rem;
-    font-family: var(--font-heading);
-    font-size: 1rem;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    cursor: pointer;
-    border-radius: 4px;
-    width: 100%;
-    margin-top: 1rem;
-    transition: all 0.3s;
-  }
-
-  .btn-add-product:hover { box-shadow: 0 0 25px rgba(123,47,255,0.5); }
-
-  .admin-status {
-    padding: 0.8rem 1rem;
-    border-radius: 4px;
-    margin-top: 1rem;
-    font-family: var(--font-heading);
-    font-size: 0.9rem;
-    letter-spacing: 0.05em;
-    display: none;
-  }
-
-  .admin-status.success { background: rgba(0,255,100,0.1); border: 1px solid rgba(0,255,100,0.3); color: #4fffaa; display: block; }
-  .admin-status.error { background: rgba(255,50,50,0.1); border: 1px solid rgba(255,50,50,0.3); color: #ff6b6b; display: block; }
-
-  .admin-product-list { display: flex; flex-direction: column; gap: 0.8rem; }
-
-  .admin-product-item {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(123,47,255,0.15);
-    border-radius: 4px;
-    padding: 0.8rem;
-  }
-
-  .admin-product-item img {
-    width: 60px;
-    height: 60px;
-    object-fit: cover;
-    border-radius: 3px;
-  }
-
-  .admin-product-item-info { flex: 1; }
-  .admin-product-item-info strong { color: var(--white); font-family: var(--font-heading); display: block; }
-  .admin-product-item-info small { color: var(--grey); font-size: 0.8rem; }
-
-  .btn-delete {
-    background: rgba(255,50,50,0.1);
-    border: 1px solid rgba(255,50,50,0.3);
-    color: #ff6b6b;
-    padding: 0.4rem 0.8rem;
-    border-radius: 3px;
-    cursor: pointer;
-    font-family: var(--font-heading);
-    font-size: 0.8rem;
-    font-weight: 600;
-    letter-spacing: 0.05em;
-    transition: all 0.3s;
-  }
-
-  .btn-delete:hover { background: rgba(255,50,50,0.25); }
-
-  /* ── ANIMATIONS ── */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes bounce {
-    0%, 100% { transform: translateX(-50%) translateY(0); }
-    50% { transform: translateX(-50%) translateY(8px); }
-  }
-
-  .reveal {
-    opacity: 0;
-    transform: translateY(40px);
-    transition: opacity 0.7s ease, transform 0.7s ease;
-  }
-
-  .reveal.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  /* ── RESPONSIVE ── */
-  @media (max-width: 768px) {
-    nav { padding: 1rem 1.5rem; }
-    .nav-links { display: none; }
-    .about-grid, .contact-grid { grid-template-columns: 1fr; gap: 2rem; }
-    .about-stats { grid-template-columns: 1fr 1fr; }
-    .admin-form-grid { grid-template-columns: 1fr; }
-    .admin-header { padding: 1rem 1.5rem; }
-  }
-
-  /* ── GLOSSY PREMIUM FINISH ── */
-  .btn-primary {
-    background: linear-gradient(135deg, #9d5bff 0%, #7b2fff 40%, #4a00c8 100%) !important;
-    box-shadow: 0 2px 0 rgba(255,255,255,0.15) inset, 0 0 30px rgba(123,47,255,0.5) !important;
-  }
-
-  .product-card {
-    background: linear-gradient(145deg, rgba(25,10,55,0.95), rgba(13,5,32,0.85)) !important;
-    box-shadow: 0 1px 0 rgba(180,140,255,0.08) inset, 0 4px 24px rgba(0,0,0,0.4);
-  }
-
-  .stat-box {
-    background: linear-gradient(145deg, rgba(25,10,55,0.95), rgba(13,5,32,0.85)) !important;
-    box-shadow: 0 1px 0 rgba(180,140,255,0.1) inset;
-  }
-
-  .order-box {
-    background: linear-gradient(145deg, rgba(20,8,45,0.98), rgba(13,5,32,0.9)) !important;
-    box-shadow: 0 1px 0 rgba(240,180,41,0.12) inset, 0 8px 40px rgba(0,0,0,0.5);
-  }
-
-  .contact-link {
-    background: linear-gradient(135deg, rgba(25,10,55,0.9), rgba(13,5,32,0.7)) !important;
-    box-shadow: 0 1px 0 rgba(180,140,255,0.08) inset;
-  }
-
-  .modal {
-    box-shadow: 0 1px 0 rgba(180,140,255,0.1) inset, 0 0 80px rgba(123,47,255,0.25) !important;
-  }
-
-  .cat-tag.active {
-    box-shadow: 0 1px 0 rgba(255,255,255,0.15) inset, 0 0 15px rgba(123,47,255,0.5) !important;
-  }
-
-  /* Subtle noise texture overlay for depth */
-  body::after {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 0;
-    opacity: 0.4;
-  }
-
-
-
-  /* ── IMAGE UPLOAD ── */
-  .upload-zone {
-    border: 2px dashed rgba(123,47,255,0.4);
-    border-radius: 6px;
-    padding: 1.5rem;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s;
-    background: rgba(123,47,255,0.04);
-    position: relative;
-  }
-  .upload-zone:hover, .upload-zone.dragover {
-    border-color: var(--purple-glow);
-    background: rgba(123,47,255,0.1);
-  }
-  .upload-zone input[type="file"] {
-    position: absolute; inset: 0; opacity: 0; cursor: pointer;
-    width: 100%; height: 100%; border: none; background: none; padding: 0; margin: 0;
-  }
-  .upload-zone .upload-icon { font-size: 2rem; margin-bottom: 0.4rem; }
-  .upload-zone p { color: var(--grey); font-family: var(--font-heading); font-size: 0.85rem; letter-spacing: 0.1em; margin: 0; }
-  .upload-zone p span { color: var(--purple-glow); }
-  .upload-preview { display: none; align-items: center; gap: 1rem; margin-top: 0.8rem; padding: 0.8rem; background: rgba(123,47,255,0.08); border-radius: 4px; }
-  .upload-preview.show { display: flex; }
-  .upload-preview img { width: 60px; height: 60px; object-fit: cover; border-radius: 3px; }
-  .upload-preview-info { flex: 1; }
-  .upload-preview-info strong { color: var(--white); font-family: var(--font-heading); font-size: 0.9rem; display: block; }
-  .upload-preview-info small { color: var(--grey); font-size: 0.75rem; }
-  .upload-progress { width: 100%; height: 3px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-top: 0.5rem; overflow: hidden; display: none; }
-  .upload-progress.show { display: block; }
-  .upload-progress-bar { height: 100%; background: linear-gradient(to right, var(--purple), var(--gold)); width: 0%; transition: width 0.3s; border-radius: 2px; }
-  .img-source-tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
-  .img-tab {
-    flex: 1; padding: 0.5rem; text-align: center;
-    font-family: var(--font-heading); font-size: 0.8rem; font-weight: 700;
-    letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; border-radius: 3px;
-    border: 1px solid rgba(123,47,255,0.3); color: var(--grey); background: transparent;
-    transition: all 0.25s;
-  }
-  .img-tab.active { background: var(--purple); border-color: var(--purple-glow); color: white; }
-  .img-tab-panel { display: none; }
-  .img-tab-panel.active { display: block; }
-
-
-  .product-disclaimer {
-    font-size: 0.72rem;
-    color: rgba(155,147,176,0.8);
-    line-height: 1.5;
-    margin-bottom: 0.8rem;
-    padding: 0.5rem 0.7rem;
-    border-left: 2px solid var(--purple-dim);
-    background: rgba(123,47,255,0.05);
-    border-radius: 0 3px 3px 0;
-  }
-  .product-disclaimer strong { color: var(--gold); font-weight: 600; }
-
-
-  /* ── FAQ ── */
-  #faq { background: linear-gradient(to bottom, transparent, rgba(123,47,255,0.03), transparent); }
-
-  .faq-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 0.8rem;
-  }
-
-  .faq-item {
-    background: linear-gradient(145deg, rgba(20,8,45,0.9), rgba(13,5,32,0.7));
-    border: 1px solid rgba(123,47,255,0.2);
-    border-radius: 6px;
-    overflow: hidden;
-    transition: border-color 0.3s;
-  }
-
-  .faq-item:hover { border-color: rgba(123,47,255,0.4); }
-
-  .faq-question {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.2rem 1.5rem;
-    cursor: pointer;
-    font-family: var(--font-heading);
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--white);
-    letter-spacing: 0.03em;
-    transition: color 0.3s;
-    user-select: none;
-  }
-
-  .faq-question:hover { color: var(--purple-glow); }
-
-  .faq-icon {
-    font-size: 1.4rem;
-    color: var(--purple-glow);
-    transition: transform 0.3s;
-    flex-shrink: 0;
-    margin-left: 1rem;
-  }
-
-  .faq-item.open .faq-icon { transform: rotate(45deg); }
-
-  .faq-answer {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.4s ease, padding 0.3s;
-    color: var(--grey);
-    font-size: 0.9rem;
-    line-height: 1.8;
-    padding: 0 1.5rem;
-  }
-
-  .faq-item.open .faq-answer {
-    max-height: 200px;
-    padding: 0 1.5rem 1.2rem;
-  }
-
+:root{--black:#03000a;--deep:#0a0218;--purple:#7b2fff;--pg:#c87bff;--pdim:#3d1a7a;--gold:#f0b429;--white:#ffffff;--text:#e8deff;--muted:rgba(232,222,255,0.55);--dim:rgba(232,222,255,0.32);--orb:'Orbitron',sans-serif;--bb:'Bebas Neue',sans-serif;--cin:'Cinzel',serif;--body:'Rajdhani',sans-serif;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--black);color:var(--text);font-family:var(--body);overflow-x:hidden;}
+#forge-bg{position:fixed;inset:0;z-index:0;pointer-events:none;}
+.smoke{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse 100% 50% at 10% 100%,rgba(140,40,255,.2) 0%,transparent 55%),radial-gradient(ellipse 80% 40% at 90% 100%,rgba(200,80,255,.15) 0%,transparent 50%),radial-gradient(ellipse 120% 35% at 50% 100%,rgba(100,0,220,.25) 0%,transparent 45%);}
+.vig{position:fixed;inset:0;z-index:2;pointer-events:none;background:radial-gradient(ellipse 75% 75% at 50% 40%,transparent 30%,rgba(0,0,0,.88) 100%);}
+
+nav{position:fixed;top:0;width:100%;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.1rem 3rem;background:linear-gradient(to bottom,rgba(3,0,10,.97),rgba(3,0,10,.75));backdrop-filter:blur(20px);border-bottom:1px solid rgba(160,80,255,.13);box-shadow:0 0 40px rgba(100,0,200,.1);}
+.nav-logo{font-family:var(--orb);font-size:1.15rem;font-weight:900;letter-spacing:.22em;color:var(--white);text-shadow:0 0 20px rgba(180,95,255,.6);cursor:pointer;position:relative;user-select:none;}
+.nav-logo span{color:var(--pg);text-shadow:0 0 30px rgba(180,80,255,1),0 0 60px rgba(140,40,255,.5);}
+.nav-logo::after{content:'';position:absolute;bottom:-4px;left:0;right:0;height:1px;background:linear-gradient(to right,transparent,rgba(200,123,255,.5),transparent);}
+.nav-links{display:flex;gap:2rem;list-style:none;}
+.nav-links a{color:var(--white);opacity:.45;text-decoration:none;font-family:var(--orb);font-size:.6rem;font-weight:700;letter-spacing:.25em;text-transform:uppercase;transition:all .3s;}
+.nav-links a:hover{opacity:1;color:var(--pg);text-shadow:0 0 10px rgba(200,123,255,.6);}
+.nav-cta{background:linear-gradient(135deg,rgba(123,47,255,.15),rgba(80,0,200,.1));border:1px solid rgba(180,80,255,.45);color:var(--pg);padding:.5rem 1.4rem;font-family:var(--orb);font-size:.6rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;transition:all .3s;box-shadow:0 2px 0 rgba(255,255,255,.05) inset,0 0 15px rgba(123,47,255,.15);}
+.nav-cta:hover{background:linear-gradient(135deg,rgba(160,80,255,.22),rgba(100,0,255,.15));box-shadow:0 2px 0 rgba(255,255,255,.08) inset,0 0 30px rgba(160,80,255,.4);}
+
+section{position:relative;z-index:10;}
+.si{max-width:1100px;margin:0 auto;padding:5.5rem 2rem;}
+.sp{font-family:var(--orb);font-size:.6rem;letter-spacing:.5em;color:rgba(240,180,41,.65);text-transform:uppercase;margin-bottom:.6rem;display:flex;align-items:center;gap:1rem;}
+.sp::before,.sp::after{content:'';flex:0 0 60px;height:1px;background:linear-gradient(to right,transparent,rgba(240,180,41,.35));}
+.sp::after{background:linear-gradient(to left,transparent,rgba(240,180,41,.35));}
+.sp.left::before{display:none;}
+.st{font-family:var(--bb);font-size:clamp(2.8rem,6vw,5rem);letter-spacing:.06em;color:var(--white);}
+.st span{color:var(--pg);text-shadow:0 0 40px rgba(200,123,255,.6);}
+.sd{width:60px;height:2px;background:linear-gradient(to right,var(--purple),var(--gold));margin:1.2rem 0 2.5rem;box-shadow:0 0 10px rgba(123,47,255,.3);}
+.ld{position:relative;z-index:10;height:3px;background:linear-gradient(to right,transparent,rgba(160,80,255,.85),rgba(240,180,41,.6),rgba(160,80,255,.85),transparent);box-shadow:0 0 25px rgba(160,80,255,.55),0 0 60px rgba(123,47,255,.2);}
+
+#home{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:6rem 2rem 2rem;}
+.emb{width:150px;height:150px;margin:0 auto 2rem;position:relative;}
+.er1{position:absolute;inset:0;border-radius:50%;border:1px solid rgba(180,80,255,.5);box-shadow:0 0 20px rgba(123,47,255,.3),inset 0 0 20px rgba(123,47,255,.08);animation:spin 8s linear infinite;}
+.er2{position:absolute;inset:14px;border-radius:50%;border:1px solid rgba(240,180,41,.3);box-shadow:0 0 15px rgba(240,180,41,.12);animation:spin 14s linear infinite reverse;}
+.er3{position:absolute;inset:28px;border-radius:50%;border:1px dashed rgba(180,80,255,.2);animation:spin 7s linear infinite;}
+.ec{position:absolute;inset:40px;border-radius:50%;background:radial-gradient(circle,rgba(160,60,255,.35),rgba(80,0,180,.15),transparent);display:flex;align-items:center;justify-content:center;font-size:2.6rem;box-shadow:0 0 25px rgba(123,47,255,.35) inset;animation:pulse 3s ease-in-out infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+@keyframes pulse{0%,100%{transform:scale(1);filter:brightness(1);}50%{transform:scale(1.1);filter:brightness(1.4);}}
+
+.hey{font-family:var(--orb);font-size:.58rem;letter-spacing:.5em;color:rgba(240,180,41,.7);text-transform:uppercase;margin-bottom:1.5rem;text-shadow:0 0 10px rgba(240,180,41,.35);}
+.hpre{font-family:var(--orb);font-size:clamp(.65rem,1.2vw,.85rem);font-weight:400;letter-spacing:.55em;color:rgba(220,190,255,.4);text-transform:uppercase;display:block;margin-bottom:.2rem;}
+.hs{font-family:var(--bb);font-size:clamp(5rem,14vw,10rem);color:var(--white);display:block;letter-spacing:.06em;line-height:.88;text-shadow:0 0 40px rgba(255,255,255,.08);}
+.hx{font-family:var(--cin);font-size:clamp(4.5rem,12vw,8.5rem);font-weight:900;color:var(--pg);display:block;line-height:.88;text-shadow:0 0 60px rgba(160,80,255,.95),0 0 120px rgba(120,40,255,.5),0 0 200px rgba(80,0,200,.2);}
+.htag{font-family:var(--orb);font-size:clamp(.52rem,1vw,.72rem);font-weight:700;letter-spacing:.45em;color:rgba(240,180,41,.6);text-transform:uppercase;display:block;margin-top:1rem;text-shadow:0 0 12px rgba(240,180,41,.25);}
+.hr{width:100%;max-width:500px;height:1px;margin:2rem auto;position:relative;background:linear-gradient(to right,transparent,rgba(160,80,255,.65),rgba(240,180,41,.45),rgba(160,80,255,.65),transparent);box-shadow:0 0 8px rgba(160,80,255,.25);}
+.hr::before,.hr::after{content:'✦';position:absolute;top:50%;transform:translateY(-50%);color:rgba(240,180,41,.65);font-size:.6rem;}
+.hr::before{left:28%;}.hr::after{right:28%;}
+.hdesc{max-width:440px;color:var(--muted);font-size:1rem;line-height:1.9;margin:0 auto 1.5rem;letter-spacing:.03em;}
+.hdesc em{color:var(--gold);font-style:normal;text-shadow:0 0 8px rgba(240,180,41,.25);}
+.hnote{font-family:var(--orb);font-size:.55rem;letter-spacing:.2em;color:var(--dim);text-transform:uppercase;margin-bottom:2.5rem;}
+.fbtns{display:flex;gap:1.2rem;justify-content:center;flex-wrap:wrap;}
+.vb{padding:1rem 2.6rem;font-family:var(--orb);font-size:.7rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;text-decoration:none;display:inline-block;transition:all .4s;position:relative;overflow:hidden;}
+.vb::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(to right,transparent,rgba(255,255,255,.25),transparent);}
+.vm{background:linear-gradient(135deg,#9d2fff 0%,#5a00cc 50%,#7b00ff 100%);color:#fff;border:none;box-shadow:0 2px 0 rgba(255,255,255,.12) inset,0 -2px 0 rgba(0,0,0,.3) inset,0 6px 35px rgba(123,47,255,.55);}
+.vm:hover{box-shadow:0 2px 0 rgba(255,255,255,.15) inset,0 -2px 0 rgba(0,0,0,.3) inset,0 6px 55px rgba(160,80,255,.85);transform:translateY(-3px);}
+.vg{background:linear-gradient(135deg,rgba(240,180,41,.08),rgba(200,140,20,.05));color:var(--gold);border:1px solid rgba(240,180,41,.4);box-shadow:0 2px 0 rgba(255,255,255,.04) inset,0 0 18px rgba(240,180,41,.08);}
+.vg:hover{background:linear-gradient(135deg,rgba(240,180,41,.14),rgba(200,140,20,.08));box-shadow:0 2px 0 rgba(255,255,255,.07) inset,0 0 35px rgba(240,180,41,.28);transform:translateY(-3px);}
+.sh{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.4rem;opacity:.4;animation:bounce 2.5s infinite;}
+.sh span{font-family:var(--orb);font-size:.5rem;letter-spacing:.4em;text-transform:uppercase;color:var(--dim);}
+.sh .arr{width:1px;height:36px;background:linear-gradient(to bottom,var(--pg),transparent);}
+@keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0);}50%{transform:translateX(-50%) translateY(8px);}}
+
+#stats{background:linear-gradient(to bottom,rgba(10,2,25,.95),rgba(6,1,18,.92));border-bottom:1px solid rgba(123,47,255,.1);}
+.sr{display:flex;justify-content:center;gap:5rem;flex-wrap:wrap;padding:1.8rem 2rem;}
+.si2{text-align:center;}
+.sn{font-family:var(--orb);font-size:1.7rem;font-weight:900;color:var(--pg);text-shadow:0 0 18px rgba(200,123,255,.65);letter-spacing:.05em;}
+.sl{font-family:var(--orb);font-size:.5rem;letter-spacing:.28em;color:var(--white);opacity:.6;text-transform:uppercase;margin-top:.3rem;}
+
+.cts{display:flex;gap:.8rem;flex-wrap:wrap;margin-bottom:2.5rem;}
+.ct{background:rgba(123,47,255,.08);border:1px solid rgba(123,47,255,.25);color:var(--pg);padding:.4rem 1rem;font-family:var(--orb);font-size:.55rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;transition:all .25s;}
+.ct:hover,.ct.active{background:var(--purple);border-color:var(--pg);color:#fff;box-shadow:0 0 15px rgba(123,47,255,.45);}
+
+.vg2{display:grid;grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:1px;background:rgba(123,47,255,.07);}
+.vc{background:linear-gradient(145deg,rgba(15,5,35,.98),rgba(8,2,20,.95));border:1px solid rgba(123,47,255,.14);overflow:hidden;cursor:pointer;transition:all .4s;position:relative;}
+.vc::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(to right,transparent,rgba(200,123,255,.18),transparent);z-index:2;}
+.vc::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(to right,transparent,var(--purple),var(--gold),transparent);transform:scaleX(0);transition:transform .4s;z-index:2;}
+.vc:hover{border-color:rgba(180,80,255,.45);background:linear-gradient(145deg,rgba(25,8,55,.98),rgba(12,3,30,.95));transform:translateY(-5px);box-shadow:0 2px 0 rgba(200,123,255,.07) inset,0 12px 45px rgba(123,47,255,.28);}
+.vc:hover::after{transform:scaleX(1);}
+.vci{width:100%;aspect-ratio:1;background:radial-gradient(circle at 50% 75%,rgba(123,47,255,.22),rgba(0,0,0,.95));display:flex;align-items:center;justify-content:center;font-size:4.5rem;border-bottom:1px solid rgba(123,47,255,.1);position:relative;overflow:hidden;transition:filter .4s;}
+.vc:hover .vci{filter:brightness(1.35);}
+.vci img{width:100%;height:100%;object-fit:cover;display:block;}
+.vci::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(80,20,160,.28),transparent 55%);pointer-events:none;}
+.vbdg{position:absolute;top:10px;right:10px;font-family:var(--orb);font-size:.48rem;letter-spacing:.18em;padding:3px 8px;border:1px solid rgba(240,180,41,.4);color:rgba(240,180,41,.85);text-transform:uppercase;background:rgba(0,0,0,.7);z-index:3;box-shadow:0 0 8px rgba(240,180,41,.12);}
+.vcb{padding:1.1rem;}
+.vcc{font-family:var(--orb);font-size:.5rem;letter-spacing:.28em;color:rgba(240,180,41,.6);text-transform:uppercase;margin-bottom:.35rem;}
+.vcn{font-family:var(--cin);font-size:.95rem;font-weight:700;color:var(--white);margin-bottom:.4rem;line-height:1.3;}
+.vcd{font-size:.78rem;color:var(--muted);line-height:1.6;margin-bottom:.5rem;}
+.vcdi{font-size:.68rem;color:var(--muted);line-height:1.55;margin-bottom:.9rem;padding:.45rem .7rem;border-left:2px solid rgba(123,47,255,.3);background:rgba(123,47,255,.04);}
+.vcdi strong{color:rgba(240,180,41,.65);}
+.vcbt{width:100%;background:linear-gradient(135deg,rgba(123,47,255,.1),rgba(80,0,200,.07));border:1px solid rgba(160,80,255,.28);color:var(--pg);padding:.65rem;font-family:var(--orb);font-size:.58rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;transition:all .3s;box-shadow:0 1px 0 rgba(200,123,255,.05) inset;}
+.vcbt:hover{background:linear-gradient(135deg,rgba(160,80,255,.2),rgba(100,20,255,.13));color:#fff;border-color:rgba(200,123,255,.5);box-shadow:0 1px 0 rgba(200,123,255,.1) inset,0 0 18px rgba(123,47,255,.22);}
+.ec2{grid-column:1/-1;text-align:center;padding:4rem 2rem;color:var(--dim);}
+.ec2 p{font-family:var(--orb);font-size:.8rem;letter-spacing:.15em;}
+
+#about{background:linear-gradient(to bottom,transparent,rgba(123,47,255,.03),transparent);}
+.ag{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;}
+.at p{color:var(--muted);line-height:1.95;font-size:.95rem;margin-bottom:1.2rem;}
+.at p strong{color:var(--white);}
+.at p em{color:var(--gold);font-style:normal;text-shadow:0 0 8px rgba(240,180,41,.2);}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(123,47,255,.07);}
+.vst{background:linear-gradient(145deg,rgba(15,5,35,.98),rgba(8,2,20,.95));padding:1.8rem;text-align:center;border:1px solid rgba(123,47,255,.1);transition:all .3s;box-shadow:0 1px 0 rgba(200,123,255,.04) inset;}
+.vst:hover{border-color:rgba(200,123,255,.28);background:linear-gradient(145deg,rgba(25,8,55,.98),rgba(12,3,30,.95));}
+.vst .big{font-family:var(--orb);font-size:1.8rem;font-weight:900;color:var(--pg);text-shadow:0 0 18px rgba(200,123,255,.65);}
+.vst .lbl{font-family:var(--orb);font-size:.48rem;letter-spacing:.22em;color:var(--white);opacity:.6;text-transform:uppercase;margin-top:.4rem;}
+
+#faq{background:linear-gradient(to bottom,transparent,rgba(123,47,255,.03),transparent);}
+.fl{display:flex;flex-direction:column;gap:.7rem;}
+.fi{background:linear-gradient(145deg,rgba(15,5,35,.97),rgba(8,2,20,.93));border:1px solid rgba(123,47,255,.14);overflow:hidden;transition:border-color .3s;box-shadow:0 1px 0 rgba(200,123,255,.04) inset;}
+.fi:hover{border-color:rgba(160,80,255,.35);}
+.fq{display:flex;justify-content:space-between;align-items:center;padding:1.1rem 1.4rem;cursor:pointer;font-family:var(--body);font-size:1rem;font-weight:700;color:var(--white);letter-spacing:.03em;transition:color .3s;user-select:none;}
+.fq:hover{color:var(--pg);}
+.fi2{font-size:1.3rem;color:var(--pg);transition:transform .3s;flex-shrink:0;margin-left:1rem;}
+.fi.open .fi2{transform:rotate(45deg);}
+.fa{max-height:0;overflow:hidden;transition:max-height .4s ease,padding .3s;color:var(--muted);font-size:.9rem;line-height:1.85;padding:0 1.4rem;}
+.fi.open .fa{max-height:200px;padding:0 1.4rem 1.1rem;}
+
+.cg{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start;}
+.cit{color:var(--muted);line-height:1.85;margin-bottom:2rem;font-size:.95rem;}
+.cls{display:flex;flex-direction:column;gap:.9rem;}
+.cl{display:flex;align-items:center;gap:1rem;background:linear-gradient(135deg,rgba(15,5,35,.95),rgba(8,2,20,.85));border:1px solid rgba(123,47,255,.18);padding:1rem 1.4rem;text-decoration:none;color:var(--white);font-family:var(--orb);font-size:.62rem;font-weight:700;letter-spacing:.1em;transition:all .3s;box-shadow:0 1px 0 rgba(200,123,255,.04) inset;}
+.cl:hover{border-color:rgba(180,80,255,.45);background:linear-gradient(135deg,rgba(25,8,55,.95),rgba(12,3,30,.9));box-shadow:0 1px 0 rgba(200,123,255,.07) inset,0 0 20px rgba(123,47,255,.18);transform:translateX(4px);}
+.cl .ic{font-size:1.3rem;}
+.ob{background:linear-gradient(145deg,rgba(15,5,35,.98),rgba(8,2,20,.95));border:1px solid rgba(240,180,41,.25);padding:2rem;box-shadow:0 1px 0 rgba(255,210,80,.06) inset,0 8px 40px rgba(0,0,0,.4);}
+.ob h3{font-family:var(--bb);font-size:2rem;color:var(--gold);margin-bottom:.5rem;letter-spacing:.05em;}
+.ob p{color:var(--muted);font-size:.88rem;line-height:1.75;margin-bottom:1.4rem;}
+.os{list-style:none;margin-bottom:1.4rem;}
+.os li{display:flex;align-items:flex-start;gap:.8rem;margin-bottom:.8rem;color:var(--muted);font-size:.88rem;line-height:1.55;}
+.sn2{background:var(--pdim);color:var(--pg);font-family:var(--orb);font-weight:700;font-size:.6rem;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+
+footer{position:relative;z-index:10;text-align:center;padding:2.5rem;border-top:1px solid rgba(123,47,255,.12);}
+.fl2{font-family:var(--orb);font-size:1.3rem;font-weight:900;letter-spacing:.2em;color:var(--white);margin-bottom:.5rem;text-shadow:0 0 18px rgba(180,95,255,.45);}
+.fl2 span{color:var(--pg);text-shadow:0 0 28px rgba(200,123,255,.75);}
+footer p{color:var(--white);opacity:.4;font-family:var(--orb);font-size:.5rem;letter-spacing:.28em;text-transform:uppercase;}
+
+.mo{display:none;position:fixed;inset:0;background:rgba(3,0,10,.92);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(12px);}
+.mo.open{display:flex;}
+.md{background:linear-gradient(145deg,#0d0520,#1a0840);border:1px solid rgba(123,47,255,.35);padding:2.4rem;width:90%;max-width:480px;position:relative;box-shadow:0 1px 0 rgba(200,123,255,.08) inset,0 0 60px rgba(123,47,255,.28);}
+.mt{font-family:var(--bb);font-size:2rem;color:var(--white);margin-bottom:.3rem;letter-spacing:.05em;}
+.ms{color:var(--muted);font-size:.85rem;margin-bottom:1.5rem;}
+.md input,.md textarea,.md select{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(123,47,255,.28);color:var(--white);padding:.8rem 1rem;font-family:var(--body);font-size:.95rem;margin-bottom:1rem;transition:border-color .3s;resize:vertical;}
+.md input:focus,.md textarea:focus{outline:none;border-color:var(--pg);box-shadow:0 0 10px rgba(123,47,255,.18);}
+.md label{display:block;font-family:var(--orb);font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-bottom:.4rem;}
+.mc{position:absolute;top:1rem;right:1.2rem;background:none;border:none;color:var(--dim);font-size:1.4rem;cursor:pointer;transition:color .3s;}
+.mc:hover{color:var(--white);}
+.me{color:#ff6b6b;font-size:.82rem;margin-bottom:1rem;display:none;font-family:var(--orb);letter-spacing:.05em;}
+
+#admin-panel{display:none;position:fixed;inset:0;background:var(--black);z-index:2000;overflow-y:scroll;-webkit-overflow-scrolling:touch;}
+#admin-panel.open{display:block;}
+.ah{background:linear-gradient(to right,var(--deep),#1a0840);border-bottom:1px solid rgba(123,47,255,.28);padding:1.4rem 3rem;display:flex;align-items:center;justify-content:space-between;}
+.ah h1{font-family:var(--orb);font-size:1.1rem;font-weight:900;letter-spacing:.2em;color:var(--white);}
+.ah h1 span{color:var(--pg);}
+.ab{max-width:900px;margin:0 auto;padding:2rem;}
+.as{background:rgba(13,5,32,.85);border:1px solid rgba(123,47,255,.18);padding:2rem;margin-bottom:2rem;box-shadow:0 1px 0 rgba(200,123,255,.04) inset;}
+.as h2{font-family:var(--bb);font-size:1.4rem;letter-spacing:.08em;color:var(--gold);margin-bottom:1.4rem;border-bottom:1px solid rgba(240,180,41,.18);padding-bottom:.8rem;display:flex;align-items:center;justify-content:space-between;}
+.afg{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.afg .full{grid-column:1/-1;}
+.afr{display:flex;flex-direction:column;gap:.4rem;}
+.afr label{font-family:var(--orb);font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);}
+.afr input,.afr textarea,.afr select{background:rgba(255,255,255,.04);border:1px solid rgba(123,47,255,.28);color:var(--white);padding:.7rem 1rem;font-family:var(--body);font-size:.9rem;transition:border-color .3s;resize:vertical;}
+.afr input:focus,.afr textarea:focus{outline:none;border-color:var(--pg);}
+.afr select option{background:#1a0840;}
+.scr{display:flex;gap:.8rem;align-items:flex-end;}
+.scr input{flex:1;}
+.bs{background:linear-gradient(135deg,var(--gold),#c8860a);color:var(--black);border:none;padding:.7rem 1.4rem;font-family:var(--orb);font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;white-space:nowrap;transition:all .3s;box-shadow:0 2px 0 rgba(255,255,255,.15) inset;}
+.bs:hover{box-shadow:0 2px 0 rgba(255,255,255,.2) inset,0 0 20px rgba(240,180,41,.4);}
+.bs:disabled{opacity:.5;cursor:not-allowed;}
+.sp2{display:none;margin-top:1rem;gap:1rem;align-items:flex-start;}
+.sp2.show{display:flex;}
+.sp2 img{width:90px;height:90px;object-fit:cover;border:1px solid rgba(123,47,255,.28);}
+.sp2 strong{color:var(--white);display:block;margin-bottom:.3rem;}
+.sp2 small{color:var(--dim);font-size:.8rem;}
+.its{display:flex;gap:.5rem;margin-bottom:1rem;}
+.it{flex:1;padding:.5rem;text-align:center;font-family:var(--orb);font-size:.58rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;border:1px solid rgba(123,47,255,.28);color:var(--dim);background:transparent;transition:all .25s;}
+.it.active{background:var(--purple);border-color:var(--pg);color:#fff;}
+.itp{display:none;}
+.itp.active{display:block;}
+.uz{border:2px dashed rgba(123,47,255,.35);padding:1.5rem;text-align:center;cursor:pointer;transition:all .3s;background:rgba(123,47,255,.03);position:relative;}
+.uz:hover{border-color:var(--pg);background:rgba(123,47,255,.08);}
+.uz input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;border:none;background:none;padding:0;margin:0;}
+.uz .ui{font-size:1.8rem;margin-bottom:.4rem;}
+.uz p{color:var(--dim);font-family:var(--orb);font-size:.58rem;letter-spacing:.1em;margin:0;}
+.uz p span{color:var(--pg);}
+.up2{display:none;align-items:center;gap:1rem;margin-top:.8rem;padding:.8rem;background:rgba(123,47,255,.07);}
+.up2.show{display:flex;}
+.up2 img{width:55px;height:55px;object-fit:cover;border:1px solid rgba(123,47,255,.28);}
+.up2 strong{color:var(--white);display:block;}
+.up2 small{color:var(--dim);font-size:.75rem;}
+.upb{width:100%;height:3px;background:rgba(255,255,255,.08);margin-top:.5rem;overflow:hidden;display:none;}
+.upb.show{display:block;}
+.upbar{height:100%;background:linear-gradient(to right,var(--purple),var(--gold));width:0%;transition:width .3s;}
+.ba{background:linear-gradient(135deg,var(--purple),#4a00c8);color:#fff;border:none;padding:.85rem 2rem;font-family:var(--orb);font-size:.65rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;width:100%;margin-top:1rem;transition:all .3s;box-shadow:0 2px 0 rgba(255,255,255,.1) inset;}
+.ba:hover{box-shadow:0 2px 0 rgba(255,255,255,.15) inset,0 0 25px rgba(123,47,255,.5);}
+.astat{padding:.8rem 1rem;margin-top:1rem;font-family:var(--orb);font-size:.65rem;letter-spacing:.05em;display:none;}
+.astat.success{background:rgba(0,255,100,.07);border:1px solid rgba(0,255,100,.25);color:#4fffaa;display:block;}
+.astat.error{background:rgba(255,50,50,.07);border:1px solid rgba(255,50,50,.25);color:#ff6b6b;display:block;}
+.apl{display:flex;flex-direction:column;gap:.8rem;}
+.api{display:flex;align-items:center;gap:1rem;background:rgba(255,255,255,.02);border:1px solid rgba(123,47,255,.12);padding:.8rem;}
+.api img{width:55px;height:55px;object-fit:cover;border:1px solid rgba(123,47,255,.2);}
+.api strong{color:var(--white);display:block;font-size:.95rem;}
+.api small{color:var(--dim);font-size:.78rem;}
+.bd{background:rgba(255,50,50,.08);border:1px solid rgba(255,50,50,.28);color:#ff6b6b;padding:.4rem .8rem;cursor:pointer;font-family:var(--orb);font-size:.58rem;font-weight:700;letter-spacing:.05em;transition:all .3s;}
+.bd:hover{background:rgba(255,50,50,.2);}
+.bb2{background:rgba(240,180,41,.05);border:1px solid rgba(240,180,41,.22);padding:1.4rem;margin-bottom:1rem;}
+.bb2 ol{color:var(--muted);font-size:.85rem;line-height:1.95;padding-left:1.2rem;}
+
+.rev{opacity:0;transform:translateY(35px);transition:opacity .7s ease,transform .7s ease;}
+.rev.visible{opacity:1;transform:translateY(0);}
+@media(max-width:768px){nav{padding:1rem 1.5rem;}.nav-links{display:none;}.ag,.cg{grid-template-columns:1fr;gap:2rem;}.vs{grid-template-columns:1fr 1fr;}.afg{grid-template-columns:1fr;}.ah{padding:1rem 1.5rem;}.sr{gap:2.5rem;}}
 </style>
 </head>
 <body>
+<canvas id="forge-bg"></canvas>
+<div class="smoke"></div>
+<div class="vig"></div>
 
-<!-- Animated starfield -->
-<canvas id="starfield"></canvas>
-
-<!-- NAV -->
 <nav>
-  <div class="nav-logo" id="nav-logo" onclick="handleLogoClick()" style="cursor:default">SRIJAN<span>X</span></div>
+  <div class="nav-logo" id="nav-logo">SRIJAN<span>X</span></div>
   <ul class="nav-links">
     <li><a href="#home">Home</a></li>
     <li><a href="#catalog">Catalog</a></li>
     <li><a href="#about">About</a></li>
-    <li><a href="#contact">Contact</a></li>
     <li><a href="#faq">FAQ</a></li>
+    <li><a href="#contact">Contact</a></li>
   </ul>
-  <!-- Admin: click logo 5x to access -->
+  <button class="nav-cta" onclick="document.getElementById('om').classList.add('open')">⚒ Order Now</button>
 </nav>
 
-<!-- ═══════════════════ HERO ═══════════════════ -->
 <section id="home">
-  <p class="hero-eyebrow">✦ Bringing Stories To Life ✦</p>
-  <h1 class="hero-title">
-    <div>TURN YOUR</div>
-    <div class="line-purple">FAVOURITES</div>
-    <div class="line-gold">INTO ART</div>
-  </h1>
-  <p class="hero-sub">Custom 3D Miniatures · <em>Inspired by moments you love</em></p>
-  <p style="font-family:var(--font-heading);font-size:0.8rem;letter-spacing:0.2em;color:rgba(155,147,176,0.6);margin-top:0.5rem;text-transform:uppercase;opacity:0;animation:fadeUp 0.8s 1.1s forwards;">Pricing confirmed on WhatsApp · Cash on Delivery · Max size 10.08³ in</p>
-  <div class="hero-cta">
-    <a href="#catalog" class="btn-primary">Explore Catalog</a>
-    <a href="#contact" class="btn-secondary">Order Custom</a>
+  <div class="emb">
+    <div class="er1"></div><div class="er2"></div><div class="er3"></div>
+    <div id="ve-dots"></div>
+    <div class="ec">⚒️</div>
   </div>
-  <div class="scroll-hint">
-    <span>Scroll</span>
-    <div class="arrow"></div>
+  <p class="hey">✦ &nbsp; Bringing Stories To Life &nbsp; · &nbsp; Bengaluru &nbsp; · &nbsp; Est. 2026 &nbsp; ✦</p>
+  <div>
+    <span class="hpre">The World of</span>
+    <span class="hs">SRIJAN</span>
+    <span class="hx">X</span>
+    <span class="htag">Where Legends Are Forged</span>
+  </div>
+  <div class="hr"></div>
+  <p class="hdesc">Every character you love. Every moment that moved you.<br><em>Pulled from the screen. Forged in three dimensions. Yours forever.</em></p>
+  <p class="hnote">Pricing on WhatsApp · Cash on Delivery · Max 10.08³ in</p>
+  <div class="fbtns">
+    <a href="#catalog" class="vb vm">⚒ Enter The Forge</a>
+    <a href="#contact" class="vb vg">✦ Commission Custom</a>
+  </div>
+  <div class="sh"><span>Scroll</span><div class="arr"></div></div>
+</section>
+
+<div class="ld"></div>
+
+<section id="stats">
+  <div class="sr">
+    <div class="si2"><div class="sn">3D</div><div class="sl">Printed &amp; Painted</div></div>
+    <div class="si2"><div class="sn">∞</div><div class="sl">Custom Options</div></div>
+    <div class="si2"><div class="sn">COD</div><div class="sl">Cash on Delivery</div></div>
+    <div class="si2"><div class="sn">🔥</div><div class="sl">Always Forging</div></div>
   </div>
 </section>
 
-<!-- ═══════════════════ CATALOG ═══════════════════ -->
+<div class="ld"></div>
+
 <section id="catalog">
-  <div class="section-inner">
-    <p class="section-label reveal">Our Collection</p>
-    <h2 class="section-title reveal">THE <span>CATALOG</span></h2>
-    <div class="divider reveal"></div>
-
-    <div class="categories reveal" id="category-filter">
-      <button class="cat-tag active" data-cat="all">All</button>
-      <button class="cat-tag" data-cat="Anime">Anime</button>
-      <button class="cat-tag" data-cat="Home Decor">Home Decor</button>
-      <button class="cat-tag" data-cat="Custom">Custom</button>
-      <button class="cat-tag" data-cat="Chibi">Chibi</button>
-      <button class="cat-tag" data-cat="Gift">Gift</button>
+  <div class="si">
+    <p class="sp rev">From The Forge</p>
+    <h2 class="st rev">THE <span>CATALOG</span></h2>
+    <div class="sd rev"></div>
+    <div class="cts rev" id="cf">
+      <button class="ct active" data-cat="all">All</button>
+      <button class="ct" data-cat="Anime">Anime</button>
+      <button class="ct" data-cat="Home Decor">Home Decor</button>
+      <button class="ct" data-cat="Custom">Custom</button>
+      <button class="ct" data-cat="Chibi">Chibi</button>
+      <button class="ct" data-cat="Gift">Gift</button>
     </div>
-
-    <div id="catalog-grid">
-      <div class="empty-catalog">
-        <div class="icon">✦</div>
-        <p>Loading catalog…</p>
-      </div>
-    </div>
+    <div class="vg2" id="cg"><div class="ec2"><p>Loading the forge...</p></div></div>
   </div>
 </section>
 
-<!-- ═══════════════════ ABOUT ═══════════════════ -->
+<div class="ld"></div>
+
 <section id="about">
-  <div class="section-inner">
-    <p class="section-label reveal">Our Story</p>
-    <h2 class="section-title reveal">ABOUT <span>SRIJANX</span></h2>
-    <div class="divider reveal"></div>
-
-    <div class="about-grid reveal">
-      <div class="about-text">
-        <p>
-          <strong>SrijanX</strong> was born from a simple obsession: that the things we love most — the characters that shaped us, the moments that moved us, the idols that inspired us — deserve to <em>exist in the real world</em>.
-        </p>
-        <p>
-          Every piece we create is a bridge between a screen and a shelf. We design, print, paint, and finish each miniature by hand — giving it weight, texture, and life that no digital image can match.
-        </p>
-        <p>
-          From <em>anime figures and chibi collectibles</em> to wedding keepsakes and custom fan gifts — if you can dream it, we can build it. Powered by precision 3D printing, painted with care, delivered with pride.
-        </p>
-        <p>
-          <strong>Your faves. Our creation.</strong>
-        </p>
+  <div class="si">
+    <p class="sp left rev">The Smithy</p>
+    <h2 class="st rev">WHO <span>WE ARE</span></h2>
+    <div class="sd rev"></div>
+    <div class="ag rev">
+      <div class="at">
+        <p><strong>SrijanX</strong> is a one-person forge operating out of Bengaluru. We take the things you love — <em>the characters, the moments, the worlds</em> — and make them real.</p>
+        <p>Every piece is <strong>3D printed, hand-finished and painted</strong> with obsessive care. No two pieces are identical. No shortcuts. <em>The forge never lies.</em></p>
+        <p>From <em>anime figures and chibi collectibles</em> to wedding keepsakes and custom fan gifts — if you can dream it, we can build it.</p>
+        <p><strong>Your faves. Our creation.</strong></p>
       </div>
-      <div class="about-stats">
-        <div class="stat-box">
-          <div class="num">3D</div>
-          <div class="label">Printed & Painted</div>
-        </div>
-        <div class="stat-box">
-          <div class="num">∞</div>
-          <div class="label">Custom Options</div>
-        </div>
-        <div class="stat-box">
-          <div class="num">100%</div>
-          <div class="label">Handcrafted</div>
-        </div>
-        <div class="stat-box">
-          <div class="num">✦</div>
-          <div class="label">Made With Love</div>
-        </div>
+      <div class="vs">
+        <div class="vst"><div class="big">3D</div><div class="lbl">Printed</div></div>
+        <div class="vst"><div class="big">∞</div><div class="lbl">Custom Options</div></div>
+        <div class="vst"><div class="big">100%</div><div class="lbl">Handcrafted</div></div>
+        <div class="vst"><div class="big">🔥</div><div class="lbl">Made With Love</div></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ═══════════════════ CONTACT ═══════════════════ -->
-<section id="contact">
-  <div class="section-inner">
-    <p class="section-label reveal">Get In Touch</p>
-    <h2 class="section-title reveal">CONTACT <span>US</span></h2>
-    <div class="divider reveal"></div>
+<div class="ld"></div>
 
-    <div class="contact-grid reveal">
-      <div class="contact-info">
-        <p>Have a custom idea? Want to order something from the catalog? Reach out on Instagram or WhatsApp — we respond fast and love talking about anything 3D print related.</p>
-        <div class="contact-links">
-          <a href="https://instagram.com/srijanx2026" target="_blank" class="contact-link">
-            <span class="icon">📸</span>
-            <span>@srijanx2026 on Instagram</span>
-          </a>
-          <a href="mailto:srijanx2026@gmail.com" class="contact-link">
-            <span class="icon">✉️</span>
-            <span>srijanx2026@gmail.com</span>
-          </a>
-          <a href="https://wa.me/919845536010?text=Hi%20SrijanX!%20I%20want%20to%20place%20an%20order." target="_blank" class="contact-link">
-            <!-- 
-              ──────────────────────────────────────────
-              📱 WHATSAPP NUMBER — UPDATE THIS!
-              Replace 91XXXXXXXXXX with your WhatsApp
-              number in international format.
-              Example: 919876543210 (India +91)
-              ──────────────────────────────────────────
-            -->
-            <span class="icon">💬</span>
-            <span>WhatsApp Us</span>
-          </a>
-        </div>
-      </div>
-
-      <div class="order-box">
-        <h3>HOW TO ORDER</h3>
-        <p>We currently accept orders via WhatsApp. All payments are cash on delivery or in person.</p>
-        <ul class="order-steps">
-          <li><span class="step-num">1</span> Browse the catalog and pick your design</li>
-          <li><span class="step-num">2</span> Click "Order on WhatsApp" on any product</li>
-          <li><span class="step-num">3</span> We confirm details, size & colour options</li>
-          <li><span class="step-num">4</span> We print, paint & deliver — cash on delivery</li>
-        </ul>
-        <a href="#catalog" class="btn-primary" style="display:block;text-align:center;text-decoration:none;">Browse Catalog</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════════════ FOOTER ═══════════════════ -->
-
-<!-- ═══════════════════ FAQ ═══════════════════ -->
 <section id="faq">
-  <div class="section-inner">
-    <p class="section-label reveal">Got Questions?</p>
-    <h2 class="section-title reveal">FAQ</h2>
-    <div class="divider reveal"></div>
-    <div class="faq-grid reveal" id="faq-grid">
+  <div class="si">
+    <p class="sp rev">Got Questions?</p>
+    <h2 class="st rev">FORGE <span>FAQ</span></h2>
+    <div class="sd rev"></div>
+    <div class="fl rev">
+      <div class="fi"><div class="fq" onclick="tFaq(this)"><span>What are the prints made of?</span><span class="fi2">+</span></div><div class="fa">All prints use FDM 3D printing with PLA/PETG filament — durable, lightweight and paintable in any color.</div></div>
+      <div class="fi"><div class="fq" onclick="tFaq(this)"><span>Do the prints come painted?</span><span class="fi2">+</span></div><div class="fa">By default prints are colorless. You can get them painted by us (extra cost), specify colors on WhatsApp, or paint them yourself.</div></div>
+      <div class="fi"><div class="fq" onclick="tFaq(this)"><span>What is the maximum print size?</span><span class="fi2">+</span></div><div class="fa">Max size is 10.08 × 10.08 × 10.08 inches (256mm³). For larger pieces we print in multiple parts and assemble.</div></div>
+      <div class="fi"><div class="fq" onclick="tFaq(this)"><span>How is pricing decided?</span><span class="fi2">+</span></div><div class="fa">Pricing depends on complexity, size, color and finishing. We confirm the price on WhatsApp before printing — no surprises.</div></div>
+      <div class="fi"><div class="fq" onclick="tFaq(this)"><span>Can I request a fully custom design?</span><span class="fi2">+</span></div><div class="fa">Yes! Wedding figurines, portraits, fan gifts — anything. Share a reference image on WhatsApp and we'll work it out together.</div></div>
+      <div class="fi"><div class="fq" onclick="tFaq(this)"><span>How do I pay?</span><span class="fi2">+</span></div><div class="fa">Cash on delivery or in-person payment only. Payment details confirmed on WhatsApp before dispatch.</div></div>
+      <div class="fi"><div class="fq" onclick="tFaq(this)"><span>How long does an order take?</span><span class="fi2">+</span></div><div class="fa">Typically 3–7 days depending on complexity, size and painting. We'll confirm the timeline on WhatsApp after your order.</div></div>
+      <div class="fi"><div class="fq" onclick="tFaq(this)"><span>Do you ship or only deliver locally?</span><span class="fi2">+</span></div><div class="fa">Currently based in Bengaluru with local delivery. Shipping options coming soon — message us on WhatsApp to discuss.</div></div>
+    </div>
+  </div>
+</section>
 
-      <div class="faq-item">
-        <div class="faq-question" onclick="toggleFaq(this)">
-          <span>What are the prints made of?</span>
-          <span class="faq-icon">+</span>
+<div class="ld"></div>
+
+<section id="contact">
+  <div class="si">
+    <p class="sp rev">Get In Touch</p>
+    <h2 class="st rev">CONTACT <span>US</span></h2>
+    <div class="sd rev"></div>
+    <div class="cg rev">
+      <div>
+        <p class="cit">Have a custom idea or want to order from the catalog? Reach out on Instagram or WhatsApp — we respond fast and love talking all things 3D print.</p>
+        <div class="cls">
+          <a href="https://instagram.com/srijanx2026" target="_blank" class="cl"><span class="ic">📸</span><span>@srijanx2026 on Instagram</span></a>
+          <a href="https://wa.me/919845536010?text=Hello!%20SrijanX%20%F0%9F%91%8B%0A%0AI%27d%20like%20to%20enquire%20about%20a%20custom%20order." target="_blank" class="cl"><span class="ic">💬</span><span>WhatsApp Us</span></a>
+          <a href="mailto:srijanx2026@gmail.com" class="cl"><span class="ic">✉️</span><span>srijanx2026@gmail.com</span></a>
         </div>
-        <div class="faq-answer">All prints are made using FDM 3D printing with PLA/PETG filament. They are durable, lightweight and can be painted in any color.</div>
       </div>
-
-      <div class="faq-item">
-        <div class="faq-question" onclick="toggleFaq(this)">
-          <span>Do the prints come painted?</span>
-          <span class="faq-icon">+</span>
-        </div>
-        <div class="faq-answer">By default prints are colorless (single filament color). You can choose to: get them painted by us (additional cost), specify colors on WhatsApp, or paint them yourself.</div>
+      <div class="ob">
+        <h3>HOW TO ORDER</h3>
+        <p>We accept orders via WhatsApp. All payments are cash on delivery or in person.</p>
+        <ul class="os">
+          <li><span class="sn2">1</span> Browse catalog and pick your design</li>
+          <li><span class="sn2">2</span> Click "⚒ Forge This" on any product</li>
+          <li><span class="sn2">3</span> We confirm size, color &amp; price on WhatsApp</li>
+          <li><span class="sn2">4</span> We forge, paint &amp; deliver — cash on delivery</li>
+        </ul>
+        <a href="#catalog" class="vb vm" style="display:block;text-align:center;text-decoration:none;width:100%;">Browse Catalog</a>
       </div>
-
-      <div class="faq-item">
-        <div class="faq-question" onclick="toggleFaq(this)">
-          <span>What is the maximum print size?</span>
-          <span class="faq-icon">+</span>
-        </div>
-        <div class="faq-answer">Maximum print size is 10.08 × 10.08 × 10.08 inches (256mm³). For larger items, we can print in multiple parts and assemble. Let us know your requirements on WhatsApp.</div>
-      </div>
-
-      <div class="faq-item">
-        <div class="faq-question" onclick="toggleFaq(this)">
-          <span>How is pricing decided?</span>
-          <span class="faq-icon">+</span>
-        </div>
-        <div class="faq-answer">Pricing depends on the model complexity, size, color requirements and finishing. We discuss and confirm the final price on WhatsApp before printing — no surprises.</div>
-      </div>
-
-      <div class="faq-item">
-        <div class="faq-question" onclick="toggleFaq(this)">
-          <span>Can I request a fully custom design?</span>
-          <span class="faq-icon">+</span>
-        </div>
-        <div class="faq-answer">Yes! We do fully custom work — wedding figurines, portraits, fan gifts, anything. Share a reference image on WhatsApp and we'll work it out together.</div>
-      </div>
-
-      <div class="faq-item">
-        <div class="faq-question" onclick="toggleFaq(this)">
-          <span>How do I pay?</span>
-          <span class="faq-icon">+</span>
-        </div>
-        <div class="faq-answer">Currently cash on delivery or in-person payment only. We'll confirm payment details on WhatsApp before dispatch.</div>
-      </div>
-
-      <div class="faq-item">
-        <div class="faq-question" onclick="toggleFaq(this)">
-          <span>How long does an order take?</span>
-          <span class="faq-icon">+</span>
-        </div>
-        <div class="faq-answer">Typical turnaround is 3-7 days depending on complexity, size and painting requirements. We'll give you an accurate timeline on WhatsApp after confirming your order.</div>
-      </div>
-
-      <div class="faq-item">
-        <div class="faq-question" onclick="toggleFaq(this)">
-          <span>Do you ship or only deliver locally?</span>
-          <span class="faq-icon">+</span>
-        </div>
-        <div class="faq-answer">Currently we are based in Bengaluru and offer local delivery. Shipping options will be available soon — reach out on WhatsApp to discuss.</div>
-      </div>
-
     </div>
   </div>
 </section>
 
 <footer>
-  <div class="logo">SRIJAN<span>X</span></div>
-  <p>Bringing Stories To Life · @srijanx2026 · Your Faves. Our Creation.</p>
+  <div class="fl2">SRIJAN<span>X</span></div>
+  <p>The Forge · Bengaluru · @srijanx2026 · Your Faves. Our Creation.</p>
 </footer>
 
-<!-- ═══════════════════ ORDER MODAL ═══════════════════ -->
-<div class="modal-overlay" id="order-modal">
-  <div class="modal">
-    <button class="modal-close" onclick="closeOrderModal()">✕</button>
-    <div class="modal-title">ORDER NOW</div>
-    <p class="modal-sub">You'll be redirected to WhatsApp with your order details.</p>
-    <p id="order-product-name" style="font-family:var(--font-heading);font-size:1.1rem;color:var(--purple-glow);margin-bottom:1rem;"></p>
+<!-- ORDER MODAL -->
+<div class="mo" id="om">
+  <div class="md">
+    <button class="mc" onclick="cM('om')">✕</button>
+    <div class="mt">FORGE THIS</div>
+    <p class="ms">You'll be sent to WhatsApp with your order details.</p>
+    <p id="opn" style="font-family:var(--cin);font-size:1.1rem;color:var(--pg);margin-bottom:1rem;"></p>
     <label>Your Name</label>
-    <input type="text" id="order-name" placeholder="e.g. Akshay" />
-    <label>Any custom notes?</label>
-    <textarea id="order-notes" rows="3" placeholder="Colour preference, size, special request…"></textarea>
-    <div class="modal-error" id="order-error">Please enter your name.</div>
-    <button class="btn-primary" style="width:100%" onclick="submitOrder()">Send via WhatsApp</button>
+    <input type="text" id="on" placeholder="e.g. Akshay" />
+    <label>Custom Notes</label>
+    <textarea id="ono" rows="3" placeholder="Color preference, size, special request…"></textarea>
+    <div class="me" id="oe">Please enter your name.</div>
+    <button class="vb vm" style="width:100%;border:none;" onclick="subOrder()">⚒ Send via WhatsApp</button>
   </div>
 </div>
 
-<!-- ═══════════════════ ADMIN LOGIN MODAL ═══════════════════ -->
-<div class="modal-overlay" id="admin-login-modal">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal('admin-login-modal')">✕</button>
-    <div class="modal-title">ADMIN ACCESS</div>
-    <p class="modal-sub">Enter your password to manage the catalog.</p>
+<!-- ADMIN LOGIN -->
+<div class="mo" id="alm">
+  <div class="md">
+    <button class="mc" onclick="cM('alm')">✕</button>
+    <div class="mt">ADMIN ACCESS</div>
+    <p class="ms">Enter password to manage the forge catalog.</p>
     <label>Password</label>
-    <input type="password" id="admin-password-input" placeholder="Enter password" onkeyup="if(event.key==='Enter')verifyAdmin()" />
-    <div class="modal-error" id="admin-error">Incorrect password. Try again.</div>
-    <button class="btn-primary" style="width:100%;margin-top:0.5rem" onclick="verifyAdmin()">Enter</button>
+    <input type="password" id="apw" placeholder="Enter password" onkeyup="if(event.key==='Enter')vAdmin()" />
+    <div class="me" id="ae">Incorrect password.</div>
+    <button class="vb vm" style="width:100%;border:none;margin-top:.5rem;" onclick="vAdmin()">Enter</button>
   </div>
 </div>
 
-<!-- ═══════════════════ ADMIN PANEL ═══════════════════ -->
-<div id="admin-panel">
-  <div class="admin-header">
-    <h1>SRIJAN<span>X</span> ADMIN</h1>
-    <button class="nav-admin-btn" onclick="closeAdmin()">← Exit Admin</button>
+<!-- QUICKSAVE -->
+<div class="mo" id="qsm" style="align-items:flex-start;padding:1rem;overflow-y:auto;">
+  <div class="md" style="max-width:440px;margin:auto;">
+    <div class="mt">QUICK SAVE</div>
+    <p class="ms">Review and save to the forge catalog.</p>
+    <img id="qsp" src="" alt="" style="width:100%;height:160px;object-fit:cover;margin-bottom:1rem;border:1px solid rgba(123,47,255,.28);display:none;" onerror="this.style.display='none'" />
+    <label>Product Name</label><input type="text" id="qst" placeholder="Product name..." />
+    <label>Image URL</label><input type="url" id="qsi" placeholder="Image URL..." oninput="var p=document.getElementById('qsp');p.src=this.value;p.style.display='block';" />
+    <label>Category</label>
+    <select id="qsc" style="width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(123,47,255,.28);color:var(--white);padding:.8rem 1rem;font-family:var(--body);font-size:.95rem;margin-bottom:1rem;">
+      <option value="Anime">Anime</option><option value="Home Decor">Home Decor</option><option value="Chibi">Chibi</option><option value="Gift">Gift</option><option value="Custom">Custom</option>
+    </select>
+    <label>Description (optional)</label><textarea id="qsd" rows="2" placeholder="Short description..."></textarea>
+    <input type="hidden" id="qss" />
+    <div id="qsok" style="display:none;color:#4fffaa;font-family:var(--orb);font-size:.8rem;letter-spacing:.1em;margin-bottom:1rem;">✦ Saved to forge! Closing…</div>
+    <button id="qsbtn" class="vb vm" style="width:100%;border:none;" onclick="subQS()">✦ Save to Catalog</button>
   </div>
-  <div class="admin-body">
+</div>
 
-    <!-- Add Product -->
-    <div class="admin-section">
+<!-- ADMIN PANEL -->
+<div id="admin-panel">
+  <div class="ah">
+    <h1>SRIJAN<span>X</span> FORGE ADMIN</h1>
+    <button class="bs" onclick="closeAdmin()">← Exit Forge</button>
+  </div>
+  <div class="ab">
+    <div class="as">
       <h2>✦ ADD NEW PRODUCT</h2>
-
-      <div class="admin-form-group full" style="margin-bottom:1rem">
-        <label>Auto-fetch from URL (Thingiverse / Printables / Bambu)</label>
-        <div class="scrape-row">
-          <input type="url" id="scrape-url" placeholder="https://www.thingiverse.com/thing:..." />
-          <button class="btn-scrape" onclick="scrapeUrl()" id="scrape-btn">Fetch →</button>
-        </div>
-        <div class="scrape-preview" id="scrape-preview">
-          <img id="scrape-img" src="" alt="" />
-          <div class="scrape-preview-info">
-            <strong id="scrape-title-preview"></strong>
-            <small>Review and edit the fields below before saving.</small>
-          </div>
-        </div>
+      <div class="afr full" style="margin-bottom:1rem;">
+        <label>Auto-Fetch from URL (MakerWorld / Thingiverse / Printables)</label>
+        <div class="scr"><input type="url" id="su" placeholder="https://makerworld.com/en/models/..." /><button class="bs" onclick="doScrape()" id="sbt">Fetch →</button></div>
+        <div class="sp2" id="spr"><img id="spimg" src="" alt="" /><div><strong id="sptit"></strong><small>Review fields below before saving.</small></div></div>
       </div>
-
-      <div class="admin-form-grid">
-        <div class="admin-form-group full">
-          <label>Product Name *</label>
-          <input type="text" id="p-name" placeholder="e.g. Naruto Chibi Figurine" />
-        </div>
-        <div class="admin-form-group full">
+      <div class="afg">
+        <div class="afr full"><label>Product Name *</label><input type="text" id="pn" placeholder="e.g. Naruto Chibi Figurine" /></div>
+        <div class="afr full">
           <label>Image *</label>
-          <div class="img-source-tabs">
-            <button class="img-tab active" onclick="switchImgTab('upload')">📁 Upload from PC</button>
-            <button class="img-tab" onclick="switchImgTab('url')">🔗 Paste URL</button>
+          <div class="its">
+            <button class="it active" onclick="swTab('upload')">📁 Upload from PC</button>
+            <button class="it" onclick="swTab('url')">🔗 Paste URL</button>
           </div>
-          <div class="img-tab-panel active" id="img-tab-upload">
-            <div class="upload-zone" id="upload-zone">
-              <input type="file" id="p-img-file" accept="image/*" onchange="onFileSelected(this)" />
-              <div class="upload-icon">🖼️</div>
-              <p>Drag & drop or <span>click to browse</span></p>
-              <p style="font-size:0.75rem;margin-top:0.3rem;color:var(--grey)">JPG, PNG, WEBP up to 10MB</p>
-            </div>
-            <div class="upload-preview" id="upload-preview">
-              <img id="upload-preview-img" src="" alt="" />
-              <div class="upload-preview-info">
-                <strong id="upload-preview-name"></strong>
-                <small id="upload-preview-size"></small>
-              </div>
-            </div>
-            <div class="upload-progress" id="upload-progress">
-              <div class="upload-progress-bar" id="upload-progress-bar"></div>
-            </div>
+          <div class="itp active" id="it-upload">
+            <div class="uz"><input type="file" id="pif" accept="image/*" onchange="onFile(this)" /><div class="ui">🖼️</div><p>Drag &amp; drop or <span>click to browse</span></p><p style="margin-top:.3rem;font-size:.52rem;">JPG, PNG, WEBP up to 10MB</p></div>
+            <div class="up2" id="uprev"><img id="uprimg" src="" alt="" /><div><strong id="uprn"></strong><small id="uprs"></small></div></div>
+            <div class="upb" id="uppb"><div class="upbar" id="uppbar"></div></div>
           </div>
-          <div class="img-tab-panel" id="img-tab-url">
-            <input type="url" id="p-img" placeholder="Paste any image URL (jpg, png, webp)..." />
-          </div>
+          <div class="itp" id="it-url"><input type="url" id="pi" placeholder="Paste image URL..." /></div>
         </div>
-        <div class="admin-form-group">
-          <label>Category</label>
-          <select id="p-cat">
-            <option value="Anime">Anime</option>
-            <option value="Home Decor">Home Decor</option>
-            <option value="Custom">Custom</option>
-            <option value="Chibi">Chibi</option>
-            <option value="Gift">Gift</option>
-          </select>
-        </div>
-        <div class="admin-form-group">
-          <label>Source URL (optional)</label>
-          <input type="url" id="p-source" placeholder="Original design link" />
-        </div>
-        <div class="admin-form-group full">
-          <label>Short Description</label>
-          <textarea id="p-desc" rows="2" placeholder="A short punchy description…"></textarea>
-        </div>
+        <div class="afr"><label>Category</label><select id="pc"><option value="Anime">Anime</option><option value="Home Decor">Home Decor</option><option value="Custom">Custom</option><option value="Chibi">Chibi</option><option value="Gift">Gift</option></select></div>
+        <div class="afr"><label>Source URL (optional)</label><input type="url" id="pso" placeholder="Original design link" /></div>
+        <div class="afr full"><label>Short Description</label><textarea id="pd" rows="2" placeholder="A short punchy description…"></textarea></div>
       </div>
-
-      <button class="btn-add-product" onclick="addProduct()">✦ Add to Catalog</button>
-      <div class="admin-status" id="add-status"></div>
+      <button class="ba" onclick="addProd()">⚒ Add to Forge Catalog</button>
+      <div class="astat" id="ast"></div>
     </div>
 
-    <!-- Bookmarklet -->
-    <div class="admin-section">
+    <div class="as">
       <h2>✦ QUICK-SAVE BOOKMARKLET</h2>
-      <p style="color:var(--grey);font-size:0.9rem;line-height:1.7;margin-bottom:1.2rem;">
-        Browse MakerWorld, Thingiverse or Printables → click the bookmarklet → product gets added to your catalog in <strong style="color:var(--white)">one click</strong>. No copy-pasting.
-      </p>
-      <div style="background:rgba(240,180,41,0.08);border:1px solid rgba(240,180,41,0.3);border-radius:6px;padding:1.2rem;margin-bottom:1.2rem;">
-        <p style="color:var(--gold);font-family:var(--font-heading);font-size:0.85rem;letter-spacing:0.1em;margin-bottom:0.8rem;">HOW TO INSTALL:</p>
-        <ol style="color:var(--grey);font-size:0.85rem;line-height:1.9;padding-left:1.2rem;">
-          <li>Make sure your browser bookmarks bar is visible <em style="color:var(--grey)">(Ctrl+Shift+B on Chrome)</em></li>
-          <li>Drag the button below to your bookmarks bar</li>
+      <div class="bb2">
+        <p style="color:var(--white);font-family:var(--orb);font-size:.6rem;letter-spacing:.15em;margin-bottom:.8rem;">HOW TO INSTALL:</p>
+        <ol>
+          <li>Show bookmarks bar in browser <em>(Ctrl+Shift+B)</em></li>
+          <li>Drag the gold button below to your bookmarks bar</li>
           <li>Go to any MakerWorld / Thingiverse / Printables page</li>
-          <li>Click the bookmarklet → fill category → Save!</li>
+          <li>Click the bookmarklet → popup opens → fill details → Save!</li>
         </ol>
       </div>
       <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
-        <a id="bookmarklet-link" href="" class="btn-scrape" style="text-decoration:none;display:inline-block;font-size:1rem;padding:0.8rem 1.5rem;">
-          ✦ Save to SrijanX
-        </a>
-        <span style="color:var(--grey);font-size:0.85rem;font-family:var(--font-heading);">← Drag this to your bookmarks bar</span>
-      </div>
-      <p style="color:var(--grey);font-size:0.78rem;margin-top:1rem;font-family:var(--font-heading);letter-spacing:0.05em;">
-        ⚠️ If the site blocks image fetching, bookmarklet will still capture the title and URL — just upload a screenshot of the design manually.
-      </p>
-    </div>
-
-    <!-- Product List -->
-    <div class="admin-section">
-      <h2>✦ MANAGE CATALOG</h2>
-      <div class="admin-product-list" id="admin-product-list">
-        <p style="color:var(--grey);font-family:var(--font-heading);letter-spacing:0.1em">Loading…</p>
+        <a id="bml" href="" class="bs" style="text-decoration:none;display:inline-block;font-size:.8rem;padding:.8rem 1.5rem;">✦ Save to SrijanX Forge</a>
+        <span style="color:var(--dim);font-family:var(--orb);font-size:.55rem;letter-spacing:.1em;">← Drag this to your bookmarks bar</span>
       </div>
     </div>
 
+    <div class="as">
+      <h2>✦ MANAGE CATALOG <button class="bs" onclick="loadAdminList()" style="font-size:.55rem;padding:.35rem .9rem;">↻ Refresh</button></h2>
+      <div class="apl" id="apl"><p style="color:var(--dim);font-family:var(--orb);font-size:.65rem;letter-spacing:.1em;">Loading...</p></div>
+    </div>
   </div>
 </div>
 
-<!-- ═══════════════════ SCRIPTS ═══════════════════ -->
 <script>
-// ─── STARFIELD ───
-const canvas = document.getElementById('starfield');
-const ctx = canvas.getContext('2d');
-let stars = [], spotlights = [];
+const canvas=document.getElementById('forge-bg');
+const ctx=canvas.getContext('2d');
+let W,H,mouse={x:-999,y:-999};
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+resize();window.addEventListener('resize',resize);
+window.addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY;});
+const de=document.getElementById('ve-dots');
+for(let i=0;i<8;i++){const d=document.createElement('div');const g=i%2===0;d.style.cssText=`position:absolute;border-radius:50%;width:${g?6:4}px;height:${g?6:4}px;background:${g?'#f0b429':'#c87bff'};box-shadow:0 0 8px ${g?'rgba(240,180,41,.9)':'rgba(200,123,255,.9)'};`;const a=(i/8)*Math.PI*2,r=69;d.style.left=(75+Math.cos(a)*r-3)+'px';d.style.top=(75+Math.sin(a)*r-3)+'px';de.appendChild(d);}
+const pp=[];for(let i=0;i<180;i++)pp.push({x:Math.random()*3000,y:Math.random()*2000,vx:(Math.random()-.5)*.25,vy:-(Math.random()*.5+.1),life:Math.random(),ml:Math.random()*.7+.3,sz:Math.random()*2+.3,h:Math.random()*50+260,st:Math.random()>.65});
+const em=[];for(let i=0;i<65;i++)em.push({x:Math.random()*3000,y:Math.random()*2000+500,vx:(Math.random()-.5)*1.4,vy:-(Math.random()*2+.4),life:Math.random(),sz:Math.random()*1.8+.3,g:Math.random()>.45});
+const bms=[{x:.15,sp:.00035,c:'140,40,255'},{x:.42,sp:.00025,c:'180,80,255'},{x:.72,sp:.0004,c:'100,20,220'},{x:.9,sp:.0003,c:'160,60,255'}];
+const lv=[];for(let i=0;i<=35;i++)lv.push({x:0,y:0,ph:Math.random()*Math.PI*2});
+let t=0;
+function draw(){
+  t+=.006;ctx.clearRect(0,0,W,H);
+  const bg=ctx.createRadialGradient(W*.5,H*.3,0,W*.5,H*.6,H);bg.addColorStop(0,'rgba(20,5,45,1)');bg.addColorStop(.35,'rgba(10,2,22,1)');bg.addColorStop(1,'rgba(0,0,0,1)');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  const lg=ctx.createRadialGradient(W*.5,H,0,W*.5,H*.55,H*.6);lg.addColorStop(0,'rgba(160,50,255,.45)');lg.addColorStop(.25,'rgba(100,20,220,.18)');lg.addColorStop(.5,'rgba(60,0,180,.06)');lg.addColorStop(1,'transparent');ctx.fillStyle=lg;ctx.fillRect(0,0,W,H);
+  const s1=ctx.createRadialGradient(0,H*.65,0,0,H*.65,W*.5);s1.addColorStop(0,'rgba(160,60,255,.18)');s1.addColorStop(1,'transparent');ctx.fillStyle=s1;ctx.fillRect(0,0,W,H);
+  const s2=ctx.createRadialGradient(W,H*.55,0,W,H*.55,W*.45);s2.addColorStop(0,'rgba(200,80,255,.13)');s2.addColorStop(1,'transparent');ctx.fillStyle=s2;ctx.fillRect(0,0,W,H);
+  if(mouse.x>0){const mg=ctx.createRadialGradient(mouse.x,mouse.y,0,mouse.x,mouse.y,280);mg.addColorStop(0,'rgba(160,60,255,.1)');mg.addColorStop(.5,'rgba(100,20,200,.03)');mg.addColorStop(1,'transparent');ctx.fillStyle=mg;ctx.fillRect(0,0,W,H);}
+  bms.forEach((b,i)=>{b.a=Math.sin(t*b.sp*1000+i*1.8)*.4;const sx=b.x*W,len=H*1.4,ex=sx+Math.sin(b.a)*len;const g=ctx.createLinearGradient(sx,0,ex,len);g.addColorStop(0,`rgba(${b.c},.2)`);g.addColorStop(.3,`rgba(${b.c},.08)`);g.addColorStop(.7,`rgba(${b.c},.02)`);g.addColorStop(1,'transparent');ctx.beginPath();ctx.moveTo(sx-4,0);ctx.lineTo(sx+4,0);ctx.lineTo(ex+100,len);ctx.lineTo(ex-100,len);ctx.closePath();ctx.fillStyle=g;ctx.fill();const c=ctx.createLinearGradient(sx,0,ex,len);c.addColorStop(0,`rgba(${b.c},.45)`);c.addColorStop(.2,`rgba(${b.c},.12)`);c.addColorStop(1,'transparent');ctx.beginPath();ctx.moveTo(sx-1,0);ctx.lineTo(sx+1,0);ctx.lineTo(ex+12,len);ctx.lineTo(ex-12,len);ctx.closePath();ctx.fillStyle=c;ctx.fill();});
+  ctx.strokeStyle='rgba(123,47,255,.045)';ctx.lineWidth=.5;
+  for(let x=0;x<W;x+=58){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=58){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  pp.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.life-=.0018;if(p.life<=0||p.y<-10){p.x=Math.random()*W;p.y=H+20;p.life=p.ml;p.vy=-(Math.random()*.5+.1);}if(p.st){const a=.1+Math.abs(Math.sin(t*1.8+p.life*12))*.7;ctx.beginPath();ctx.arc(p.x,p.y,p.sz*.7,0,Math.PI*2);ctx.fillStyle=`hsla(${p.h},85%,80%,${a*p.life})`;ctx.fill();}else{const a=p.life*.7;const g=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.sz*4);g.addColorStop(0,`hsla(${p.h},95%,75%,${a})`);g.addColorStop(1,'transparent');ctx.fillStyle=g;ctx.beginPath();ctx.arc(p.x,p.y,p.sz*4,0,Math.PI*2);ctx.fill();}});
+  em.forEach(e=>{e.x+=e.vx+Math.sin(t*.9+e.life*5)*.5;e.y+=e.vy;e.life-=.005;if(e.life<=0||e.y<H*.15){e.x=Math.random()*W;e.y=H-70;e.life=1;e.vy=-(Math.random()*2+.4);e.vx=(Math.random()-.5)*1.4;}const c=e.g?`255,${170+Math.floor(e.life*60)},40`:`220,120,255`;const eg=ctx.createRadialGradient(e.x,e.y,0,e.x,e.y,e.sz*2.5);eg.addColorStop(0,`rgba(${c},${e.life*.85})`);eg.addColorStop(1,'transparent');ctx.fillStyle=eg;ctx.beginPath();ctx.arc(e.x,e.y,e.sz*2.5,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(e.x,e.y,e.sz,0,Math.PI*2);ctx.fillStyle=`rgba(${c},${e.life})`;ctx.fill();ctx.beginPath();ctx.moveTo(e.x,e.y);ctx.lineTo(e.x-e.vx*6,e.y-e.vy*6);ctx.strokeStyle=`rgba(${c},${e.life*.3})`;ctx.lineWidth=.7;ctx.stroke();});
+  lv.forEach((p,i)=>{p.ph+=.014;p.x=(i/(lv.length-1))*W;p.y=H-28+Math.sin(p.ph+i*.35)*12;});
+  ctx.beginPath();ctx.moveTo(0,H);ctx.lineTo(lv[0].x,lv[0].y);for(let i=1;i<lv.length;i++){const pv=lv[i-1],cu=lv[i];ctx.quadraticCurveTo(pv.x,pv.y,(pv.x+cu.x)/2,(pv.y+cu.y)/2);}ctx.lineTo(W,H);ctx.closePath();
+  const lf=ctx.createLinearGradient(0,H-55,0,H);lf.addColorStop(0,'rgba(200,80,255,1)');lf.addColorStop(.3,'rgba(140,30,255,.95)');lf.addColorStop(1,'rgba(80,0,200,.98)');ctx.fillStyle=lf;ctx.fill();
+  const lb=ctx.createLinearGradient(0,H-80,0,H-28);lb.addColorStop(0,'transparent');lb.addColorStop(1,'rgba(200,80,255,.3)');ctx.fillStyle=lb;ctx.fillRect(0,H-80,W,80);
+  for(let i=0;i<6;i++){const cx=(.08+i*.17)*W+Math.sin(t*.6+i)*25,cy=H-28+Math.sin(lv[Math.floor(i*5)].ph)*12;ctx.beginPath();ctx.moveTo(cx,H);ctx.lineTo(cx+Math.sin(t*.4+i)*18,cy-12);ctx.strokeStyle=`rgba(255,210,80,${.4+Math.sin(t*2.5+i)*.22})`;ctx.lineWidth=1.5;ctx.stroke();const cg=ctx.createRadialGradient(cx,cy,0,cx,cy,22);cg.addColorStop(0,'rgba(255,200,60,.3)');cg.addColorStop(1,'transparent');ctx.fillStyle=cg;ctx.fillRect(cx-22,cy-22,44,44);}
+  const ls=ctx.createLinearGradient(0,H-28,0,H-20);ls.addColorStop(0,'rgba(240,150,255,.28)');ls.addColorStop(1,'transparent');ctx.fillStyle=ls;ctx.fillRect(0,H-28,W,8);
+  requestAnimationFrame(draw);
+}
+draw();
 
-function resize() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+const revs=document.querySelectorAll('.rev');
+const ob=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:.1});
+revs.forEach(r=>ob.observe(r));
+
+let db=null,fbFns=null,allP=[],curP=null;
+window.addEventListener('firebaseReady',()=>{db=window._db;fbFns=window._fbFns;loadCatalog();chkQS();restAdmin();if(sessionStorage.getItem('sx_admin')==='1')loadAdminList();});
+
+async function loadCatalog(){
+  const g=document.getElementById('cg');
+  if(!db){g.innerHTML='<div class="ec2"><p>Firebase not connected.</p></div>';return;}
+  try{const s=await fbFns.getDocs(fbFns.collection(db,'products'));allP=s.docs.map(d=>({id:d.id,...d.data()}));renderCat('all');}
+  catch(e){g.innerHTML='<div class="ec2"><p>Could not load catalog.</p></div>';}
+}
+function renderCat(cat){
+  const g=document.getElementById('cg');
+  const f=cat==='all'?allP:allP.filter(p=>p.category===cat);
+  if(!f.length){g.innerHTML='<div class="ec2"><p>No products in this category yet.</p></div>';return;}
+  g.innerHTML=f.map(p=>`<div class="vc"><div class="vci">${p.image?`<img src="${p.image}" alt="${p.name}" onerror="this.parentElement.innerHTML='🔥'" loading="lazy"/>`:'🔥'}<div class="vbdg">${p.category||'Custom'}</div></div><div class="vcb"><div class="vcc">${p.category||'Custom'}</div><div class="vcn">${p.name}</div><div class="vcd">${p.description||'Custom 3D printed piece — forged to order.'}</div><div class="vcdi">⚠️ Reference only — prints colorless by default. <strong>Colors, size &amp; price on WhatsApp.</strong> Max 10.08³ in.</div><button class="vcbt" data-id="${p.id}" data-name="${p.name.replace(/"/g,'&quot;')}" data-img="${(p.image||'').replace(/"/g,'&quot;')}" onclick="oOM(this.dataset.id,this.dataset.name,this.dataset.img)">⚒ Forge This</button></div></div>`).join('');
+}
+document.getElementById('cf').addEventListener('click',e=>{if(!e.target.classList.contains('ct'))return;document.querySelectorAll('.ct').forEach(t=>t.classList.remove('active'));e.target.classList.add('active');renderCat(e.target.dataset.cat);});
+
+function oOM(id,name,img){curP={id,name,img};document.getElementById('opn').textContent='⚒ '+name;document.getElementById('on').value='';document.getElementById('ono').value='';document.getElementById('oe').style.display='none';document.getElementById('om').classList.add('open');}
+function subOrder(){const n=document.getElementById('on').value.trim();const nt=document.getElementById('ono').value.trim();if(!n){document.getElementById('oe').style.display='block';return;}document.getElementById('oe').style.display='none';const pi=curP&&curP.img?`
+Product Image: ${curP.img}`:'';const msg=encodeURIComponent(`Hello! SrijanX 👋
+
+I'd like to order:
+*${curP?curP.name:'Custom Order'}*${pi}
+
+Name: ${n}
+Notes: ${nt||'None'}
+
+Please confirm details, colors, size and pricing!`);window.open(`https://wa.me/919845536010?text=${msg}`,'_blank');cM('om');}
+function cM(id){document.getElementById(id).classList.remove('open');}
+
+let lc=0,lt=null;
+document.getElementById('nav-logo').addEventListener('click',()=>{lc++;clearTimeout(lt);lt=setTimeout(()=>{lc=0;},1500);if(lc>=5){lc=0;oAL();}});
+const APW='Srijanx@143';
+function oAL(){document.getElementById('apw').value='';document.getElementById('ae').style.display='none';document.getElementById('alm').classList.add('open');setTimeout(()=>document.getElementById('apw').focus(),100);}
+function vAdmin(){if(document.getElementById('apw').value===APW){cM('alm');oAdmin();}else document.getElementById('ae').style.display='block';}
+function oAdmin(){document.getElementById('admin-panel').classList.add('open');sessionStorage.setItem('sx_admin','1');loadAdminList();initBML();}
+function closeAdmin(){document.getElementById('admin-panel').classList.remove('open');sessionStorage.removeItem('sx_admin');}
+function restAdmin(){if(sessionStorage.getItem('sx_admin')==='1'){document.getElementById('admin-panel').classList.add('open');initBML();}}
+
+async function loadAdminList(){
+  const l=document.getElementById('apl');if(!db){l.innerHTML='<p style="color:var(--dim)">Firebase not connected.</p>';return;}
+  try{const s=await fbFns.getDocs(fbFns.collection(db,'products'));const ps=s.docs.map(d=>({id:d.id,...d.data()}));if(!ps.length){l.innerHTML='<p style="color:var(--dim);font-family:var(--orb);font-size:.65rem;">No products yet.</p>';return;}l.innerHTML=ps.map(p=>`<div class="api"><img src="${p.image||''}" onerror="this.src=''" alt=""/><div style="flex:1"><strong>${p.name}</strong><small>${p.category} · ${p.description?p.description.substring(0,55)+'…':'No description'}</small></div><button class="bd" data-id="${p.id}" data-img="${(p.image||'').replace(/"/g,'&quot;')}" onclick="delProd(this.dataset.id,this.dataset.img)">Delete</button></div>`).join('');}
+  catch(e){l.innerHTML='<p style="color:#ff6b6b">Error loading.</p>';}
 }
 
-function initStars() {
-  stars = Array.from({length: 180}, () => ({
-    x: Math.random() * canvas.width,
-    y: Math.random() * canvas.height,
-    r: Math.random() * 1.4 + 0.2,
-    a: Math.random(),
-    speed: Math.random() * 0.003 + 0.001,
-    twinkle: Math.random() * Math.PI * 2
-  }));
+let selFile=null;
+function swTab(tab){document.querySelectorAll('.it').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.itp').forEach(p=>p.classList.remove('active'));if(tab==='upload'){document.querySelectorAll('.it')[0].classList.add('active');document.getElementById('it-upload').classList.add('active');}else{document.querySelectorAll('.it')[1].classList.add('active');document.getElementById('it-url').classList.add('active');}selFile=null;}
+function onFile(inp){const f=inp.files[0];if(!f)return;selFile=f;const r=new FileReader();r.onload=e=>{document.getElementById('uprimg').src=e.target.result;document.getElementById('uprn').textContent=f.name;document.getElementById('uprs').textContent=(f.size/1024).toFixed(1)+' KB';document.getElementById('uprev').classList.add('show');};r.readAsDataURL(f);}
+async function upToStorage(f){const s=window._storage;const{ref:sr,uploadBytes,getDownloadURL}=window._storageFns;const fr=sr(s,`products/${Date.now()}_${f.name}`);const pb=document.getElementById('uppb');const bar=document.getElementById('uppbar');pb.classList.add('show');bar.style.width='40%';await uploadBytes(fr,f);bar.style.width='85%';const url=await getDownloadURL(fr);bar.style.width='100%';setTimeout(()=>{pb.classList.remove('show');bar.style.width='0%';},600);return url;}
 
-  spotlights = Array.from({length: 3}, (_, i) => ({
-    x: (canvas.width / 4) * (i + 1),
-    y: 0,
-    angle: -0.3 + i * 0.3,
-    color: i === 1 ? '123,47,255' : '157,91,255',
-    speed: 0.0003 + i * 0.0002
-  }));
+async function doScrape(){
+  const url=document.getElementById('su').value.trim();if(!url)return;
+  const btn=document.getElementById('sbt');btn.disabled=true;btn.textContent='Fetching…';
+  const pi=document.getElementById('pi');if(pi)pi.value='';
+  document.getElementById('spr').classList.remove('show');
+  try{const res=await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);const data=await res.json();const doc=new DOMParser().parseFromString(data.contents,'text/html');let tt=doc.querySelector('meta[property="og:title"]')?.content||doc.querySelector('title')?.textContent||'';tt=tt.replace(/ - Thingiverse| \| Printables| \| MakerWorld/g,'').trim();let img=doc.querySelector('meta[property="og:image"]')?.content||doc.querySelector('meta[name="twitter:image"]')?.content||'';if(tt)document.getElementById('pn').value=tt;if(img&&pi)pi.value=img;document.getElementById('pso').value=url;if(img||tt){document.getElementById('spimg').src=img||'';document.getElementById('sptit').textContent=tt||'No title — enter manually';document.getElementById('spr').classList.add('show');showStat(img?'✦ Fetched! Review below.':'⚠️ No image found — paste URL manually.','success');}else showStat('⚠️ Could not fetch. Paste image URL manually.','error');}
+  catch(e){showStat('⚠️ Blocked by site. Paste image URL manually.','error');}
+  btn.disabled=false;btn.textContent='Fetch →';
 }
 
-function drawStarfield(t) {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  // Spotlights
-  spotlights.forEach((s, i) => {
-    const angle = Math.sin(t * s.speed + i * 1.2) * 0.35;
-    const len = canvas.height * 1.2;
-    const endX = s.x + Math.sin(angle) * len;
-    const endY = len;
-    const grad = ctx.createLinearGradient(s.x, 0, endX, endY);
-    grad.addColorStop(0, `rgba(${s.color},0.10)`);
-    grad.addColorStop(0.5, `rgba(${s.color},0.05)`);
-    grad.addColorStop(1, `rgba(${s.color},0)`);
-    ctx.beginPath();
-    ctx.moveTo(s.x - 8, 0);
-    ctx.lineTo(s.x + 8, 0);
-    ctx.lineTo(endX + 80, endY);
-    ctx.lineTo(endX - 80, endY);
-    ctx.closePath();
-    ctx.fillStyle = grad;
-    ctx.fill();
-  });
-
-  // Stars
-  stars.forEach(s => {
-    s.twinkle += s.speed * 1.5;
-    const alpha = 0.15 + Math.abs(Math.sin(s.twinkle)) * 0.75;
-    const glow = s.r > 1.0;
-    if (glow) {
-      const g = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r * 3);
-      g.addColorStop(0, `rgba(200,170,255,${alpha})`);
-      g.addColorStop(1, `rgba(200,170,255,0)`);
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, s.r * 3, 0, Math.PI * 2);
-      ctx.fillStyle = g;
-      ctx.fill();
-    }
-    ctx.beginPath();
-    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(245,240,255,${Math.min(1, alpha)})`;
-    ctx.fill();
-  });
-
-  requestAnimationFrame(drawStarfield);
+async function addProd(){
+  const n=document.getElementById('pn').value.trim();const pi=document.getElementById('pi');const pu=pi?pi.value.trim():'';const cat=document.getElementById('pc').value;const desc=document.getElementById('pd').value.trim();const src=document.getElementById('pso').value.trim();
+  if(!n){showStat('Product name is required.','error');return;}if(!pu&&!selFile){showStat('Add an image — upload a file or paste a URL.','error');return;}if(!db){showStat('Firebase not connected!','error');return;}
+  let img=pu;if(selFile){try{showStat('⏳ Uploading image…','success');img=await upToStorage(selFile);}catch(e){showStat('Upload failed: '+e.message,'error');return;}}
+  try{await fbFns.addDoc(fbFns.collection(db,'products'),{name:n,image:img,category:cat,description:desc,source:src,createdAt:new Date().toISOString()});showStat(`✦ "${n}" added to the forge!`,'success');['pn','pd','pso','su'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});if(pi)pi.value='';document.getElementById('spr').classList.remove('show');document.getElementById('uprev').classList.remove('show');const pif=document.getElementById('pif');if(pif)pif.value='';selFile=null;loadAdminList();loadCatalog();}
+  catch(e){showStat('Error: '+e.message,'error');}
 }
 
-resize();
-initStars();
-requestAnimationFrame(drawStarfield);
-window.addEventListener('resize', () => { resize(); initStars(); });
-
-// ─── FAQ TOGGLE ───
-function toggleFaq(el) {
-  const item = el.parentElement;
-  const isOpen = item.classList.contains('open');
-  document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
-  if (!isOpen) item.classList.add('open');
+async function delProd(id,imgUrl){
+  if(!confirm('Delete this product from the forge?'))return;
+  try{await fbFns.deleteDoc(fbFns.doc(db,'products',id));if(imgUrl&&imgUrl.includes('firebasestorage.googleapis.com')&&window._storage&&window._storageFns){try{const{ref:sr,deleteObject}=window._storageFns;const m=imgUrl.match(/o\/(.+?)\?/);if(m){const fr=sr(window._storage,decodeURIComponent(m[1]));await deleteObject(fr);}}catch(e){console.log('Storage delete skipped:',e.message);}}loadAdminList();loadCatalog();}
+  catch(e){alert('Error: '+e.message);}
 }
 
-// ─── SCROLL REVEAL ───
-const reveals = document.querySelectorAll('.reveal');
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-}, { threshold: 0.1 });
-reveals.forEach(r => observer.observe(r));
+function showStat(msg,type){const el=document.getElementById('ast');el.textContent=msg;el.className='astat '+type;setTimeout(()=>el.className='astat',4500);}
 
-// ─── FIREBASE STATE ───
-let db = null, fbFns = null, allProducts = [], currentProduct = null;
+function initBML(){const code=`javascript:(function(){var t=document.querySelector('meta[property="og:title"]')?.content||document.title||'';t=t.replace(/ - Thingiverse|\| Printables|\| MakerWorld/g,'').trim();var i=document.querySelector('meta[property="og:image"]')?.content||document.querySelector('meta[name="twitter:image"]')?.content||'';var p=new URLSearchParams({title:t,img:i,source:window.location.href,action:'quicksave'});var w=window.open('https://srijanx2026.github.io?'+p.toString(),'sx_save','width=500,height=620,left=200,top=80');if(!w)alert('Please allow popups, then try again.');})()`;const l=document.getElementById('bml');if(l)l.href=code;}
 
-window.addEventListener('firebaseReady', () => {
-  db = window._db;
-  fbFns = window._fbFns;
-  loadCatalog();
-  checkQuickSave();
-});
-
-// ─── QUICKSAVE POPUP HANDLER ───
-function checkQuickSave() {
-  const params = new URLSearchParams(window.location.search);
-  if (params.get('action') !== 'quicksave') return;
-
-  const title = params.get('title') || '';
-  const img = params.get('img') || '';
-  const source = params.get('source') || '';
-
-  document.getElementById('qs-title').value = title;
-  document.getElementById('qs-img').value = img;
-  document.getElementById('qs-source').value = source;
-  if (img) {
-    const prev = document.getElementById('qs-preview');
-    prev.src = img;
-    prev.style.display = 'block';
-  }
-  document.getElementById('quicksave-modal').classList.add('open');
-
-  // Hide nav and main content in popup mode for clean UI
-  document.querySelector('nav').style.display = 'none';
-  document.getElementById('starfield').style.display = 'none';
-  document.body.style.background = 'var(--deep)';
-  // Make body scrollable in popup mode
-  document.body.style.overflow = 'auto';
-  document.body.style.height = 'auto';
-  const overlay = document.getElementById('quicksave-modal');
-  overlay.style.position = 'relative';
-  overlay.style.inset = 'auto';
-  overlay.style.display = 'block';
-  overlay.style.background = 'transparent';
-  overlay.style.backdropFilter = 'none';
-  overlay.style.padding = '1rem';
-  overlay.querySelector('.modal').style.margin = '0 auto';
-  overlay.querySelector('.modal').style.maxWidth = '440px';
+function chkQS(){
+  const p=new URLSearchParams(window.location.search);if(p.get('action')!=='quicksave')return;
+  const t=p.get('title')||'',i=p.get('img')||'',s=p.get('source')||'';
+  document.getElementById('qst').value=t;document.getElementById('qsi').value=i;document.getElementById('qss').value=s;
+  if(i){const pr=document.getElementById('qsp');pr.src=i;pr.style.display='block';}
+  document.getElementById('qsm').classList.add('open');
+  document.querySelector('nav').style.display='none';document.getElementById('forge-bg').style.display='none';document.body.style.background='#0d0520';
+  const ov=document.getElementById('qsm');ov.style.position='relative';ov.style.inset='auto';ov.style.display='block';ov.style.background='transparent';ov.style.backdropFilter='none';ov.style.padding='1rem';
 }
 
-async function submitQuickSave() {
-  const name = document.getElementById('qs-title').value.trim();
-  const img = document.getElementById('qs-img').value.trim();
-  const cat = document.getElementById('qs-cat').value;
-  const desc = document.getElementById('qs-desc').value.trim();
-  const source = document.getElementById('qs-source').value.trim();
-
-  if (!name) { alert('Please enter a product name.'); return; }
-
-  const btn = document.getElementById('qs-save-btn');
-  btn.textContent = 'Saving…';
-  btn.disabled = true;
-
-  // Wait for Firebase SDK (it loads with the page)
-  let attempts = 0;
-  while ((!window._db || !window._fbFns) && attempts < 20) {
-    await new Promise(r => setTimeout(r, 300));
-    attempts++;
-  }
-
-  if (!window._db) {
-    alert('Firebase not loaded. Please refresh the popup and try again.');
-    btn.textContent = '✦ Save to Catalog';
-    btn.disabled = false;
-    return;
-  }
-
-  try {
-    const _db = window._db;
-    const { collection, addDoc } = window._fbFns;
-    await addDoc(collection(_db, 'products'), {
-      name, image: img, category: cat,
-      description: desc, source,
-      createdAt: new Date().toISOString()
-    });
-    document.getElementById('qs-success').style.display = 'block';
-    btn.textContent = '✦ Saved!';
-    if (window.opener && !window.opener.closed) {
-      try { window.opener.loadCatalog(); } catch(e) {}
-    }
-    setTimeout(() => window.close(), 1500);
-  } catch(e) {
-    alert('Error: ' + e.message);
-    btn.textContent = '✦ Save to Catalog';
-    btn.disabled = false;
-  }
+async function subQS(){
+  const n=document.getElementById('qst').value.trim(),i=document.getElementById('qsi').value.trim(),c=document.getElementById('qsc').value,d=document.getElementById('qsd').value.trim(),s=document.getElementById('qss').value.trim();
+  if(!n){alert('Please enter a product name.');return;}
+  const btn=document.getElementById('qsbtn');btn.textContent='Saving…';btn.disabled=true;
+  let at=0;while((!window._db||!window._fbFns)&&at<20){await new Promise(r=>setTimeout(r,300));at++;}
+  if(!window._db){alert('Firebase not loaded. Refresh and try again.');btn.textContent='✦ Save to Catalog';btn.disabled=false;return;}
+  try{await window._fbFns.addDoc(window._fbFns.collection(window._db,'products'),{name:n,image:i,category:c,description:d,source:s,createdAt:new Date().toISOString()});document.getElementById('qsok').style.display='block';btn.textContent='✦ Saved!';if(window.opener&&!window.opener.closed){try{window.opener.loadCatalog();window.opener.loadAdminList();}catch(e){}}setTimeout(()=>window.close(),1500);}
+  catch(e){alert('Error: '+e.message);btn.textContent='✦ Save to Catalog';btn.disabled=false;}
 }
 
-// ─── LOAD CATALOG ───
-async function loadCatalog() {
-  const grid = document.getElementById('catalog-grid');
-  if (!db) {
-    grid.innerHTML = `<div class="empty-catalog"><div class="icon">⚙️</div><p>Firebase not connected yet.<br>Add your config to see the catalog.</p></div>`;
-    return;
-  }
-  try {
-    const snap = await fbFns.getDocs(fbFns.collection(db, 'products'));
-    allProducts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderCatalog('all');
-  } catch(e) {
-    grid.innerHTML = `<div class="empty-catalog"><div class="icon">⚠️</div><p>Could not load catalog. Check Firebase config.</p></div>`;
-  }
-}
-
-function renderCatalog(cat) {
-  const grid = document.getElementById('catalog-grid');
-  const filtered = cat === 'all' ? allProducts : allProducts.filter(p => p.category === cat);
-  if (!filtered.length) {
-    grid.innerHTML = `<div class="empty-catalog"><div class="icon">✦</div><p>No products in this category yet.</p></div>`;
-    return;
-  }
-  grid.innerHTML = filtered.map(p => `
-    <div class="product-card">
-      <img src="${p.image}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/300x300/0d0520/7b2fff?text=SrijanX'" loading="lazy"/>
-      <div class="product-card-body">
-        <div class="product-card-category">${p.category || 'Custom'}</div>
-        <div class="product-card-name">${p.name}</div>
-        <div class="product-card-desc">${p.description || 'Custom 3D printed piece.'}</div>
-        <div class="product-disclaimer">
-          ⚠️ Reference image only — prints are colorless. Choose colors on WhatsApp or paint yourself.
-          Max size: 10.08³ in. <strong>Pricing decided after size, color & model confirmation.</strong>
-        </div>
-        <button class="btn-order" onclick="openOrderModal('${p.id}', '${p.name.replace(/'/g,"\\'")}', '${p.image.replace(/'/g,"\\'")}')">Order on WhatsApp</button>
-      </div>
-    </div>
-  `).join('');
-}
-
-// Category filter
-document.getElementById('category-filter').addEventListener('click', e => {
-  if (!e.target.classList.contains('cat-tag')) return;
-  document.querySelectorAll('.cat-tag').forEach(t => t.classList.remove('active'));
-  e.target.classList.add('active');
-  renderCatalog(e.target.dataset.cat);
-});
-
-// ─── ORDER MODAL ───
-function openOrderModal(id, name, image) {
-  currentProduct = { id, name, image };
-  document.getElementById('order-product-name').textContent = '✦ ' + name;
-  document.getElementById('order-name').value = '';
-  document.getElementById('order-notes').value = '';
-  document.getElementById('order-error').style.display = 'none';
-  document.getElementById('order-modal').classList.add('open');
-}
-
-function closeOrderModal() {
-  document.getElementById('order-modal').classList.remove('open');
-}
-
-function submitOrder() {
-  const name = document.getElementById('order-name').value.trim();
-  const notes = document.getElementById('order-notes').value.trim();
-  if (!name) { document.getElementById('order-error').style.display = 'block'; return; }
-  document.getElementById('order-error').style.display = 'none';
-
-  const productImg = currentProduct.image ? `\nProduct Image: ${currentProduct.image}` : '';
-  const msg = encodeURIComponent(
-    `Hello! SrijanX 👋\n\nI'd like to order:\n*${currentProduct.name}*${productImg}\n\nName: ${name}\nNotes: ${notes || 'None'}\n\nPlease let me know the details, color options, size and pricing!`
-  );
-
-  // ──────────────────────────────────────────────────
-  // 📱 WHATSAPP NUMBER — UPDATE BELOW!
-  // Replace 91XXXXXXXXXX with your number (India = 91 + 10 digits)
-  // Example: 919876543210
-  // ──────────────────────────────────────────────────
-  const waNumber = '919845536010';
-
-  window.open(`https://wa.me/${waNumber}?text=${msg}`, '_blank');
-  closeOrderModal();
-}
-
-// ─── SECRET LOGO CLICK ADMIN ───
-let logoClickCount = 0, logoClickTimer = null;
-function handleLogoClick() {
-  logoClickCount++;
-  clearTimeout(logoClickTimer);
-  logoClickTimer = setTimeout(() => { logoClickCount = 0; }, 1500);
-  if (logoClickCount >= 5) { logoClickCount = 0; openAdminLogin(); }
-}
-
-// ─── ADMIN LOGIN ───
-const ADMIN_PASSWORD = 'Srijanx@143';
-
-function openAdminLogin() {
-  document.getElementById('admin-password-input').value = '';
-  document.getElementById('admin-error').style.display = 'none';
-  document.getElementById('admin-login-modal').classList.add('open');
-  setTimeout(() => document.getElementById('admin-password-input').focus(), 100);
-}
-
-function verifyAdmin() {
-  const pw = document.getElementById('admin-password-input').value;
-  if (pw === ADMIN_PASSWORD) {
-    closeModal('admin-login-modal');
-    openAdmin();
-  } else {
-    document.getElementById('admin-error').style.display = 'block';
-  }
-}
-
-function closeModal(id) {
-  document.getElementById(id).classList.remove('open');
-}
-
-// ─── ADMIN PANEL ───
-function openAdmin() {
-  document.getElementById('admin-panel').classList.add('open');
-  loadAdminList();
-  initBookmarklet();
-}
-
-function closeAdmin() {
-  document.getElementById('admin-panel').classList.remove('open');
-}
-
-async function loadAdminList() {
-  const list = document.getElementById('admin-product-list');
-  if (!db) { list.innerHTML = '<p style="color:var(--grey)">Firebase not connected.</p>'; return; }
-  try {
-    const snap = await fbFns.getDocs(fbFns.collection(db, 'products'));
-    const products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    if (!products.length) {
-      list.innerHTML = '<p style="color:var(--grey);font-family:var(--font-heading);letter-spacing:0.1em">No products yet. Add some above!</p>';
-      return;
-    }
-    list.innerHTML = products.map(p => `
-      <div class="admin-product-item">
-        <img src="${p.image}" onerror="this.src='https://via.placeholder.com/60x60/0d0520/7b2fff?text=X'" />
-        <div class="admin-product-item-info">
-          <strong>${p.name}</strong>
-          <small>${p.category} · ${p.description ? p.description.substring(0,60)+'…' : 'No description'}</small>
-        </div>
-        <button class="btn-delete" data-id="${p.id}" data-img="${(p.image||'').replace(/"/g,'&quot;')}" onclick="deleteProduct(this.dataset.id, this.dataset.img)">Delete</button>
-      </div>
-    `).join('');
-  } catch(e) {
-    list.innerHTML = '<p style="color:#ff6b6b">Error loading products.</p>';
-  }
-}
-
-// ─── IMAGE TAB + UPLOAD ───
-let selectedImageFile = null;
-
-function switchImgTab(tab) {
-  document.querySelectorAll('.img-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.img-tab-panel').forEach(p => p.classList.remove('active'));
-  if (tab === 'upload') {
-    document.querySelectorAll('.img-tab')[0].classList.add('active');
-    document.getElementById('img-tab-upload').classList.add('active');
-  } else {
-    document.querySelectorAll('.img-tab')[1].classList.add('active');
-    document.getElementById('img-tab-url').classList.add('active');
-  }
-  selectedImageFile = null;
-}
-
-function onFileSelected(input) {
-  const file = input.files[0];
-  if (!file) return;
-  selectedImageFile = file;
-  const reader = new FileReader();
-  reader.onload = e => {
-    document.getElementById('upload-preview-img').src = e.target.result;
-    document.getElementById('upload-preview-name').textContent = file.name;
-    document.getElementById('upload-preview-size').textContent = (file.size/1024).toFixed(1) + ' KB';
-    document.getElementById('upload-preview').classList.add('show');
-  };
-  reader.readAsDataURL(file);
-}
-
-async function uploadImageToStorage(file) {
-  const storage = window._storage;
-  const { ref: sRef, uploadBytes, getDownloadURL } = window._storageFns;
-  const fileRef = sRef(storage, `products/${Date.now()}_${file.name}`);
-  const progress = document.getElementById('upload-progress');
-  const bar = document.getElementById('upload-progress-bar');
-  progress.classList.add('show');
-  bar.style.width = '40%';
-  await uploadBytes(fileRef, file);
-  bar.style.width = '80%';
-  const url = await getDownloadURL(fileRef);
-  bar.style.width = '100%';
-  setTimeout(() => { progress.classList.remove('show'); bar.style.width = '0%'; }, 600);
-  return url;
-}
-
-// ─── BOOKMARKLET SETUP ───
-function initBookmarklet() {
-  const firebaseConfig = {'apiKey': 'AIzaSyDYBpoOfcXQGRQ-bstduxpI9V07g5oWRJo', 'projectId': 'srijanx-sap'};
-  
-  const bookmarkletCode = `javascript:(function(){
-    var title = document.querySelector('meta[property="og:title"]')?.content || document.title || '';
-    title = title.replace(/ - Thingiverse| \| Printables| \| MakerWorld/g,'').trim();
-    var img = document.querySelector('meta[property="og:image"]')?.content || document.querySelector('meta[name="twitter:image"]')?.content || '';
-    var pageUrl = window.location.href;
-    var params = new URLSearchParams({
-      title: title,
-      img: img,
-      source: pageUrl,
-      action: 'quicksave'
-    });
-    var popup = window.open('https://srijanx2026.github.io?' + params.toString(), 'srijanx_save', 'width=500,height=600,left=200,top=100');
-    if(!popup) alert('Please allow popups for this site, then try again.');
-  })()`;
-
-  const link = document.getElementById('bookmarklet-link');
-  if (link) link.href = bookmarkletCode;
-}
-
-// ─── SCRAPE URL ───
-async function scrapeUrl() {
-  const url = document.getElementById('scrape-url').value.trim();
-  if (!url) return;
-  const btn = document.getElementById('scrape-btn');
-  btn.disabled = true;
-  btn.textContent = 'Fetching…';
-
-  // Always reset form fields first so manual entry works after
-  document.getElementById('p-img').value = '';
-  document.getElementById('scrape-preview').classList.remove('show');
-
-  try {
-    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
-    const res = await fetch(proxyUrl);
-    const data = await res.json();
-    const htmlStr = data.contents;
-    const parser = new DOMParser();
-    const parsed = parser.parseFromString(htmlStr, 'text/html');
-
-    let title = parsed.querySelector('meta[property="og:title"]')?.content
-      || parsed.querySelector('title')?.textContent || '';
-    title = title.replace(' - Thingiverse','').replace(' | Printables','').replace(' | MakerWorld','').trim();
-
-    let img = parsed.querySelector('meta[property="og:image"]')?.content
-      || parsed.querySelector('meta[name="twitter:image"]')?.content || '';
-
-    if (title) document.getElementById('p-name').value = title;
-    if (img) document.getElementById('p-img').value = img;
-    document.getElementById('p-source').value = url;
-
-    if (img || title) {
-      document.getElementById('scrape-img').src = img || '';
-      document.getElementById('scrape-title-preview').textContent = title || 'Title not found — enter manually';
-      document.getElementById('scrape-preview').classList.add('show');
-      showAdminStatus(img ? '✦ Fetched! Review and edit below.' : '⚠️ Title found but no image — paste image URL manually.', img ? 'success' : 'error');
-    } else {
-      showAdminStatus('⚠️ Could not auto-fetch. Paste the image URL manually below — it will work!', 'error');
-    }
-
-  } catch(e) {
-    showAdminStatus('⚠️ Fetch blocked. Paste the image URL manually below — it will work!', 'error');
-  }
-
-  btn.disabled = false;
-  btn.textContent = 'Fetch →';
-}
-
-// ─── ADD PRODUCT ───
-async function addProduct() {
-  const name = document.getElementById('p-name').value.trim();
-  const urlImg = document.getElementById('p-img') ? document.getElementById('p-img').value.trim() : '';
-  const cat = document.getElementById('p-cat').value;
-  const desc = document.getElementById('p-desc').value.trim();
-  const source = document.getElementById('p-source').value.trim();
-
-  if (!name) { showAdminStatus('Product name is required.', 'error'); return; }
-  if (!urlImg && !selectedImageFile) { showAdminStatus('Add an image — upload a file or paste a URL.', 'error'); return; }
-  if (!db) { showAdminStatus('Firebase not connected!', 'error'); return; }
-
-  let finalImg = urlImg;
-
-  if (selectedImageFile) {
-    try {
-      showAdminStatus('⏳ Uploading image…', 'success');
-      finalImg = await uploadImageToStorage(selectedImageFile);
-    } catch(e) {
-      showAdminStatus('Image upload failed: ' + e.message, 'error');
-      return;
-    }
-  }
-
-  try {
-    await fbFns.addDoc(fbFns.collection(db, 'products'), {
-      name, image: finalImg, category: cat, description: desc, source,
-      createdAt: new Date().toISOString()
-    });
-    showAdminStatus(`✦ "${name}" added successfully!`, 'success');
-    ['p-name','p-desc','p-source','scrape-url'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
-    const imgEl = document.getElementById('p-img'); if(imgEl) imgEl.value = '';
-    document.getElementById('scrape-preview').classList.remove('show');
-    document.getElementById('upload-preview').classList.remove('show');
-    const fileEl = document.getElementById('p-img-file'); if(fileEl) fileEl.value = '';
-    selectedImageFile = null;
-    loadAdminList();
-    loadCatalog();
-  } catch(e) {
-    showAdminStatus('Error saving product: ' + e.message, 'error');
-  }
-}
-
-// ─── DELETE PRODUCT ───
-async function deleteProduct(id, imageUrl) {
-  if (!confirm('Delete this product?')) return;
-  try {
-    // Delete Firestore document
-    await fbFns.deleteDoc(fbFns.doc(db, 'products', id));
-
-    // If image is hosted on Firebase Storage, delete it too
-    if (imageUrl && imageUrl.includes('firebasestorage.googleapis.com') && window._storage && window._storageFns) {
-      try {
-        const { ref: sRef, deleteObject } = window._storageFns;
-        // Extract path from URL
-        const pathMatch = imageUrl.match(/o\/(.+?)\?/);
-        if (pathMatch) {
-          const filePath = decodeURIComponent(pathMatch[1]);
-          const fileRef = sRef(window._storage, filePath);
-          await deleteObject(fileRef);
-        }
-      } catch(e) {
-        console.log('Storage delete skipped:', e.message);
-      }
-    }
-
-    loadAdminList();
-    loadCatalog();
-  } catch(e) {
-    alert('Error deleting: ' + e.message);
-  }
-}
-
-function showAdminStatus(msg, type) {
-  const el = document.getElementById('add-status');
-  el.textContent = msg;
-  el.className = 'admin-status ' + type;
-  setTimeout(() => el.className = 'admin-status', 4000);
-}
+function tFaq(el){const it=el.parentElement;const op=it.classList.contains('open');document.querySelectorAll('.fi.open').forEach(i=>i.classList.remove('open'));if(!op)it.classList.add('open');}
 </script>
-
-
-<!-- ═══════════════════ QUICKSAVE MODAL ═══════════════════ -->
-<div class="modal-overlay" id="quicksave-modal">
-  <div class="modal" style="max-width:440px;width:100%;margin:auto;">
-    <div class="modal-title">QUICK SAVE</div>
-    <p class="modal-sub">Review details and save to your catalog.</p>
-
-    <img id="qs-preview" src="" alt="" style="width:100%;height:180px;object-fit:cover;border-radius:4px;margin-bottom:1rem;border:1px solid rgba(123,47,255,0.3);display:block;" onerror="this.style.display='none'" />
-
-    <label>Product Name</label>
-    <input type="text" id="qs-title" placeholder="Product name..." />
-
-    <label>Image URL</label>
-    <input type="url" id="qs-img" placeholder="Image URL..." oninput="document.getElementById('qs-preview').src=this.value" />
-
-    <label>Category</label>
-    <select id="qs-cat" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(123,47,255,0.3);color:var(--white);padding:0.8rem 1rem;border-radius:4px;font-family:var(--font-body);font-size:0.95rem;margin-bottom:1rem;">
-      <option value="Anime">Anime</option>
-      <option value="Home Decor">Home Decor</option>
-      <option value="Chibi">Chibi</option>
-      <option value="Gift">Gift</option>
-      <option value="Custom">Custom</option>
-    </select>
-
-    <label>Description (optional)</label>
-    <textarea id="qs-desc" rows="2" placeholder="Short description..."></textarea>
-
-    <input type="hidden" id="qs-source" />
-
-    <div id="qs-success" style="display:none;color:#4fffaa;font-family:var(--font-heading);font-size:1rem;letter-spacing:0.1em;margin-bottom:1rem;">✦ Saved to catalog! Closing…</div>
-
-    <button id="qs-save-btn" class="btn-primary" style="width:100%" onclick="submitQuickSave()">✦ Save to Catalog</button>
-  </div>
-</div>
-
 </body>
 </html>
