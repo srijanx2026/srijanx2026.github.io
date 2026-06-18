@@ -110,13 +110,13 @@ section{position:relative;z-index:10;}
 .vci img{width:100%;height:100%;object-fit:cover;display:block;}
 .vci::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(80,20,160,.28),transparent 55%);pointer-events:none;}
 .vbdg{position:absolute;top:10px;right:10px;font-family:var(--orb);font-size:.48rem;letter-spacing:.18em;padding:3px 8px;border:1px solid rgba(240,180,41,.4);color:rgba(240,180,41,.85);text-transform:uppercase;background:rgba(0,0,0,.7);z-index:3;box-shadow:0 0 8px rgba(240,180,41,.12);}
-.vcb{padding:1.1rem;}
+.vcb{padding:1.1rem;display:flex;flex-direction:column;height:100%;}
 .vcc{font-family:var(--orb);font-size:.5rem;letter-spacing:.28em;color:rgba(240,180,41,.6);text-transform:uppercase;margin-bottom:.35rem;}
 .vcn{font-family:var(--cin);font-size:.95rem;font-weight:700;color:var(--white);margin-bottom:.4rem;line-height:1.3;}
-.vcd{font-size:.78rem;color:var(--muted);line-height:1.6;margin-bottom:.5rem;}
+.vcd{font-size:.78rem;color:var(--muted);line-height:1.6;margin-bottom:.5rem;flex:1;}
 .vcdi{font-size:.68rem;color:var(--muted);line-height:1.55;margin-bottom:.9rem;padding:.45rem .7rem;border-left:2px solid rgba(123,47,255,.3);background:rgba(123,47,255,.04);}
 .vcdi strong{color:rgba(240,180,41,.65);}
-.vcbt{width:100%;background:linear-gradient(135deg,rgba(123,47,255,.1),rgba(80,0,200,.07));border:1px solid rgba(160,80,255,.28);color:var(--pg);padding:.65rem;font-family:var(--orb);font-size:.58rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;transition:all .3s;box-shadow:0 1px 0 rgba(200,123,255,.05) inset;}
+.vcbt{width:100%;background:linear-gradient(135deg,rgba(123,47,255,.1),rgba(80,0,200,.07));border:1px solid rgba(160,80,255,.28);color:var(--pg);padding:.65rem;font-family:var(--orb);font-size:.58rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;transition:all .3s;box-shadow:0 1px 0 rgba(200,123,255,.05) inset;margin-top:auto;}
 .vcbt:hover{background:linear-gradient(135deg,rgba(160,80,255,.2),rgba(100,20,255,.13));color:#fff;border-color:rgba(200,123,255,.5);box-shadow:0 1px 0 rgba(200,123,255,.1) inset,0 0 18px rgba(123,47,255,.22);}
 .ec2{grid-column:1/-1;text-align:center;padding:4rem 2rem;color:var(--dim);}
 .ec2 p{font-family:var(--orb);font-size:.8rem;letter-spacing:.15em;}
@@ -234,6 +234,17 @@ footer p{color:var(--white);opacity:.4;font-family:var(--orb);font-size:.5rem;le
 
 .rev{opacity:0;transform:translateY(35px);transition:opacity .7s ease,transform .7s ease;}
 .rev.visible{opacity:1;transform:translateY(0);}
+.lb-modal{display:none;position:fixed;inset:0;background:rgba(3,0,10,.95);z-index:1500;align-items:center;justify-content:center;backdrop-filter:blur(12px);}
+.lb-modal.open{display:flex;}
+.lb-content{background:linear-gradient(145deg,#0d0520,#1a0840);border:1px solid rgba(123,47,255,.35);max-width:90%;max-height:90vh;overflow:auto;position:relative;box-shadow:0 1px 0 rgba(200,123,255,.08) inset,0 0 60px rgba(123,47,255,.28);}
+.lb-close{position:absolute;top:1rem;right:1.2rem;background:none;border:none;color:var(--dim);font-size:1.4rem;cursor:pointer;transition:color .3s;z-index:10;}
+.lb-close:hover{color:var(--white);}
+.lb-img{width:100%;max-height:600px;object-fit:contain;display:block;}
+.lb-info{padding:2rem;color:var(--text);}
+.lb-name{font-family:var(--cin);font-size:1.5rem;font-weight:700;color:var(--white);margin-bottom:0.8rem;letter-spacing:.05em;}
+.lb-desc{color:var(--muted);font-size:0.95rem;line-height:1.8;margin-bottom:1.2rem;}
+.lb-action{display:flex;gap:1rem;}
+
 @media(max-width:768px){nav{padding:1rem 1.5rem;}.nav-links{display:none;}.ag,.cg{grid-template-columns:1fr;gap:2rem;}.vs{grid-template-columns:1fr 1fr;}.afg{grid-template-columns:1fr;}.ah{padding:1rem 1.5rem;}.sr{gap:2.5rem;}}
 </style>
 </head>
@@ -304,6 +315,7 @@ footer p{color:var(--white);opacity:.4;font-family:var(--orb);font-size:.5rem;le
       <button class="ct" data-cat="Gift">Gift</button>
     </div>
     <div class="vg2" id="cg"><div class="ec2"><p>Loading the forge...</p></div></div>
+    <div id="pg" style="display:none;"></div>
   </div>
 </section>
 
@@ -386,6 +398,22 @@ footer p{color:var(--white);opacity:.4;font-family:var(--orb);font-size:.5rem;le
   <div class="fl2">SRIJAN<span>X</span></div>
   <p>The Forge · Bengaluru · @srijanx2026 · Your Faves. Our Creation.</p>
 </footer>
+
+<!-- LIGHTBOX -->
+<div class="lb-modal" id="lbm">
+  <div class="lb-content">
+    <button class="lb-close" onclick="closeLB()">✕</button>
+    <img id="lb-img" src="" alt="" class="lb-img" />
+    <div class="lb-info">
+      <div class="lb-name" id="lb-name"></div>
+      <div class="lb-desc" id="lb-desc"></div>
+      <div class="lb-action">
+        <button class="vb vm" style="flex:1;" id="lb-forge-btn">⚒ Forge This</button>
+        <button class="vb vg" style="flex:1;" onclick="closeLB()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ORDER MODAL -->
 <div class="mo" id="om">
@@ -537,7 +565,11 @@ const revs=document.querySelectorAll('.rev');
 const ob=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:.1});
 revs.forEach(r=>ob.observe(r));
 
-let db=null,fbFns=null,allP=[],curP=null;
+let curLBProduct=null;
+function openLB(img,name,desc){document.getElementById('lb-img').src=img;document.getElementById('lb-name').textContent=name;document.getElementById('lb-desc').textContent=desc;curLBProduct={name,img};document.getElementById('lbm').classList.add('open');}
+function closeLB(){document.getElementById('lbm').classList.remove('open');}
+
+let db=null,fbFns=null,allP=[],curP=null,curCat='all',curPage=1,itemsPerPage=4;
 window.addEventListener('firebaseReady',()=>{db=window._db;fbFns=window._fbFns;loadCatalog();chkQS();restAdmin();if(sessionStorage.getItem('sx_admin')==='1')loadAdminList();});
 
 async function loadCatalog(){
@@ -547,11 +579,19 @@ async function loadCatalog(){
   catch(e){g.innerHTML='<div class="ec2"><p>Could not load catalog.</p></div>';}
 }
 function renderCat(cat){
+  curCat=cat;if(cat!==curCat)curPage=1;curCat=cat;
   const g=document.getElementById('cg');
   const f=cat==='all'?allP:allP.filter(p=>p.category===cat);
-  if(!f.length){g.innerHTML='<div class="ec2"><p>No products in this category yet.</p></div>';return;}
-  g.innerHTML=f.map(p=>`<div class="vc"><div class="vci">${p.image?`<img src="${p.image}" alt="${p.name}" onerror="this.parentElement.innerHTML='🔥'" loading="lazy"/>`:'🔥'}<div class="vbdg">${p.category||'Custom'}</div></div><div class="vcb"><div class="vcc">${p.category||'Custom'}</div><div class="vcn">${p.name}</div><div class="vcd">${p.description||'Custom 3D printed piece — forged to order.'}</div><div class="vcdi">⚠️ Reference only — prints colorless by default. <strong>Colors, size &amp; price on WhatsApp.</strong> Max 10.08³ in.</div><button class="vcbt" data-id="${p.id}" data-name="${p.name.replace(/"/g,'&quot;')}" data-img="${(p.image||'').replace(/"/g,'&quot;')}" onclick="oOM(this.dataset.id,this.dataset.name,this.dataset.img)">⚒ Forge This</button></div></div>`).join('');
+  if(!f.length){g.innerHTML='<div class="ec2"><p>No products in this category yet.</p></div>';document.getElementById('pg').style.display='none';return;}
+  const totalPages=Math.ceil(f.length/itemsPerPage);
+  const start=(curPage-1)*itemsPerPage;const end=start+itemsPerPage;
+  const pageItems=f.slice(start,end);
+  g.innerHTML=pageItems.map(p=>`<div class="vc"><div class="vci" onclick="openLB('${p.image||''}','${p.name.replace(/"/g,'&quot;')}','${(p.description||'').replace(/"/g,'&quot;')}')"><img src="${p.image}" alt="${p.name}" onerror="this.parentElement.innerHTML='🔥'" loading="lazy" style="cursor:pointer;width:100%;height:100%;object-fit:cover;"/><div class="vbdg">${p.category||'Custom'}</div></div><div class="vcb"><div class="vcc">${p.category||'Custom'}</div><div class="vcn">${p.name}</div><div class="vcd">${p.description||'Custom 3D printed piece — forged to order.'}</div><div class="vcdi">⚠️ Reference only — prints colorless by default. <strong>Colors, size &amp; price on WhatsApp.</strong> Max 10.08³ in.</div><button class="vcbt" data-id="${p.id}" data-name="${p.name.replace(/"/g,'&quot;')}" data-img="${(p.image||'').replace(/"/g,'&quot;')}" onclick="oOM(this.dataset.id,this.dataset.name,this.dataset.img)">⚒ Forge This</button></div></div>`).join('');
+  document.getElementById('pg').innerHTML=`<div style="text-align:center;padding:1.5rem;"><span style="color:var(--dim);font-family:var(--orb);font-size:.7rem;letter-spacing:.1em;margin-right:1rem;">Page ${curPage} of ${totalPages}</span><button class="vb vg" onclick="prevPage('${cat}')" style="padding:.6rem 1.2rem;margin-right:.5rem;font-size:.65rem;" ${curPage===1?'disabled style="opacity:.4;cursor:not-allowed;"':''}>← Previous</button><button class="vb vg" onclick="nextPage('${cat}')" style="padding:.6rem 1.2rem;font-size:.65rem;" ${curPage===totalPages?'disabled style="opacity:.4;cursor:not-allowed;"':''}>Next →</button></div>`;
+  document.getElementById('pg').style.display='block';
 }
+function nextPage(cat){const f=cat==='all'?allP:allP.filter(p=>p.category===cat);const totalPages=Math.ceil(f.length/itemsPerPage);if(curPage<totalPages){curPage++;renderCat(cat);window.scrollTo({top:document.getElementById('cg').offsetTop-100,behavior:'smooth'});}};
+function prevPage(cat){if(curPage>1){curPage--;renderCat(cat);window.scrollTo({top:document.getElementById('cg').offsetTop-100,behavior:'smooth'});}}
 document.getElementById('cf').addEventListener('click',e=>{if(!e.target.classList.contains('ct'))return;document.querySelectorAll('.ct').forEach(t=>t.classList.remove('active'));e.target.classList.add('active');renderCat(e.target.dataset.cat);});
 
 function oOM(id,name,img){curP={id,name,img};document.getElementById('opn').textContent='⚒ '+name;document.getElementById('on').value='';document.getElementById('ono').value='';document.getElementById('oe').style.display='none';document.getElementById('om').classList.add('open');}
