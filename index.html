@@ -10,6 +10,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
   // ─────────────────────────────────────────────
   // 🔧 PASTE YOUR FIREBASE CONFIG HERE
@@ -27,8 +28,11 @@
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
+  const storage = getStorage(app);
   window._db = db;
+  window._storage = storage;
   window._fbFns = { collection, addDoc, getDocs, deleteDoc, doc };
+  window._storageFns = { ref, uploadBytes, getDownloadURL };
   window.dispatchEvent(new Event("firebaseReady"));
 </script>
 
@@ -960,6 +964,51 @@
     opacity: 0.4;
   }
 
+
+
+  /* ── IMAGE UPLOAD ── */
+  .upload-zone {
+    border: 2px dashed rgba(123,47,255,0.4);
+    border-radius: 6px;
+    padding: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: rgba(123,47,255,0.04);
+    position: relative;
+  }
+  .upload-zone:hover, .upload-zone.dragover {
+    border-color: var(--purple-glow);
+    background: rgba(123,47,255,0.1);
+  }
+  .upload-zone input[type="file"] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer;
+    width: 100%; height: 100%; border: none; background: none; padding: 0; margin: 0;
+  }
+  .upload-zone .upload-icon { font-size: 2rem; margin-bottom: 0.4rem; }
+  .upload-zone p { color: var(--grey); font-family: var(--font-heading); font-size: 0.85rem; letter-spacing: 0.1em; margin: 0; }
+  .upload-zone p span { color: var(--purple-glow); }
+  .upload-preview { display: none; align-items: center; gap: 1rem; margin-top: 0.8rem; padding: 0.8rem; background: rgba(123,47,255,0.08); border-radius: 4px; }
+  .upload-preview.show { display: flex; }
+  .upload-preview img { width: 60px; height: 60px; object-fit: cover; border-radius: 3px; }
+  .upload-preview-info { flex: 1; }
+  .upload-preview-info strong { color: var(--white); font-family: var(--font-heading); font-size: 0.9rem; display: block; }
+  .upload-preview-info small { color: var(--grey); font-size: 0.75rem; }
+  .upload-progress { width: 100%; height: 3px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-top: 0.5rem; overflow: hidden; display: none; }
+  .upload-progress.show { display: block; }
+  .upload-progress-bar { height: 100%; background: linear-gradient(to right, var(--purple), var(--gold)); width: 0%; transition: width 0.3s; border-radius: 2px; }
+  .img-source-tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+  .img-tab {
+    flex: 1; padding: 0.5rem; text-align: center;
+    font-family: var(--font-heading); font-size: 0.8rem; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; border-radius: 3px;
+    border: 1px solid rgba(123,47,255,0.3); color: var(--grey); background: transparent;
+    transition: all 0.25s;
+  }
+  .img-tab.active { background: var(--purple); border-color: var(--purple-glow); color: white; }
+  .img-tab-panel { display: none; }
+  .img-tab-panel.active { display: block; }
+
 </style>
 </head>
 <body>
@@ -1184,8 +1233,32 @@
           <input type="text" id="p-name" placeholder="e.g. Naruto Chibi Figurine" />
         </div>
         <div class="admin-form-group full">
-          <label>Image URL *</label>
-          <input type="url" id="p-img" placeholder="https://..." />
+          <label>Image *</label>
+          <div class="img-source-tabs">
+            <button class="img-tab active" onclick="switchImgTab('upload')">📁 Upload from PC</button>
+            <button class="img-tab" onclick="switchImgTab('url')">🔗 Paste URL</button>
+          </div>
+          <div class="img-tab-panel active" id="img-tab-upload">
+            <div class="upload-zone" id="upload-zone">
+              <input type="file" id="p-img-file" accept="image/*" onchange="onFileSelected(this)" />
+              <div class="upload-icon">🖼️</div>
+              <p>Drag & drop or <span>click to browse</span></p>
+              <p style="font-size:0.75rem;margin-top:0.3rem;color:var(--grey)">JPG, PNG, WEBP up to 10MB</p>
+            </div>
+            <div class="upload-preview" id="upload-preview">
+              <img id="upload-preview-img" src="" alt="" />
+              <div class="upload-preview-info">
+                <strong id="upload-preview-name"></strong>
+                <small id="upload-preview-size"></small>
+              </div>
+            </div>
+            <div class="upload-progress" id="upload-progress">
+              <div class="upload-progress-bar" id="upload-progress-bar"></div>
+            </div>
+          </div>
+          <div class="img-tab-panel" id="img-tab-url">
+            <input type="url" id="p-img" placeholder="Paste any image URL (jpg, png, webp)..." />
+          </div>
         </div>
         <div class="admin-form-group">
           <label>Category</label>
@@ -1209,6 +1282,32 @@
 
       <button class="btn-add-product" onclick="addProduct()">✦ Add to Catalog</button>
       <div class="admin-status" id="add-status"></div>
+    </div>
+
+    <!-- Bookmarklet -->
+    <div class="admin-section">
+      <h2>✦ QUICK-SAVE BOOKMARKLET</h2>
+      <p style="color:var(--grey);font-size:0.9rem;line-height:1.7;margin-bottom:1.2rem;">
+        Browse MakerWorld, Thingiverse or Printables → click the bookmarklet → product gets added to your catalog in <strong style="color:var(--white)">one click</strong>. No copy-pasting.
+      </p>
+      <div style="background:rgba(240,180,41,0.08);border:1px solid rgba(240,180,41,0.3);border-radius:6px;padding:1.2rem;margin-bottom:1.2rem;">
+        <p style="color:var(--gold);font-family:var(--font-heading);font-size:0.85rem;letter-spacing:0.1em;margin-bottom:0.8rem;">HOW TO INSTALL:</p>
+        <ol style="color:var(--grey);font-size:0.85rem;line-height:1.9;padding-left:1.2rem;">
+          <li>Make sure your browser bookmarks bar is visible <em style="color:var(--grey)">(Ctrl+Shift+B on Chrome)</em></li>
+          <li>Drag the button below to your bookmarks bar</li>
+          <li>Go to any MakerWorld / Thingiverse / Printables page</li>
+          <li>Click the bookmarklet → fill category → Save!</li>
+        </ol>
+      </div>
+      <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+        <a id="bookmarklet-link" href="" class="btn-scrape" style="text-decoration:none;display:inline-block;font-size:1rem;padding:0.8rem 1.5rem;">
+          ✦ Save to SrijanX
+        </a>
+        <span style="color:var(--grey);font-size:0.85rem;font-family:var(--font-heading);">← Drag this to your bookmarks bar</span>
+      </div>
+      <p style="color:var(--grey);font-size:0.78rem;margin-top:1rem;font-family:var(--font-heading);letter-spacing:0.05em;">
+        ⚠️ If the site blocks image fetching, bookmarklet will still capture the title and URL — just upload a screenshot of the design manually.
+      </p>
     </div>
 
     <!-- Product List -->
@@ -1436,6 +1535,7 @@ function closeModal(id) {
 function openAdmin() {
   document.getElementById('admin-panel').classList.add('open');
   loadAdminList();
+  initBookmarklet();
 }
 
 function closeAdmin() {
@@ -1467,6 +1567,85 @@ async function loadAdminList() {
   }
 }
 
+// ─── IMAGE TAB + UPLOAD ───
+let selectedImageFile = null;
+
+function switchImgTab(tab) {
+  document.querySelectorAll('.img-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.img-tab-panel').forEach(p => p.classList.remove('active'));
+  if (tab === 'upload') {
+    document.querySelectorAll('.img-tab')[0].classList.add('active');
+    document.getElementById('img-tab-upload').classList.add('active');
+  } else {
+    document.querySelectorAll('.img-tab')[1].classList.add('active');
+    document.getElementById('img-tab-url').classList.add('active');
+  }
+  selectedImageFile = null;
+}
+
+function onFileSelected(input) {
+  const file = input.files[0];
+  if (!file) return;
+  selectedImageFile = file;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('upload-preview-img').src = e.target.result;
+    document.getElementById('upload-preview-name').textContent = file.name;
+    document.getElementById('upload-preview-size').textContent = (file.size/1024).toFixed(1) + ' KB';
+    document.getElementById('upload-preview').classList.add('show');
+  };
+  reader.readAsDataURL(file);
+}
+
+async function uploadImageToStorage(file) {
+  const storage = window._storage;
+  const { ref: sRef, uploadBytes, getDownloadURL } = window._storageFns;
+  const fileRef = sRef(storage, `products/${Date.now()}_${file.name}`);
+  const progress = document.getElementById('upload-progress');
+  const bar = document.getElementById('upload-progress-bar');
+  progress.classList.add('show');
+  bar.style.width = '40%';
+  await uploadBytes(fileRef, file);
+  bar.style.width = '80%';
+  const url = await getDownloadURL(fileRef);
+  bar.style.width = '100%';
+  setTimeout(() => { progress.classList.remove('show'); bar.style.width = '0%'; }, 600);
+  return url;
+}
+
+// ─── BOOKMARKLET SETUP ───
+function initBookmarklet() {
+  const firebaseConfig = {'apiKey': 'AIzaSyDYBpoOfcXQGRQ-bstduxpI9V07g5oWRJo', 'projectId': 'srijanx-sap'};
+  
+  const bookmarkletCode = `javascript:(function(){
+    var title = document.querySelector('meta[property="og:title"]')?.content || document.title || '';
+    title = title.replace(/ - Thingiverse| \| Printables| \| MakerWorld/g,'').trim();
+    var img = document.querySelector('meta[property="og:image"]')?.content || document.querySelector('meta[name="twitter:image"]')?.content || '';
+    var url = window.location.href;
+    var cat = prompt('Category? (Anime / Home Decor / Chibi / Gift / Custom)\n\nTitle found: ' + title, 'Anime');
+    if(!cat) return;
+    var desc = prompt('Short description (or press OK to skip):', '');
+    fetch('https://firestore.googleapis.com/v1/projects/srijanx-sap/databases/(default)/documents/products',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-goog-api-key':'AIzaSyDYBpoOfcXQGRQ-bstduxpI9V07g5oWRJo'},
+      body:JSON.stringify({fields:{
+        name:{stringValue:title},
+        image:{stringValue:img},
+        category:{stringValue:cat},
+        description:{stringValue:desc||''},
+        source:{stringValue:url},
+        createdAt:{stringValue:new Date().toISOString()}
+      }})
+    }).then(r=>r.json()).then(d=>{
+      if(d.name) alert('✦ Saved to SrijanX catalog!\n\n' + title);
+      else alert('Error: ' + JSON.stringify(d.error||d));
+    }).catch(e=>alert('Failed: '+e));
+  })()`;
+
+  const link = document.getElementById('bookmarklet-link');
+  if (link) link.href = bookmarkletCode;
+}
+
 // ─── SCRAPE URL ───
 async function scrapeUrl() {
   const url = document.getElementById('scrape-url').value.trim();
@@ -1475,37 +1654,40 @@ async function scrapeUrl() {
   btn.disabled = true;
   btn.textContent = 'Fetching…';
 
+  // Always reset form fields first so manual entry works after
+  document.getElementById('p-img').value = '';
+  document.getElementById('scrape-preview').classList.remove('show');
+
   try {
     const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
     const res = await fetch(proxyUrl);
     const data = await res.json();
-    const html = data.contents;
+    const htmlStr = data.contents;
     const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
+    const parsed = parser.parseFromString(htmlStr, 'text/html');
 
-    // Try to extract title
-    let title = doc.querySelector('meta[property="og:title"]')?.content
-      || doc.querySelector('title')?.textContent
-      || '';
+    let title = parsed.querySelector('meta[property="og:title"]')?.content
+      || parsed.querySelector('title')?.textContent || '';
     title = title.replace(' - Thingiverse','').replace(' | Printables','').replace(' | MakerWorld','').trim();
 
-    // Try to extract image
-    let img = doc.querySelector('meta[property="og:image"]')?.content
-      || doc.querySelector('meta[name="twitter:image"]')?.content
-      || '';
+    let img = parsed.querySelector('meta[property="og:image"]')?.content
+      || parsed.querySelector('meta[name="twitter:image"]')?.content || '';
 
-    document.getElementById('p-name').value = title;
-    document.getElementById('p-img').value = img;
+    if (title) document.getElementById('p-name').value = title;
+    if (img) document.getElementById('p-img').value = img;
     document.getElementById('p-source').value = url;
 
     if (img || title) {
       document.getElementById('scrape-img').src = img || '';
-      document.getElementById('scrape-title-preview').textContent = title || 'No title found';
+      document.getElementById('scrape-title-preview').textContent = title || 'Title not found — enter manually';
       document.getElementById('scrape-preview').classList.add('show');
+      showAdminStatus(img ? '✦ Fetched! Review and edit below.' : '⚠️ Title found but no image — paste image URL manually.', img ? 'success' : 'error');
+    } else {
+      showAdminStatus('⚠️ Could not auto-fetch. Paste the image URL manually below — it will work!', 'error');
     }
 
   } catch(e) {
-    showAdminStatus('Could not fetch URL. Try pasting the image URL manually.', 'error');
+    showAdminStatus('⚠️ Fetch blocked. Paste the image URL manually below — it will work!', 'error');
   }
 
   btn.disabled = false;
@@ -1515,26 +1697,43 @@ async function scrapeUrl() {
 // ─── ADD PRODUCT ───
 async function addProduct() {
   const name = document.getElementById('p-name').value.trim();
-  const img = document.getElementById('p-img').value.trim();
+  const urlImg = document.getElementById('p-img') ? document.getElementById('p-img').value.trim() : '';
   const cat = document.getElementById('p-cat').value;
   const desc = document.getElementById('p-desc').value.trim();
   const source = document.getElementById('p-source').value.trim();
 
-  if (!name || !img) { showAdminStatus('Name and Image URL are required.', 'error'); return; }
+  if (!name) { showAdminStatus('Product name is required.', 'error'); return; }
+  if (!urlImg && !selectedImageFile) { showAdminStatus('Add an image — upload a file or paste a URL.', 'error'); return; }
   if (!db) { showAdminStatus('Firebase not connected!', 'error'); return; }
+
+  let finalImg = urlImg;
+
+  if (selectedImageFile) {
+    try {
+      showAdminStatus('⏳ Uploading image…', 'success');
+      finalImg = await uploadImageToStorage(selectedImageFile);
+    } catch(e) {
+      showAdminStatus('Image upload failed: ' + e.message, 'error');
+      return;
+    }
+  }
 
   try {
     await fbFns.addDoc(fbFns.collection(db, 'products'), {
-      name, image: img, category: cat, description: desc, source,
+      name, image: finalImg, category: cat, description: desc, source,
       createdAt: new Date().toISOString()
     });
     showAdminStatus(`✦ "${name}" added successfully!`, 'success');
-    ['p-name','p-img','p-desc','p-source','scrape-url'].forEach(id => document.getElementById(id).value = '');
+    ['p-name','p-desc','p-source','scrape-url'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+    const imgEl = document.getElementById('p-img'); if(imgEl) imgEl.value = '';
     document.getElementById('scrape-preview').classList.remove('show');
+    document.getElementById('upload-preview').classList.remove('show');
+    const fileEl = document.getElementById('p-img-file'); if(fileEl) fileEl.value = '';
+    selectedImageFile = null;
     loadAdminList();
     loadCatalog();
   } catch(e) {
-    showAdminStatus('Error adding product: ' + e.message, 'error');
+    showAdminStatus('Error saving product: ' + e.message, 'error');
   }
 }
 
