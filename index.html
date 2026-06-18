@@ -411,7 +411,7 @@ footer p{color:var(--white);opacity:.4;font-family:var(--orb);font-size:.5rem;le
     <label>Password</label>
     <input type="password" id="apw" placeholder="Enter password" onkeyup="if(event.key==='Enter')vAdmin()" />
     <div class="me" id="ae">Incorrect password.</div>
-    <button class="vb vm" style="width:100%;border:none;margin-top:.5rem;" onclick="vAdmin()">Enter</button>
+    <button class="vb vm" style="width:100%;border:none;margin-top:.5rem;" onclick="vAdmin()" id="admin-btn">Enter</button>
   </div>
 </div>
 
@@ -424,8 +424,8 @@ footer p{color:var(--white);opacity:.4;font-family:var(--orb);font-size:.5rem;le
     <label>Product Name</label><input type="text" id="qst" placeholder="Product name..." />
     <label>Image URL</label><input type="url" id="qsi" placeholder="Image URL..." oninput="var p=document.getElementById('qsp');p.src=this.value;p.style.display='block';" />
     <label>Category</label>
-    <select id="qsc" style="width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(123,47,255,.28);color:var(--white);padding:.8rem 1rem;font-family:var(--body);font-size:.95rem;margin-bottom:1rem;">
-      <option value="Anime">Anime</option><option value="Home Decor">Home Decor</option><option value="Chibi">Chibi</option><option value="Gift">Gift</option><option value="Custom">Custom</option>
+    <select id="qsc" style="width:100%;background:rgba(10,2,25,.95);border:1px solid rgba(123,47,255,.28);color:var(--white);padding:.8rem 1rem;font-family:var(--body);font-size:.95rem;margin-bottom:1rem;">
+      <option value="Anime" style="background:#1a0840;color:#fff;">Anime</option><option value="Home Decor" style="background:#1a0840;color:#fff;">Home Decor</option><option value="Chibi" style="background:#1a0840;color:#fff;">Chibi</option><option value="Gift" style="background:#1a0840;color:#fff;">Gift</option><option value="Custom" style="background:#1a0840;color:#fff;">Custom</option>
     </select>
     <label>Description (optional)</label><textarea id="qsd" rows="2" placeholder="Short description..."></textarea>
     <input type="hidden" id="qss" />
@@ -568,9 +568,9 @@ function cM(id){document.getElementById(id).classList.remove('open');}
 
 let lc=0,lt=null;
 document.getElementById('nav-logo').addEventListener('click',()=>{lc++;clearTimeout(lt);lt=setTimeout(()=>{lc=0;},1500);if(lc>=5){lc=0;oAL();}});
-const APW='Srijanx@143';
+const APW='storyteller@2026';
 function oAL(){document.getElementById('apw').value='';document.getElementById('ae').style.display='none';document.getElementById('alm').classList.add('open');setTimeout(()=>document.getElementById('apw').focus(),100);}
-function vAdmin(){if(document.getElementById('apw').value===APW){cM('alm');oAdmin();}else document.getElementById('ae').style.display='block';}
+function vAdmin(){const em=document.getElementById('apw').value.trim();if(em==='srijanx2026@gmail.com'){document.getElementById('apw').value='';document.getElementById('apw').placeholder='Enter password';document.getElementById('apw').onkeyup=e=>{if(e.key==='Enter')vAdminPW();};document.getElementById('ae').style.display='none';return;}document.getElementById('ae').textContent='Only srijanx2026@gmail.com can access admin.';document.getElementById('ae').style.display='block';}function vAdminPW(){if(document.getElementById('apw').value===APW){cM('alm');oAdmin();}else{document.getElementById('ae').textContent='Incorrect password.';document.getElementById('ae').style.display='block';}}
 function oAdmin(){document.getElementById('admin-panel').classList.add('open');sessionStorage.setItem('sx_admin','1');loadAdminList();initBML();}
 function closeAdmin(){document.getElementById('admin-panel').classList.remove('open');sessionStorage.removeItem('sx_admin');}
 function restAdmin(){if(sessionStorage.getItem('sx_admin')==='1'){document.getElementById('admin-panel').classList.add('open');initBML();}}
