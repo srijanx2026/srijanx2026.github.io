@@ -23,6 +23,7 @@
   window._db = db; window._storage = storage;
   window._fbFns = { collection, addDoc, getDocs, deleteDoc, doc };
   window._storageFns = { ref, uploadBytes, getDownloadURL, deleteObject };
+  window._authToken = null;
   window.dispatchEvent(new Event("firebaseReady"));
 </script>
 
@@ -571,7 +572,7 @@ document.getElementById('nav-logo').addEventListener('click',()=>{lc++;clearTime
 const APW='Storyteller@2026';
 function oAL(){document.getElementById('apw').value='';document.getElementById('ae').style.display='none';document.getElementById('alm').classList.add('open');setTimeout(()=>document.getElementById('apw').focus(),100);}
 function vAdmin(){const em=document.getElementById('apw').value.trim();if(em==='srijanx2026@gmail.com'){document.getElementById('apw').value='';document.getElementById('apw').type='password';document.getElementById('apw').placeholder='Enter password';document.getElementById('alm-label').textContent='Password';document.getElementById('alm-subtitle').textContent='Enter your password.';document.getElementById('ae').style.display='none';document.getElementById('apw').onkeyup=e=>{if(e.key==='Enter')vAdminPW();};document.getElementById('admin-btn').onclick=vAdminPW;return;}document.getElementById('ae').textContent='Only srijanx2026@gmail.com can access admin.';document.getElementById('ae').style.display='block';}function vAdminPW(){if(document.getElementById('apw').value===APW){cM('alm');oAdmin();}else{document.getElementById('ae').textContent='Incorrect password.';document.getElementById('ae').style.display='block';}}
-function oAdmin(){document.getElementById('admin-panel').classList.add('open');sessionStorage.setItem('sx_admin','1');loadAdminList();initBML();}
+function oAdmin(){document.getElementById('admin-panel').classList.add('open');sessionStorage.setItem('sx_admin','1');window._authToken='srijanx-admin-token';loadAdminList();initBML();}
 function closeAdmin(){document.getElementById('admin-panel').classList.remove('open');sessionStorage.removeItem('sx_admin');}
 function restAdmin(){if(sessionStorage.getItem('sx_admin')==='1'){document.getElementById('admin-panel').classList.add('open');initBML();}}
 
