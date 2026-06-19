@@ -254,7 +254,15 @@ footer p{color:var(--white);opacity:.4;font-family:var(--orb);font-size:.5rem;le
 .bb2{background:rgba(240,180,41,.05);border:1px solid rgba(240,180,41,.22);padding:1.4rem;margin-bottom:1rem;}
 .bb2 ol{color:var(--muted);font-size:.85rem;line-height:1.95;padding-left:1.2rem;}
 
-.rev{opacity:0;transform:translateY(35px);transition:opacity .7s ease,transform .7s ease;}
+.hammer-set{display:flex;justify-content:center;gap:1.5rem;margin-bottom:1rem;animation:hammerBounce 2s ease-in-out infinite;}
+.hammer-icon{font-size:1.5rem;animation:hammerSwing 1.5s ease-in-out infinite;}
+.hammer-icon:nth-child(1){animation-delay:0s;}
+.hammer-icon:nth-child(2){animation-delay:.3s;}
+.hammer-icon:nth-child(3){animation-delay:.6s;}
+@keyframes hammerSwing{0%{transform:rotate(0deg);}50%{transform:rotate(-15deg);}100%{transform:rotate(0deg);}}
+@keyframes hammerBounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+
+
 .rev.visible{opacity:1;transform:translateY(0);}
 .lb-modal{display:none;position:fixed;inset:0;background:rgba(3,0,10,.95);z-index:1500;align-items:center;justify-content:center;backdrop-filter:blur(12px);}
 .lb-modal.open{display:flex;}
@@ -269,6 +277,7 @@ footer p{color:var(--white);opacity:.4;font-family:var(--orb);font-size:.5rem;le
 
 @media(max-width:768px){nav{padding:1rem 1.5rem;}.nav-links{display:none;}.ag,.cg{grid-template-columns:1fr;gap:2rem;}.vs{grid-template-columns:1fr 1fr;}.afg{grid-template-columns:1fr;}.ah{padding:1rem 1.5rem;}.sr{gap:2.5rem;}}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"></script>
 </head>
 <body>
 <canvas id="forge-bg"></canvas>
@@ -288,13 +297,8 @@ footer p{color:var(--white);opacity:.4;font-family:var(--orb);font-size:.5rem;le
 </nav>
 
 <section id="home">
-  <div class="emb">
-    <div class="er1"></div>
-    <div class="er2"></div>
-    <div class="er3"></div>
-    <div class="ec">⚒️</div>
-  </div>
-  <p class="hey">✦ &nbsp; Bringing Stories To Life &nbsp; · &nbsp; Bengaluru &nbsp; · &nbsp; Est. 2026 &nbsp; ✦</p>
+  <div id="evil-eye-bg" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none;"></div>
+  <p class="hey" style="margin-top: 150px;">✦ &nbsp; Bringing Stories To Life &nbsp; · &nbsp; Bengaluru &nbsp; · &nbsp; Est. 2026 &nbsp; ✦</p>
   <div>
     <span class="hpre">The World of</span>
     <span class="hs">SRIJAN</span>
@@ -627,7 +631,7 @@ Name: ${n}
 Notes: ${nt||'None'}
 
 Please confirm details, colors, size and pricing!`);window.open(`https://wa.me/919845536010?text=${msg}`,'_blank');cM('om');showConf('order');}
-function showConf(type){const cm=document.getElementById('confModal');const anim=document.getElementById('confAnim');const title=document.getElementById('confTitle');const msg=document.getElementById('confMsg');if(type==='order'){title.textContent='Order Placed! 🔥';msg.textContent='We\'ll reach out within 24 hours with your custom forge details!';anim.innerHTML='<div class="conf-checkmark"><div class="conf-checkmark-circle"></div><div class="conf-checkmark-path"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div></div>';}else if(type==='contact'){title.textContent='Thanks for Reaching Out! ⚒️';msg.textContent='We\'ll get back to you within 24 hours. Your creativity matters to us!';anim.innerHTML='<div class="conf-checkmark"><div class="conf-checkmark-circle"></div><div class="conf-checkmark-path"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div></div>';}cm.classList.add('open');}
+function showConf(type){const cm=document.getElementById('confModal');const anim=document.getElementById('confAnim');const title=document.getElementById('confTitle');const msg=document.getElementById('confMsg');if(type==='order'){title.textContent='Order Placed! 🔥';msg.textContent='We\'ll reach out within 24 hours with your custom forge details!';anim.innerHTML='<div class="conf-checkmark"><div class="conf-checkmark-circle"></div><div class="conf-checkmark-path"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div></div>';}else if(type==='contact'){title.textContent='Thanks for Reaching Out! ⚒️';msg.textContent='We\'ll get back to you within 24 hours. Your creativity matters to us!';anim.innerHTML='<div class="conf-checkmark"><div class="conf-checkmark-circle"></div><div class="conf-checkmark-path"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div></div>';}cm.classList.add('open');setTimeout(()=>closeConf(),3500);}
 function closeConf(){document.getElementById('confModal').classList.remove('open');}
 function cM(id){document.getElementById(id).classList.remove('open');}
 
@@ -712,5 +716,171 @@ function tFaq(el){const it=el.parentElement;const op=it.classList.contains('open
   </div>
 </div>
 
+<!-- EVIL EYE -->
+<script>
+function initEvilEye(){
+  const c = document.getElementById('evil-eye-bg');
+  if(!c) return;
+  
+  const canvas = document.createElement('canvas');
+  canvas.width = 200;
+  canvas.height = 200;
+  canvas.style.position = 'absolute';
+  canvas.style.top = '15%';
+  canvas.style.left = '50%';
+  canvas.style.transform = 'translate(-50%, -50%)';
+  canvas.style.mixBlendMode = 'lighten';
+  canvas.style.filter = 'drop-shadow(0 0 15px rgba(200, 123, 255, 0.6))';
+  
+  const gl = canvas.getContext('webgl', { alpha: true, preserveDrawingBuffer: true });
+  if(!gl) return;
+  
+  gl.clearColor(0, 0, 0, 0);
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+  
+  function genNoise(sz=256) {
+    const d = new Uint8Array(sz * sz * 4);
+    function hash(x, y, s) {
+      let n = x * 374761393 + y * 668265263 + s * 1274126177;
+      n = Math.imul(n ^ (n >>> 13), 1274126177);
+      return ((n ^ (n >>> 16)) >>> 0) / 4294967296;
+    }
+    function noise(px, py, f, s) {
+      const fx = (px / sz) * f, fy = (py / sz) * f;
+      const ix = Math.floor(fx), iy = Math.floor(fy);
+      const tx = fx - ix, ty = fy - iy;
+      const w = f | 0;
+      const v00 = hash(((ix % w) + w) % w, ((iy % w) + w) % w, s);
+      const v10 = hash((((ix + 1) % w) + w) % w, ((iy % w) + w) % w, s);
+      const v01 = hash(((ix % w) + w) % w, (((iy + 1) % w) + w) % w, s);
+      const v11 = hash((((ix + 1) % w) + w) % w, (((iy + 1) % w) + w) % w, s);
+      return v00 * (1 - tx) * (1 - ty) + v10 * tx * (1 - ty) + v01 * (1 - tx) * ty + v11 * tx * ty;
+    }
+    for (let y = 0; y < sz; y++) {
+      for (let x = 0; x < sz; x++) {
+        let v = 0, a = 0.4, ta = 0;
+        for (let o = 0; o < 8; o++) {
+          const f = 32 * (1 << o);
+          v += a * noise(x, y, f, o * 31);
+          ta += a;
+          a *= 0.65;
+        }
+        v /= ta;
+        v = (v - 0.5) * 2.2 + 0.5;
+        v = Math.max(0, Math.min(1, v));
+        const val = Math.round(v * 255);
+        const i = (y * sz + x) * 4;
+        d[i] = d[i+1] = d[i+2] = val;
+        d[i+3] = 255;
+      }
+    }
+    return d;
+  }
+  
+  const nd = genNoise(256);
+  const nt = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, nt);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 256, 256, 0, gl.RGBA, gl.UNSIGNED_BYTE, nd);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+  
+  const vs = `attribute vec2 p;void main(){gl_Position=vec4(p,0,1);}`;
+  const fs = `precision highp float;
+    uniform float t, ps, iw, gi, i, s, ns, pf, fs;
+    uniform vec2 res, m;
+    uniform sampler2D nt;
+    uniform vec3 ec, bc;
+    void main(){
+      vec2 uv = (gl_FragCoord.xy * 2.0 - res) / max(res.x, res.y);
+      uv *= 0.5;
+      uv /= s;
+      float ft = t * fs;
+      float pr = length(uv) * 2.0;
+      float pa = atan(uv.x, uv.y) * 0.3;
+      vec2 pu = vec2(pr, pa);
+      vec4 na = texture2D(nt, pu * vec2(0.2, 7.0) * ns + vec2(-ft * 0.1, 0.0));
+      vec4 nb = texture2D(nt, pu * vec2(0.3, 4.0) * ns + vec2(-ft * 0.2, 0.0));
+      vec4 nc = texture2D(nt, pu * vec2(0.1, 5.0) * ns + vec2(-ft * 0.1, 0.0));
+      float dm = 1.0 - length(uv);
+      float ir = clamp(-1.0 * ((dm - 0.7) / iw), 0.0, 1.0);
+      ir = (ir * dm - 0.2) / 0.28 + na.r - 0.5;
+      ir *= 1.3;
+      ir = clamp(ir, 0.0, 1.0);
+      float or = clamp(-1.0 * ((dm - 0.5) / 0.2), 0.0, 1.0);
+      or = (or * dm - 0.1) / 0.38 + nc.r - 0.5;
+      or *= 1.3;
+      or = clamp(or, 0.0, 1.0);
+      float ie = (dm - 0.2) * nb.r * 2.0;
+      vec2 po = m * pf * 0.12;
+      float p = 1.0 - length((uv - po) * vec2(9.0, 2.3));
+      p = clamp(p * ps / 0.35, 0.0, 1.0);
+      float og = 1.0 - length(uv * vec2(0.5, 1.5)) + nc.r - 0.5;
+      og = pow(clamp(og + dm, 0.0, 1.0), 2.0) * gi;
+      og *= pow(1.0 - dm, 2.0) * 2.5;
+      vec3 col = ec * i * clamp(max(ir + or + ie, og) - p, 0.0, 3.0);
+      float alpha = length(col);
+      gl_FragColor = vec4(col, alpha);
+    }`;
+  
+  function compileShader(type, src) {
+    const sh = gl.createShader(type);
+    gl.shaderSource(sh, src);
+    gl.compileShader(sh);
+    return sh;
+  }
+  
+  const prog = gl.createProgram();
+  gl.attachShader(prog, compileShader(gl.VERTEX_SHADER, vs));
+  gl.attachShader(prog, compileShader(gl.FRAGMENT_SHADER, fs));
+  gl.linkProgram(prog);
+  gl.useProgram(prog);
+  
+  const pl = gl.getAttribLocation(prog, 'p');
+  const pb = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, pb);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+  gl.vertexAttribPointer(pl, 2, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(pl);
+  
+  gl.uniform1i(gl.getUniformLocation(prog, 'nt'), 0);
+  gl.uniform1f(gl.getUniformLocation(prog, 'ps'), 0.6);
+  gl.uniform1f(gl.getUniformLocation(prog, 'iw'), 0.25);
+  gl.uniform1f(gl.getUniformLocation(prog, 'gi'), 0.35);
+  gl.uniform1f(gl.getUniformLocation(prog, 'i'), 1.5);
+  gl.uniform1f(gl.getUniformLocation(prog, 's'), 0.4);
+  gl.uniform1f(gl.getUniformLocation(prog, 'ns'), 1.0);
+  gl.uniform1f(gl.getUniformLocation(prog, 'pf'), 1.0);
+  gl.uniform1f(gl.getUniformLocation(prog, 'fs'), 1.0);
+  gl.uniform3f(gl.getUniformLocation(prog, 'ec'), 1.0, 0.5, 0.0);
+  gl.uniform3f(gl.getUniformLocation(prog, 'bc'), 0, 0, 0);
+  
+  let mx = 0, my = 0;
+  const heroSection = c.closest('.hero') || c.parentElement;
+  
+  window.addEventListener('mousemove', (e) => {
+    const rect = heroSection.getBoundingClientRect();
+    mx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    my = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
+  });
+  
+  c.appendChild(canvas);
+  
+  function render(t) {
+    gl.uniform1f(gl.getUniformLocation(prog, 't'), t * 0.001);
+    gl.uniform2f(gl.getUniformLocation(prog, 'res'), canvas.width, canvas.height);
+    gl.uniform2f(gl.getUniformLocation(prog, 'm'), mx, my);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    requestAnimationFrame(render);
+  }
+  
+  requestAnimationFrame(render);
+}
+
+window.addEventListener('DOMContentLoaded', initEvilEye);
+</script>
 </body>
 </html>
