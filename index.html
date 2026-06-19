@@ -89,6 +89,28 @@ section{position:relative;z-index:10;}
 .sh .arr{width:1px;height:36px;background:linear-gradient(to bottom,var(--pg),transparent);}
 @keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0);}50%{transform:translateX(-50%) translateY(8px);}}
 
+.conf-modal{display:none;position:fixed;inset:0;background:rgba(3,0,10,.94);z-index:3000;align-items:center;justify-content:center;backdrop-filter:blur(15px);}
+.conf-modal.open{display:flex;animation:confFadeIn .5s ease-out;}
+.conf-content{background:linear-gradient(145deg,rgba(15,5,35,.98),rgba(8,2,20,.95));border:2px solid rgba(200,123,255,.4);border-radius:12px;padding:3rem 2rem;max-width:420px;text-align:center;position:relative;box-shadow:0 0 50px rgba(160,80,255,.3),inset 0 0 30px rgba(200,123,255,.1);}
+.conf-close{position:absolute;top:1rem;right:1.2rem;background:none;border:none;color:var(--dim);font-size:1.4rem;cursor:pointer;transition:color .3s;}
+.conf-close:hover{color:var(--white);}
+.conf-animation{width:120px;height:120px;margin:0 auto 1.5rem;position:relative;}
+.conf-checkmark{width:100%;height:100%;position:relative;animation:scaleIn .6s cubic-bezier(.34,1.56,.64,1);}
+.conf-checkmark-circle{position:absolute;width:100%;height:100%;border-radius:50%;border:3px solid rgba(240,180,41,0);animation:drawCircle 1s ease-out forwards;}
+.conf-checkmark-path{position:absolute;width:60%;height:30%;left:20%;top:35%;border:3px solid transparent;border-right-color:rgba(240,180,41,.8);border-bottom-color:rgba(240,180,41,.8);transform:rotate(-45deg);animation:drawPath 1s ease-out .3s forwards;}
+.conf-spark{position:absolute;width:8px;height:8px;background:radial-gradient(circle,#ffdd00,#ff9900);border-radius:50%;opacity:0;animation:sparkPop 1s ease-out forwards;}
+.conf-spark:nth-child(2){left:15%;top:20%;animation-delay:.2s;--tx:-40px;--ty:-40px;}
+.conf-spark:nth-child(3){right:15%;top:25%;animation-delay:.3s;--tx:40px;--ty:-35px;}
+.conf-spark:nth-child(4){left:20%;bottom:20%;animation-delay:.4s;--tx:-35px;--ty:40px;}
+.conf-spark:nth-child(5){right:20%;bottom:15%;animation-delay:.35s;--tx:35px;--ty:40px;}
+.conf-title{font-family:var(--cin);font-size:1.8rem;color:var(--white);margin-bottom:.8rem;font-weight:700;letter-spacing:.05em;}
+.conf-message{font-size:.95rem;color:var(--muted);line-height:1.8;margin-bottom:1rem;}
+@keyframes confFadeIn{from{opacity:0;transform:scale(.9);}to{opacity:1;transform:scale(1);}}
+@keyframes drawCircle{from{border-color:rgba(240,180,41,0);}to{border-color:rgba(240,180,41,.8);}}
+@keyframes drawPath{from{border-right-color:transparent;border-bottom-color:transparent;}to{border-right-color:rgba(240,180,41,.8);border-bottom-color:rgba(240,180,41,.8);}}
+@keyframes scaleIn{0%{transform:scale(0);}70%{transform:scale(1.15);}100%{transform:scale(1);}}
+@keyframes sparkPop{0%{opacity:1;transform:translate(0,0) scale(1);}100%{opacity:0;transform:translate(var(--tx),var(--ty)) scale(0);}}
+
 #stats{background:linear-gradient(to bottom,rgba(10,2,25,.95),rgba(6,1,18,.92));border-bottom:1px solid rgba(123,47,255,.1);}
 .sr{display:flex;justify-content:center;gap:5rem;flex-wrap:wrap;padding:1.8rem 2rem;}
 .si2{text-align:center;}
@@ -100,7 +122,7 @@ section{position:relative;z-index:10;}
 .ct:hover,.ct.active{background:var(--purple);border-color:var(--pg);color:#fff;box-shadow:0 0 15px rgba(123,47,255,.45);}
 
 .vg2{display:grid;grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:1px;background:rgba(123,47,255,.07);}
-.vc{background:linear-gradient(145deg,rgba(15,5,35,.98),rgba(8,2,20,.95));border:1px solid rgba(123,47,255,.14);overflow:hidden;cursor:pointer;transition:all .4s;position:relative;}
+.vc{background:linear-gradient(145deg,rgba(15,5,35,.98),rgba(8,2,20,.95));border:1px solid rgba(123,47,255,.14);overflow:visible;cursor:pointer;transition:all .4s;position:relative;}
 .vc::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(to right,transparent,rgba(200,123,255,.18),transparent);z-index:2;}
 .vc::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(to right,transparent,var(--purple),var(--gold),transparent);transform:scaleX(0);transition:transform .4s;z-index:2;}
 .vc:hover{border-color:rgba(180,80,255,.45);background:linear-gradient(145deg,rgba(25,8,55,.98),rgba(12,3,30,.95));transform:translateY(-5px);box-shadow:0 2px 0 rgba(200,123,255,.07) inset,0 12px 45px rgba(123,47,255,.28);}
@@ -375,9 +397,9 @@ footer p{color:var(--white);opacity:.4;font-family:var(--orb);font-size:.5rem;le
       <div>
         <p class="cit">Have a custom idea or want to order from the catalog? Reach out on Instagram or WhatsApp — we respond fast and love talking all things 3D print.</p>
         <div class="cls">
-          <a href="https://instagram.com/srijanx2026" target="_blank" class="cl"><span class="ic">📸</span><span>@srijanx2026 on Instagram</span></a>
+          <a href="https://instagram.com/srijanx2026" target="_blank" onclick="showConf('contact')" class="cl"><span class="ic">📸</span><span>@srijanx2026 on Instagram</span></a>
           <a href="https://wa.me/919845536010?text=Hello!%20SrijanX%20%F0%9F%91%8B%0A%0AI%27d%20like%20to%20enquire%20about%20a%20custom%20order." target="_blank" class="cl"><span class="ic">💬</span><span>WhatsApp Us</span></a>
-          <a href="mailto:support@srijanx.in" class="cl"><span class="ic">✉️</span><span>support@srijanx.in</span></a>
+          <a href="mailto:support@srijanx.in" onclick="showConf('contact')" class="cl"><span class="ic">✉️</span><span>support@srijanx.in</span></a>
         </div>
       </div>
       <div class="ob">
@@ -604,7 +626,9 @@ I'd like to order:
 Name: ${n}
 Notes: ${nt||'None'}
 
-Please confirm details, colors, size and pricing!`);window.open(`https://wa.me/919845536010?text=${msg}`,'_blank');cM('om');}
+Please confirm details, colors, size and pricing!`);window.open(`https://wa.me/919845536010?text=${msg}`,'_blank');cM('om');showConf('order');}
+function showConf(type){const cm=document.getElementById('confModal');const anim=document.getElementById('confAnim');const title=document.getElementById('confTitle');const msg=document.getElementById('confMsg');if(type==='order'){title.textContent='Order Placed! 🔥';msg.textContent='We\'ll reach out within 24 hours with your custom forge details!';anim.innerHTML='<div class="conf-checkmark"><div class="conf-checkmark-circle"></div><div class="conf-checkmark-path"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div></div>';}else if(type==='contact'){title.textContent='Thanks for Reaching Out! ⚒️';msg.textContent='We\'ll get back to you within 24 hours. Your creativity matters to us!';anim.innerHTML='<div class="conf-checkmark"><div class="conf-checkmark-circle"></div><div class="conf-checkmark-path"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div></div>';}cm.classList.add('open');setTimeout(()=>closeConf(),3500);}
+function closeConf(){document.getElementById('confModal').classList.remove('open');}
 function cM(id){document.getElementById(id).classList.remove('open');}
 
 let lc=0,lt=null;
@@ -677,5 +701,16 @@ async function subQS(){
 
 function tFaq(el){const it=el.parentElement;const op=it.classList.contains('open');document.querySelectorAll('.fi.open').forEach(i=>i.classList.remove('open'));if(!op)it.classList.add('open');}
 </script>
+<!-- CONFIRMATION MODAL -->
+<div class="conf-modal" id="confModal">
+  <div class="conf-content">
+    <button class="conf-close" onclick="closeConf()">✕</button>
+    <div class="conf-animation" id="confAnim"></div>
+    <div class="conf-title" id="confTitle">Order Placed! 🔥</div>
+    <div class="conf-message" id="confMsg">We'll reach out within 24 hours with your custom forge details!</div>
+    <button class="vb vm" onclick="closeConf()" style="margin-top:1.5rem;">Got it!</button>
+  </div>
+</div>
+
 </body>
 </html>
