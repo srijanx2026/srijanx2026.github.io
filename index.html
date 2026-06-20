@@ -276,6 +276,10 @@ footer p{color:var(--white);opacity:.4;font-family:var(--orb);font-size:.5rem;le
 .lb-action{display:flex;gap:1rem;}
 
 @media(max-width:768px){nav{padding:1rem 1.5rem;}.nav-links{display:none;}.ag,.cg{grid-template-columns:1fr;gap:2rem;}.vs{grid-template-columns:1fr 1fr;}.afg{grid-template-columns:1fr;}.ah{padding:1rem 1.5rem;}.sr{gap:2.5rem;}}
+@keyframes waveMorph{0%{box-shadow:0 0 0 0 rgba(160,80,255,0);}40%{box-shadow:0 0 60px 30px rgba(160,80,255,.18),0 0 120px 60px rgba(240,180,41,.08);}100%{box-shadow:0 0 0 0 rgba(160,80,255,0);}}
+.wave-morph{animation:waveMorph .35s ease-out;}
+@keyframes glitchFX{0%{filter:none;}15%{filter:hue-rotate(90deg) brightness(1.4) contrast(1.2);transform:translateX(-2px);}30%{filter:hue-rotate(-60deg) brightness(.8);transform:translateX(3px);}50%{filter:none;transform:none;}70%{filter:hue-rotate(45deg) brightness(1.2);transform:translateX(-1px);}100%{filter:none;transform:none;}}
+.glitch-fx{animation:glitchFX .18s steps(1) forwards;}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"></script>
 </head>
@@ -594,6 +598,7 @@ revs.forEach(r=>ob.observe(r));
 let curLBProduct=null;
 function openLB(img,name,desc,id){document.getElementById('lb-img').src=img;document.getElementById('lb-name').textContent=name;document.getElementById('lb-desc').textContent=desc;curLBProduct={name,img,id};document.getElementById('lb-forge-btn').onclick=()=>{closeLB();oOM(id,name,img);};document.getElementById('lbm').classList.add('open');}
 function closeLB(){document.getElementById('lbm').classList.remove('open');}
+document.getElementById('lbm').addEventListener('click',e=>{if(e.target===document.getElementById('lbm'))closeLB();});
 
 let db=null,fbFns=null,allP=[],curP=null,curCat='all',curPage=1,itemsPerPage=4;
 window.addEventListener('firebaseReady',()=>{db=window._db;fbFns=window._fbFns;loadCatalog();chkQS();restAdmin();if(sessionStorage.getItem('sx_admin')==='1')loadAdminList();});
@@ -605,7 +610,7 @@ async function loadCatalog(){
   catch(e){g.innerHTML='<div class="ec2"><p>Could not load catalog.</p></div>';}
 }
 function renderCat(cat){
-  curCat=cat;if(cat!==curCat)curPage=1;curCat=cat;
+  if(cat!==curCat)curPage=1;curCat=cat;
   const g=document.getElementById('cg');
   const f=cat==='all'?allP:allP.filter(p=>p.category===cat);
   if(!f.length){g.innerHTML='<div class="ec2"><p>No products in this category yet.</p></div>';document.getElementById('pg').style.display='none';return;}
@@ -616,9 +621,10 @@ function renderCat(cat){
   document.getElementById('pg').innerHTML=`<div style="text-align:center;padding:1.5rem;"><span style="color:var(--dim);font-family:var(--orb);font-size:.7rem;letter-spacing:.1em;margin-right:1rem;">Page ${curPage} of ${totalPages}</span><button class="vb vg" onclick="prevPage('${cat}')" style="padding:.6rem 1.2rem;margin-right:.5rem;font-size:.65rem;" ${curPage===1?'disabled style="opacity:.4;cursor:not-allowed;"':''}>← Previous</button><button class="vb vg" onclick="nextPage('${cat}')" style="padding:.6rem 1.2rem;font-size:.65rem;" ${curPage===totalPages?'disabled style="opacity:.4;cursor:not-allowed;"':''}>Next →</button></div>`;
   document.getElementById('pg').style.display='block';
 }
-function nextPage(cat){const f=cat==='all'?allP:allP.filter(p=>p.category===cat);const totalPages=Math.ceil(f.length/itemsPerPage);if(curPage<totalPages){curPage++;renderCat(cat);}};
-function prevPage(cat){if(curPage>1){curPage--;renderCat(cat);}}
-document.getElementById('cf').addEventListener('click',e=>{if(!e.target.classList.contains('ct'))return;document.querySelectorAll('.ct').forEach(t=>t.classList.remove('active'));e.target.classList.add('active');renderCat(e.target.dataset.cat);});
+function nextPage(cat){const f=cat==='all'?allP:allP.filter(p=>p.category===cat);const totalPages=Math.ceil(f.length/itemsPerPage);if(curPage<totalPages){curPage++;triggerGlitch();renderCat(cat);}};
+function prevPage(cat){if(curPage>1){curPage--;triggerGlitch();renderCat(cat);}}
+document.getElementById('cf').addEventListener('click',e=>{if(!e.target.classList.contains('ct'))return;document.querySelectorAll('.ct').forEach(t=>t.classList.remove('active'));e.target.classList.add('active');const bg=document.getElementById('forge-bg');bg.classList.remove('wave-morph');void bg.offsetWidth;bg.classList.add('wave-morph');setTimeout(()=>bg.classList.remove('wave-morph'),400);renderCat(e.target.dataset.cat);});
+function triggerGlitch(){const cg=document.getElementById('cg');cg.classList.remove('glitch-fx');void cg.offsetWidth;cg.classList.add('glitch-fx');setTimeout(()=>cg.classList.remove('glitch-fx'),220);}
 
 function oOM(id,name,img){curP={id,name,img};document.getElementById('opn').textContent='⚒ '+name;document.getElementById('on').value='';document.getElementById('ono').value='';document.getElementById('oe').style.display='none';document.getElementById('om').classList.add('open');}
 function subOrder(){const n=document.getElementById('on').value.trim();const nt=document.getElementById('ono').value.trim();if(!n){document.getElementById('oe').style.display='block';return;}document.getElementById('oe').style.display='none';const pi=curP&&curP.img?`
@@ -631,7 +637,7 @@ Name: ${n}
 Notes: ${nt||'None'}
 
 Please confirm details, colors, size and pricing!`);window.open(`https://wa.me/919845536010?text=${msg}`,'_blank');cM('om');showConf('order');}
-function showConf(type){const cm=document.getElementById('confModal');const anim=document.getElementById('confAnim');const title=document.getElementById('confTitle');const msg=document.getElementById('confMsg');if(type==='order'){title.textContent='Order Placed! 🔥';msg.textContent='We\'ll reach out within 24 hours with your custom forge details!';anim.innerHTML='<div class="conf-checkmark"><div class="conf-checkmark-circle"></div><div class="conf-checkmark-path"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div></div>';}else if(type==='contact'){title.textContent='Thanks for Reaching Out! ⚒️';msg.textContent='We\'ll get back to you within 24 hours. Your creativity matters to us!';anim.innerHTML='<div class="conf-checkmark"><div class="conf-checkmark-circle"></div><div class="conf-checkmark-path"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div></div>';}cm.classList.add('open');setTimeout(()=>closeConf(),3500);}
+function showConf(type){const cm=document.getElementById('confModal');const anim=document.getElementById('confAnim');const title=document.getElementById('confTitle');const msg=document.getElementById('confMsg');if(type==='order'){title.textContent='Order Placed! 🔥';msg.textContent='We\'ll reach out within 24 hours with your custom forge details!';anim.innerHTML='<div class="conf-checkmark"><div class="conf-checkmark-circle"></div><div class="conf-checkmark-path"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div></div>';}else if(type==='contact'){title.textContent='Thanks for Reaching Out! ⚒️';msg.textContent='We\'ll get back to you within 24 hours. Your creativity matters to us!';anim.innerHTML='<div class="conf-checkmark"><div class="conf-checkmark-circle"></div><div class="conf-checkmark-path"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div></div>';}cm.classList.add('open');}
 function closeConf(){document.getElementById('confModal').classList.remove('open');}
 function cM(id){document.getElementById(id).classList.remove('open');}
 
@@ -688,9 +694,10 @@ function chkQS(){
   const t=p.get('title')||'',i=p.get('img')||'',s=p.get('source')||'';
   document.getElementById('qst').value=t;document.getElementById('qsi').value=i;document.getElementById('qss').value=s;
   if(i){const pr=document.getElementById('qsp');pr.src=i;pr.style.display='block';}
-  document.getElementById('qsm').classList.add('open');
-  document.querySelector('nav').style.display='none';document.getElementById('forge-bg').style.display='none';document.body.style.background='#0d0520';
-  const ov=document.getElementById('qsm');ov.style.position='relative';ov.style.inset='auto';ov.style.display='block';ov.style.background='transparent';ov.style.backdropFilter='none';ov.style.padding='1rem';
+  document.body.innerHTML='';document.body.style.cssText='margin:0;padding:1rem;background:#0d0520;font-family:sans-serif;';
+  const qsEl=document.getElementById('qsm')||document.createElement('div');
+  // rebuild minimal form directly
+  document.body.innerHTML=`<div style="max-width:440px;margin:auto;padding:1.5rem;background:linear-gradient(145deg,#0d0520,#1a0840);border:1px solid rgba(123,47,255,.3);border-radius:4px;"><div style="font-family:monospace;font-size:1.1rem;color:#c87bff;margin-bottom:1.2rem;letter-spacing:.1em;">✦ QUICK SAVE TO CATALOG</div><input id="qst" placeholder="Product Name *" value="${t}" style="width:100%;box-sizing:border-box;background:rgba(123,47,255,.08);border:1px solid rgba(123,47,255,.25);color:#e8e0ff;padding:.7rem;margin-bottom:.7rem;font-size:.9rem;border-radius:3px;"><input id="qsi" placeholder="Image URL" value="${i}" style="width:100%;box-sizing:border-box;background:rgba(123,47,255,.08);border:1px solid rgba(123,47,255,.25);color:#e8e0ff;padding:.7rem;margin-bottom:.7rem;font-size:.9rem;border-radius:3px;"><select id="qsc" style="width:100%;box-sizing:border-box;background:#1a0840;border:1px solid rgba(123,47,255,.25);color:#e8e0ff;padding:.7rem;margin-bottom:.7rem;font-size:.9rem;border-radius:3px;"><option value="Anime">Anime</option><option value="Home Decor">Home Decor</option><option value="Custom">Custom</option><option value="Chibi">Chibi</option><option value="Gift">Gift</option></select><textarea id="qsd" placeholder="Description (optional)" rows="3" style="width:100%;box-sizing:border-box;background:rgba(123,47,255,.08);border:1px solid rgba(123,47,255,.25);color:#e8e0ff;padding:.7rem;margin-bottom:.7rem;font-size:.9rem;border-radius:3px;resize:vertical;"></textarea><input id="qss" type="hidden" value="${s}"><div id="qsok" style="display:none;color:#c87bff;margin-bottom:.7rem;">✦ Saved successfully!</div><button id="qsbtn" onclick="subQS()" style="width:100%;background:linear-gradient(135deg,#7b2fff,#a050ff);color:#fff;border:none;padding:.85rem;font-size:.9rem;cursor:pointer;border-radius:3px;letter-spacing:.08em;">✦ Save to Catalog</button></div>`;
 }
 
 async function subQS(){
