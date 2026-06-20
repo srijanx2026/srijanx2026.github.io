@@ -881,7 +881,11 @@ function initEvilEye(){
 }
 
 window.addEventListener('DOMContentLoaded', initEvilEye);
+function triggerGlitch(){const e=document.createElement('div');e.style.position='fixed';e.style.top='0';e.style.left='0';e.style.width='100%';e.style.height='100%';e.style.pointerEvents='none';e.style.zIndex='998';e.style.background='linear-gradient(45deg, rgba(200, 123, 255, 0.2) 25%, transparent 25%, transparent 50%, rgba(200, 123, 255, 0.2) 50%, rgba(200, 123, 255, 0.2) 75%, transparent 75%, transparent)';e.style.backgroundSize='40px 40px';e.style.animation='glitchFlicker 0.4s ease-in-out';document.body.appendChild(e);setTimeout(()=>e.remove(),400);}
+function triggerWaveMorph(){const e=document.createElement('canvas');e.width=window.innerWidth;e.height=window.innerHeight;e.style.position='fixed';e.style.top='0';e.style.left='0';e.style.pointerEvents='none';e.style.zIndex='999';document.body.appendChild(e);const t=e.getContext('2d');let o=1;const n=setInterval(()=>{t.clearRect(0,0,e.width,e.height);t.fillStyle=`rgba(200, 123, 255, ${0.15*o})`;for(let i=0;i<e.width;i+=30){const r=40*o,s=.01,c=Math.sin(i*s)*r+e.height*.3;t.beginPath();t.arc(i,c,20+30*o,0,2*Math.PI);t.fill()}o*=.92;o<=.01&&(clearInterval(n),e.remove())},30);}
+if(!document.getElementById('glitchCSS')){const e=document.createElement('style');e.id='glitchCSS';e.textContent='@keyframes glitchFlicker{0%{opacity:1;transform:translate(0,0)}25%{opacity:.8;transform:translate(-2px,2px)}50%{opacity:1;transform:translate(2px,-2px)}75%{opacity:.9;transform:translate(-1px,1px)}100%{opacity:0;transform:translate(0,0)}}';document.head.appendChild(e);}
+
 </script>
-<script src="new-features.js"></script>
+
 </body>
 </html>
