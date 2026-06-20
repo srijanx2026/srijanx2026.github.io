@@ -605,7 +605,7 @@ async function loadCatalog(){
   catch(e){g.innerHTML='<div class="ec2"><p>Could not load catalog.</p></div>';}
 }
 function renderCat(cat){
-  curCat=cat;if(cat!==curCat)curPage=1;curCat=cat;
+  curCat=cat;if(cat!==curCat)curPage=1;curPage=1;curCat=cat;
   const g=document.getElementById('cg');
   const f=cat==='all'?allP:allP.filter(p=>p.category===cat);
   if(!f.length){g.innerHTML='<div class="ec2"><p>No products in this category yet.</p></div>';document.getElementById('pg').style.display='none';return;}
