@@ -616,7 +616,7 @@ function renderCat(cat){
   document.getElementById('pg').innerHTML=`<div style="text-align:center;padding:1.5rem;"><span style="color:var(--dim);font-family:var(--orb);font-size:.7rem;letter-spacing:.1em;margin-right:1rem;">Page ${curPage} of ${totalPages}</span><button class="vb vg" onclick="prevPage('${cat}')" style="padding:.6rem 1.2rem;margin-right:.5rem;font-size:.65rem;" ${curPage===1?'disabled style="opacity:.4;cursor:not-allowed;"':''}>← Previous</button><button class="vb vg" onclick="nextPage('${cat}')" style="padding:.6rem 1.2rem;font-size:.65rem;" ${curPage===totalPages?'disabled style="opacity:.4;cursor:not-allowed;"':''}>Next →</button></div>`;
   document.getElementById('pg').style.display='block';
 }
-function nextPage(cat){const f=cat==='all'?allP:allP.filter(p=>p.category===cat);const totalPages=Math.ceil(f.length/itemsPerPage);if(curPage<totalPages){curPage++;renderCat(cat);}};
+function nextPage(cat){const f=cat==='all'?allP:allP.filter(p=>p.category===cat);const totalPages=Math.ceil(f.length/itemsPerPage);if(curPage<totalPages){triggerGlitch();curPage++;setTimeout(()=>renderCat(cat),150);}};
 function prevPage(cat){if(curPage>1){curPage--;renderCat(cat);}}
 document.getElementById('cf').addEventListener('click',e=>{if(!e.target.classList.contains('ct'))return;document.querySelectorAll('.ct').forEach(t=>t.classList.remove('active'));e.target.classList.add('active');renderCat(e.target.dataset.cat);});
 
