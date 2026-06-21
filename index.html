@@ -168,7 +168,7 @@ section{position:relative;z-index:10;}
 .cg{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start;}
 .cit{color:var(--muted);line-height:1.85;margin-bottom:2rem;font-size:.95rem;}
 .cls{display:flex;flex-direction:column;gap:.9rem;}
-.cl{display:flex;align-items:center;gap:1rem;background:linear-gradient(135deg,rgba(15,5,35,.95),rgba(8,2,20,.85));border:1px solid rgba(123,47,255,.18);padding:1rem 1.4rem;text-decoration:none;color:#e8d8ff;font-family:var(--orb);font-size:.82rem;font-weight:700;letter-spacing:.08em;transition:all .3s;box-shadow:0 1px 0 rgba(200,123,255,.04) inset;}
+.cl{display:flex;align-items:center;gap:1rem;background:linear-gradient(135deg,rgba(15,5,35,.95),rgba(8,2,20,.85));border:1px solid rgba(123,47,255,.18);padding:1rem 1.4rem;text-decoration:none;color:var(--white);font-family:var(--orb);font-size:.62rem;font-weight:700;letter-spacing:.1em;transition:all .3s;box-shadow:0 1px 0 rgba(200,123,255,.04) inset;}
 .cl:hover{border-color:rgba(180,80,255,.45);background:linear-gradient(135deg,rgba(25,8,55,.95),rgba(12,3,30,.9));box-shadow:0 1px 0 rgba(200,123,255,.07) inset,0 0 20px rgba(123,47,255,.18);transform:translateX(4px);}
 .cl .ic{font-size:1.3rem;}
 .ob{background:linear-gradient(145deg,rgba(15,5,35,.98),rgba(8,2,20,.95));border:1px solid rgba(240,180,41,.25);padding:2rem;box-shadow:0 1px 0 rgba(255,210,80,.06) inset,0 8px 40px rgba(0,0,0,.4);}
@@ -476,7 +476,7 @@ footer p{color:var(--white);opacity:.4;font-family:var(--orb);font-size:.5rem;le
   <div class="md" style="max-width:440px;margin:auto;">
     <div class="mt">QUICK SAVE</div>
     <p class="ms">Review and save to the forge catalog.</p>
-    <img id="qsp" src="" alt="" style="width:100%;height:220px;object-fit:cover;margin-bottom:1rem;border:1px solid rgba(123,47,255,.28);display:none;" onerror="this.style.display='none'" />
+    <img id="qsp" src="" alt="" style="width:100%;height:160px;object-fit:cover;margin-bottom:1rem;border:1px solid rgba(123,47,255,.28);display:none;" onerror="this.style.display='none'" />
     <label>Product Name</label><input type="text" id="qst" placeholder="Product name..." />
     <label>Image URL</label><input type="url" id="qsi" placeholder="Image URL..." oninput="var p=document.getElementById('qsp');p.src=this.value;p.style.display='block';" />
     <label>Category</label>
@@ -687,14 +687,10 @@ function chkQS(){
   const p=new URLSearchParams(window.location.search);if(p.get('action')!=='quicksave')return;
   const t=p.get('title')||'',i=p.get('img')||'',s=p.get('source')||'';
   document.getElementById('qst').value=t;document.getElementById('qsi').value=i;document.getElementById('qss').value=s;
-  // Show preview image if URL provided
-  if(i){const pr=document.getElementById('qsp');pr.src=i;pr.style.display='block';pr.style.height='220px';}
-  // Hide entire page, show only the quick-save form
-  document.querySelectorAll('body > *:not(#qsm):not(script)').forEach(el=>el.style.display='none');
-  document.body.style.cssText='margin:0;padding:1.2rem;background:#0d0520;box-sizing:border-box;';
-  const ov=document.getElementById('qsm');
-  ov.style.cssText='position:relative;inset:auto;display:block;background:transparent;backdrop-filter:none;padding:0;max-width:460px;margin:0 auto;';
-  const md=ov.querySelector('.md');if(md)md.style.cssText='max-width:100%;margin:0;';
+  if(i){const pr=document.getElementById('qsp');pr.src=i;pr.style.display='block';}
+  document.getElementById('qsm').classList.add('open');
+  document.querySelector('nav').style.display='none';document.getElementById('forge-bg').style.display='none';document.body.style.background='#0d0520';
+  const ov=document.getElementById('qsm');ov.style.position='relative';ov.style.inset='auto';ov.style.display='block';ov.style.background='transparent';ov.style.backdropFilter='none';ov.style.padding='1rem';
 }
 
 async function subQS(){
@@ -727,8 +723,11 @@ function initEvilEye(){
   if(!c) return;
   
   const canvas = document.createElement('canvas');
-  canvas.width = 200;
-  canvas.height = 200;
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = 200 * dpr;
+  canvas.height = 200 * dpr;
+  canvas.style.width = '200px';
+  canvas.style.height = '200px';
   canvas.style.position = 'absolute';
   canvas.style.top = '15%';
   canvas.style.left = '50%';
@@ -871,6 +870,7 @@ function initEvilEye(){
   });
   
   c.appendChild(canvas);
+  gl.viewport(0, 0, canvas.width, canvas.height);
   
   function render(t) {
     gl.uniform1f(gl.getUniformLocation(prog, 't'), t * 0.001);
