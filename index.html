@@ -7,7 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cinzel:wght@400;700;900&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
   import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
   const firebaseConfig = {
     apiKey: "AIzaSyDYBpoOfcXQGRQ-bstduxpI9V07g5oWRJo",
@@ -21,7 +21,7 @@
   const db = getFirestore(app);
   const storage = getStorage(app);
   window._db = db; window._storage = storage;
-  window._fbFns = { collection, addDoc, getDocs, deleteDoc, doc };
+  window._fbFns = { collection, addDoc, getDocs, deleteDoc, doc, updateDoc };
   window._storageFns = { ref, uploadBytes, getDownloadURL, deleteObject };
   window._authToken = null;
   window.dispatchEvent(new Event("firebaseReady"));
@@ -248,6 +248,29 @@ footer p{color:var(--white);opacity:.4;font-family:var(--orb);font-size:.5rem;le
 .api small{color:var(--dim);font-size:.78rem;}
 .bd{background:rgba(255,50,50,.08);border:1px solid rgba(255,50,50,.28);color:#ff6b6b;padding:.4rem .8rem;cursor:pointer;font-family:var(--orb);font-size:.58rem;font-weight:700;letter-spacing:.05em;transition:all .3s;}
 .bd:hover{background:rgba(255,50,50,.2);}
+.be{background:rgba(123,47,255,.1);border:1px solid rgba(123,47,255,.35);color:#c87bff;padding:.4rem .8rem;cursor:pointer;font-family:var(--orb);font-size:.58rem;font-weight:700;letter-spacing:.05em;transition:all .3s;margin-right:.3rem;}
+.be:hover{background:rgba(123,47,255,.25);}
+.bdup{background:rgba(240,180,41,.08);border:1px solid rgba(240,180,41,.3);color:var(--gold);padding:.4rem .8rem;cursor:pointer;font-family:var(--orb);font-size:.58rem;font-weight:700;letter-spacing:.05em;transition:all .3s;margin-right:.3rem;}
+.bdup:hover{background:rgba(240,180,41,.18);}
+.edit-form{display:none;margin-top:.7rem;padding:.8rem;background:rgba(123,47,255,.06);border:1px solid rgba(123,47,255,.2);flex-direction:column;gap:.5rem;}
+.edit-form.open{display:flex;}
+.edit-form input,.edit-form select,.edit-form textarea{background:rgba(123,47,255,.08);border:1px solid rgba(123,47,255,.25);color:#e8e0ff;padding:.5rem .7rem;font-size:.8rem;font-family:var(--orb);width:100%;box-sizing:border-box;}
+.edit-form textarea{resize:vertical;rows:2;}
+.edit-form label{color:var(--dim);font-family:var(--orb);font-size:.58rem;letter-spacing:.1em;margin-bottom:.1rem;}
+.edit-row{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;}
+.edit-save{background:linear-gradient(135deg,#7b2fff,#a050ff);color:#fff;border:none;padding:.5rem 1.2rem;font-family:var(--orb);font-size:.6rem;font-weight:700;letter-spacing:.08em;cursor:pointer;margin-top:.3rem;align-self:flex-start;}
+.edit-save:hover{opacity:.85;}
+.admin-search{display:flex;gap:.6rem;align-items:center;margin-bottom:1rem;}
+.admin-search input{flex:1;background:rgba(123,47,255,.08);border:1px solid rgba(123,47,255,.25);color:#e8e0ff;padding:.6rem .9rem;font-family:var(--orb);font-size:.7rem;outline:none;}
+.admin-search input::placeholder{color:var(--dim);}
+.cat-counts{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1rem;}
+.cat-pill{background:rgba(123,47,255,.1);border:1px solid rgba(123,47,255,.2);color:#c87bff;padding:.25rem .7rem;font-family:var(--orb);font-size:.55rem;letter-spacing:.08em;cursor:pointer;transition:all .2s;}
+.cat-pill:hover,.cat-pill.active{background:rgba(123,47,255,.3);border-color:rgba(123,47,255,.5);}
+.bulk-bar{display:none;align-items:center;gap:.8rem;margin-bottom:.8rem;padding:.6rem .9rem;background:rgba(240,180,41,.06);border:1px solid rgba(240,180,41,.2);}
+.bulk-bar.show{display:flex;}
+.bulk-bar span{color:var(--gold);font-family:var(--orb);font-size:.6rem;letter-spacing:.08em;flex:1;}
+.bulk-bar select{background:#1a0840;border:1px solid rgba(123,47,255,.3);color:#e8e0ff;padding:.35rem .6rem;font-size:.7rem;}
+.api-check{width:16px;height:16px;accent-color:#7b2fff;cursor:pointer;flex-shrink:0;}
 .bb2{background:rgba(240,180,41,.05);border:1px solid rgba(240,180,41,.22);padding:1.4rem;margin-bottom:1rem;}
 .bb2 ol{color:var(--muted);font-size:.85rem;line-height:1.95;padding-left:1.2rem;}
 
@@ -548,6 +571,23 @@ footer p{color:var(--white);opacity:.4;font-family:var(--orb);font-size:.5rem;le
 
     <div class="as">
       <h2>✦ MANAGE CATALOG <span id="apl-count" style="font-size:.6rem;color:var(--pg);font-family:var(--orb);letter-spacing:.08em;margin-left:.5rem;opacity:.8;"></span> <button class="bs" onclick="loadAdminList()" style="font-size:.55rem;padding:.35rem .9rem;">↻ Refresh</button></h2>
+      <div class="admin-search">
+        <input type="text" id="apl-search" placeholder="🔍  Search by name..." oninput="filterAdminList()" />
+        <button class="bs" onclick="applyBulkCat()" style="font-size:.55rem;padding:.35rem .9rem;">Apply Bulk</button>
+      </div>
+      <div class="cat-counts" id="cat-counts"></div>
+      <div class="bulk-bar" id="bulk-bar">
+        <span id="bulk-count">0 selected</span>
+        <select id="bulk-cat-sel">
+          <option value="">Change category to…</option>
+          <option value="Anime">Anime</option>
+          <option value="Home Decor">Home Decor</option>
+          <option value="Custom">Custom</option>
+          <option value="Chibi">Chibi</option>
+          <option value="Gift">Gift</option>
+        </select>
+        <button class="bd" onclick="clearBulkSelection()">Clear</button>
+      </div>
       <div class="apl" id="apl"><p style="color:var(--dim);font-family:var(--orb);font-size:.65rem;letter-spacing:.1em;">Loading...</p></div>
     </div>
   </div>
@@ -774,12 +814,124 @@ function oAdmin(){document.getElementById('admin-panel').classList.add('open');s
 function closeAdmin(){document.getElementById('admin-panel').classList.remove('open');sessionStorage.removeItem('sx_admin');}
 function restAdmin(){if(sessionStorage.getItem('sx_admin')==='1'){document.getElementById('admin-panel').classList.add('open');initBML();}}
 
+let adminItems=[],adminCatFilter='all';
+
+function renderCatCounts(ps){
+  const counts={};ps.forEach(p=>{counts[p.category||'Custom']=(counts[p.category||'Custom']||0)+1;});
+  const el=document.getElementById('cat-counts');if(!el)return;
+  const cats=['all',...Object.keys(counts)];
+  el.innerHTML=cats.map(c=>`<div class="cat-pill${c===adminCatFilter?' active':''}" onclick="setAdminCatFilter('${c}')">${c==='all'?`All (${ps.length})`:c+' ('+counts[c]+')'}</div>`).join('');
+}
+
+function setAdminCatFilter(cat){
+  adminCatFilter=cat;
+  renderCatCounts(adminItems);
+  renderAdminItems();
+}
+
+function filterAdminList(){renderAdminItems();}
+
+function getCheckedIds(){return [...document.querySelectorAll('.api-check:checked')].map(c=>c.dataset.id);}
+
+function updateBulkBar(){
+  const ids=getCheckedIds();
+  const bar=document.getElementById('bulk-bar');
+  const cnt=document.getElementById('bulk-count');
+  if(ids.length>0){bar.classList.add('show');cnt.textContent=`${ids.length} selected`;}
+  else{bar.classList.remove('show');}
+}
+
+function clearBulkSelection(){
+  document.querySelectorAll('.api-check:checked').forEach(c=>c.checked=false);
+  updateBulkBar();
+}
+
+async function applyBulkCat(){
+  const ids=getCheckedIds();
+  const cat=document.getElementById('bulk-cat-sel').value;
+  if(!ids.length||!cat){alert('Select items and a category first.');return;}
+  if(!confirm(`Change ${ids.length} item(s) to "${cat}"?`))return;
+  try{
+    await Promise.all(ids.map(id=>fbFns.updateDoc(fbFns.doc(db,'products',id),{category:cat})));
+    clearBulkSelection();
+    await loadAdminList();
+    loadCatalog();
+  }catch(e){alert('Error: '+e.message);}
+}
+
+function renderAdminItems(){
+  const l=document.getElementById('apl');
+  const q=(document.getElementById('apl-search')?.value||'').toLowerCase().trim();
+  let items=adminItems;
+  if(adminCatFilter!=='all')items=items.filter(p=>(p.category||'Custom')===adminCatFilter);
+  if(q)items=items.filter(p=>p.name.toLowerCase().includes(q)||(p.description||'').toLowerCase().includes(q));
+  if(!items.length){l.innerHTML='<p style="color:var(--dim);font-family:var(--orb);font-size:.65rem;">No items found.</p>';return;}
+  l.innerHTML=items.map(p=>`
+  <div class="api" id="api-${p.id}">
+    <input type="checkbox" class="api-check" data-id="${p.id}" onchange="updateBulkBar()" />
+    <img src="${p.image||''}" onerror="this.src=''" alt="" style="cursor:pointer;" onclick="toggleEdit('${p.id}')" />
+    <div style="flex:1;min-width:0;">
+      <strong>${p.name}</strong>
+      <small>${p.category||'Custom'} · ${p.description?p.description.substring(0,55)+'…':'No description'}</small>
+    </div>
+    <div style="display:flex;gap:.3rem;flex-shrink:0;">
+      <button class="bdup" onclick="dupProd('${p.id}')">⧉ Dupe</button>
+      <button class="be" onclick="toggleEdit('${p.id}')">✎ Edit</button>
+      <button class="bd" data-id="${p.id}" data-img="${(p.image||'').replace(/"/g,'&quot;')}" onclick="delProd(this.dataset.id,this.dataset.img)">✕ Del</button>
+    </div>
+  </div>
+  <div class="edit-form" id="ef-${p.id}">
+    <div class="edit-row">
+      <div><label>NAME</label><input type="text" id="en-${p.id}" value="${p.name.replace(/"/g,'&quot;')}" /></div>
+      <div><label>CATEGORY</label><select id="ec-${p.id}">
+        <option value="Anime"${p.category==='Anime'?' selected':''}>Anime</option>
+        <option value="Home Decor"${p.category==='Home Decor'?' selected':''}>Home Decor</option>
+        <option value="Custom"${(p.category==='Custom'||!p.category)?' selected':''}>Custom</option>
+        <option value="Chibi"${p.category==='Chibi'?' selected':''}>Chibi</option>
+        <option value="Gift"${p.category==='Gift'?' selected':''}>Gift</option>
+      </select></div>
+    </div>
+    <div><label>IMAGE URL</label><input type="url" id="ei-${p.id}" value="${(p.image||'').replace(/"/g,'&quot;')}" /></div>
+    <div><label>DESCRIPTION</label><textarea id="ed-${p.id}" rows="2">${p.description||''}</textarea></div>
+    <button class="edit-save" onclick="saveProd('${p.id}')">✦ Save Changes</button>
+  </div>`).join('');
+}
+
+function toggleEdit(id){
+  const ef=document.getElementById('ef-'+id);
+  if(ef)ef.classList.toggle('open');
+}
+
+async function saveProd(id){
+  const name=document.getElementById('en-'+id)?.value.trim();
+  const cat=document.getElementById('ec-'+id)?.value;
+  const img=document.getElementById('ei-'+id)?.value.trim();
+  const desc=document.getElementById('ed-'+id)?.value.trim();
+  if(!name){alert('Name required.');return;}
+  try{
+    await fbFns.updateDoc(fbFns.doc(db,'products',id),{name,category:cat,image:img,description:desc});
+    await loadAdminList();
+    loadCatalog();
+  }catch(e){alert('Save failed: '+e.message);}
+}
+
+async function dupProd(id){
+  const p=adminItems.find(x=>x.id===id);if(!p)return;
+  try{
+    await fbFns.addDoc(fbFns.collection(db,'products'),{name:p.name+' (Copy)',image:p.image||'',category:p.category||'Custom',description:p.description||'',source:p.source||'',createdAt:new Date().toISOString()});
+    await loadAdminList();loadCatalog();
+  }catch(e){alert('Duplicate failed: '+e.message);}
+}
+
 async function loadAdminList(){
   const l=document.getElementById('apl');if(!db){l.innerHTML='<p style="color:var(--dim)">Firebase not connected.</p>';return;}
-  try{const s=await fbFns.getDocs(fbFns.collection(db,'products'));const ps=s.docs.map(d=>({id:d.id,...d.data()}));
-  const countEl=document.getElementById('apl-count');if(countEl)countEl.textContent=`${ps.length} item${ps.length!==1?'s':''}`;
-  if(!ps.length){l.innerHTML='<p style="color:var(--dim);font-family:var(--orb);font-size:.65rem;">No products yet.</p>';return;}l.innerHTML=ps.map(p=>`<div class="api"><img src="${p.image||''}" onerror="this.src=''" alt=""/><div style="flex:1"><strong>${p.name}</strong><small>${p.category} · ${p.description?p.description.substring(0,55)+'…':'No description'}</small></div><button class="bd" data-id="${p.id}" data-img="${(p.image||'').replace(/"/g,'&quot;')}" onclick="delProd(this.dataset.id,this.dataset.img)">Delete</button></div>`).join('');}
-  catch(e){l.innerHTML='<p style="color:#ff6b6b">Error loading.</p>';}
+  try{
+    const s=await fbFns.getDocs(fbFns.collection(db,'products'));
+    adminItems=s.docs.map(d=>({id:d.id,...d.data()}));
+    const countEl=document.getElementById('apl-count');if(countEl)countEl.textContent=`${adminItems.length} item${adminItems.length!==1?'s':''}`;
+    renderCatCounts(adminItems);
+    renderAdminItems();
+  }catch(e){l.innerHTML='<p style="color:#ff6b6b">Error loading.</p>';}
 }
 
 let selFile=null;
