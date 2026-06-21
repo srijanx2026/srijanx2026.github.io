@@ -84,6 +84,9 @@ section{position:relative;z-index:10;}
 .vm:hover{box-shadow:0 2px 0 rgba(255,255,255,.15) inset,0 -2px 0 rgba(0,0,0,.3) inset,0 6px 55px rgba(160,80,255,.85);transform:translateY(-3px);}
 .vg{background:linear-gradient(135deg,rgba(240,180,41,.08),rgba(200,140,20,.05));color:var(--gold);border:1px solid rgba(240,180,41,.4);box-shadow:0 2px 0 rgba(255,255,255,.04) inset,0 0 18px rgba(240,180,41,.08);}
 .vg:hover{background:linear-gradient(135deg,rgba(240,180,41,.14),rgba(200,140,20,.08));box-shadow:0 2px 0 rgba(255,255,255,.07) inset,0 0 35px rgba(240,180,41,.28);transform:translateY(-3px);}
+.sh{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.4rem;opacity:.4;animation:bounce 2.5s infinite;}
+.sh span{font-family:var(--orb);font-size:.5rem;letter-spacing:.4em;text-transform:uppercase;color:var(--dim);}
+.sh .arr{width:1px;height:36px;background:linear-gradient(to bottom,var(--pg),transparent);}
 @keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0);}50%{transform:translateX(-50%) translateY(8px);}}
 
 .conf-modal{display:none;position:fixed;inset:0;background:rgba(3,0,10,.94);z-index:3000;align-items:center;justify-content:center;backdrop-filter:blur(15px);}
@@ -165,7 +168,7 @@ section{position:relative;z-index:10;}
 .cg{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start;}
 .cit{color:var(--muted);line-height:1.85;margin-bottom:2rem;font-size:.95rem;}
 .cls{display:flex;flex-direction:column;gap:.9rem;}
-.cl{display:flex;align-items:center;gap:1rem;background:linear-gradient(135deg,rgba(15,5,35,.95),rgba(8,2,20,.85));border:1px solid rgba(123,47,255,.18);padding:1rem 1.4rem;text-decoration:none;color:var(--white);font-family:var(--orb);font-size:.62rem;font-weight:700;letter-spacing:.1em;transition:all .3s;box-shadow:0 1px 0 rgba(200,123,255,.04) inset;}
+.cl{display:flex;align-items:center;gap:1rem;background:linear-gradient(135deg,rgba(15,5,35,.95),rgba(8,2,20,.85));border:1px solid rgba(123,47,255,.18);padding:1rem 1.4rem;text-decoration:none;color:#e8d8ff;font-family:var(--orb);font-size:.82rem;font-weight:700;letter-spacing:.08em;transition:all .3s;box-shadow:0 1px 0 rgba(200,123,255,.04) inset;}
 .cl:hover{border-color:rgba(180,80,255,.45);background:linear-gradient(135deg,rgba(25,8,55,.95),rgba(12,3,30,.9));box-shadow:0 1px 0 rgba(200,123,255,.07) inset,0 0 20px rgba(123,47,255,.18);transform:translateX(4px);}
 .cl .ic{font-size:1.3rem;}
 .ob{background:linear-gradient(145deg,rgba(15,5,35,.98),rgba(8,2,20,.95));border:1px solid rgba(240,180,41,.25);padding:2rem;box-shadow:0 1px 0 rgba(255,210,80,.06) inset,0 8px 40px rgba(0,0,0,.4);}
@@ -273,57 +276,6 @@ footer p{color:var(--white);opacity:.4;font-family:var(--orb);font-size:.5rem;le
 .lb-action{display:flex;gap:1rem;}
 
 @media(max-width:768px){nav{padding:1rem 1.5rem;}.nav-links{display:none;}.ag,.cg{grid-template-columns:1fr;gap:2rem;}.vs{grid-template-columns:1fr 1fr;}.afg{grid-template-columns:1fr;}.ah{padding:1rem 1.5rem;}.sr{gap:2.5rem;}}
-
-/* WAVE MORPH - catalog grid on category change */
-@keyframes wavePulse{
-  0%{transform:scale(1);opacity:1;}
-  20%{transform:scale(.97);opacity:.7;box-shadow:0 0 0 0 rgba(160,80,255,0);}
-  50%{transform:scale(1.01);opacity:.85;box-shadow:0 0 40px 15px rgba(160,80,255,.22),0 0 80px 30px rgba(240,180,41,.1);}
-  100%{transform:scale(1);opacity:1;box-shadow:0 0 0 0 rgba(160,80,255,0);}
-}
-.wave-morph{animation:wavePulse .4s ease-out forwards;}
-
-/* GLITCH - aggressive RGB split + scan lines */
-@keyframes glitchMain{
-  0%  {clip-path:none;transform:none;filter:none;}
-  5%  {clip-path:polygon(0 10%,100% 10%,100% 30%,0 30%);transform:translateX(-6px);filter:hue-rotate(90deg) brightness(1.8);}
-  10% {clip-path:polygon(0 55%,100% 55%,100% 70%,0 70%);transform:translateX(8px);filter:hue-rotate(-120deg) brightness(2);}
-  15% {clip-path:polygon(0 80%,100% 80%,100% 95%,0 95%);transform:translateX(-4px);filter:hue-rotate(45deg);}
-  20% {clip-path:none;transform:translateX(3px);filter:none;}
-  25% {clip-path:polygon(0 25%,100% 25%,100% 45%,0 45%);transform:translateX(-8px);filter:hue-rotate(180deg) brightness(1.5);}
-  30% {clip-path:none;transform:none;filter:none;}
-  100%{clip-path:none;transform:none;filter:none;}
-}
-@keyframes glitchRed{
-  0%  {opacity:0;}
-  5%  {opacity:.7;transform:translateX(6px);clip-path:polygon(0 10%,100% 10%,100% 30%,0 30%);}
-  10% {opacity:.5;transform:translateX(-4px);clip-path:polygon(0 55%,100% 55%,100% 75%,0 75%);}
-  20% {opacity:.6;transform:translateX(8px);clip-path:polygon(0 0,100% 0,100% 20%,0 20%);}
-  30% {opacity:0;transform:none;}
-  100%{opacity:0;}
-}
-@keyframes glitchBlue{
-  0%  {opacity:0;}
-  8%  {opacity:.6;transform:translateX(-8px);clip-path:polygon(0 40%,100% 40%,100% 60%,0 60%);}
-  15% {opacity:.5;transform:translateX(5px);clip-path:polygon(0 70%,100% 70%,100% 90%,0 90%);}
-  25% {opacity:.7;transform:translateX(-3px);clip-path:polygon(0 15%,100% 15%,100% 35%,0 35%);}
-  30% {opacity:0;transform:none;}
-  100%{opacity:0;}
-}
-.glitch-wrap{position:relative;}
-.glitch-wrap.glitch-fx>*{animation:glitchMain .32s steps(1) forwards;}
-.glitch-wrap.glitch-fx::before{
-  content:'';position:absolute;inset:0;
-  background:rgba(255,0,80,.15);
-  animation:glitchRed .32s steps(1) forwards;
-  pointer-events:none;z-index:10;
-}
-.glitch-wrap.glitch-fx::after{
-  content:'';position:absolute;inset:0;
-  background:rgba(0,200,255,.15);
-  animation:glitchBlue .32s steps(1) forwards;
-  pointer-events:none;z-index:11;
-}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"></script>
 </head>
@@ -360,7 +312,7 @@ footer p{color:var(--white);opacity:.4;font-family:var(--orb);font-size:.5rem;le
     <a href="#catalog" class="vb vm">⚒ Enter The Forge</a>
     <a href="#contact" class="vb vg">✦ Commission Custom</a>
   </div>
-
+  <div class="sh"><span>Scroll</span><div class="arr"></div></div>
 </section>
 
 <div class="ld"></div>
@@ -389,7 +341,7 @@ footer p{color:var(--white);opacity:.4;font-family:var(--orb);font-size:.5rem;le
       <button class="ct" data-cat="Chibi">Chibi</button>
       <button class="ct" data-cat="Gift">Gift</button>
     </div>
-    <div class="glitch-wrap"><div class="vg2" id="cg"><div class="ec2"><p>Loading the forge...</p></div></div></div>
+    <div class="vg2" id="cg"><div class="ec2"><p>Loading the forge...</p></div></div>
     <div id="pg" style="display:none;"></div>
   </div>
 </section>
@@ -524,7 +476,7 @@ footer p{color:var(--white);opacity:.4;font-family:var(--orb);font-size:.5rem;le
   <div class="md" style="max-width:440px;margin:auto;">
     <div class="mt">QUICK SAVE</div>
     <p class="ms">Review and save to the forge catalog.</p>
-    <img id="qsp" src="" alt="" style="width:100%;height:160px;object-fit:cover;margin-bottom:1rem;border:1px solid rgba(123,47,255,.28);display:none;" onerror="this.style.display='none'" />
+    <img id="qsp" src="" alt="" style="width:100%;height:220px;object-fit:cover;margin-bottom:1rem;border:1px solid rgba(123,47,255,.28);display:none;" onerror="this.style.display='none'" />
     <label>Product Name</label><input type="text" id="qst" placeholder="Product name..." />
     <label>Image URL</label><input type="url" id="qsi" placeholder="Image URL..." oninput="var p=document.getElementById('qsp');p.src=this.value;p.style.display='block';" />
     <label>Category</label>
@@ -593,7 +545,7 @@ footer p{color:var(--white);opacity:.4;font-family:var(--orb);font-size:.5rem;le
     </div>
 
     <div class="as">
-      <h2>✦ MANAGE CATALOG <span id="apl-count" style="font-size:.6rem;color:var(--pg);font-family:var(--orb);letter-spacing:.08em;margin-left:.5rem;opacity:.8;"></span> <button class="bs" onclick="loadAdminList()" style="font-size:.55rem;padding:.35rem .9rem;">↻ Refresh</button></h2>
+      <h2>✦ MANAGE CATALOG <button class="bs" onclick="loadAdminList()" style="font-size:.55rem;padding:.35rem .9rem;">↻ Refresh</button></h2>
       <div class="apl" id="apl"><p style="color:var(--dim);font-family:var(--orb);font-size:.65rem;letter-spacing:.1em;">Loading...</p></div>
     </div>
   </div>
@@ -642,7 +594,6 @@ revs.forEach(r=>ob.observe(r));
 let curLBProduct=null;
 function openLB(img,name,desc,id){document.getElementById('lb-img').src=img;document.getElementById('lb-name').textContent=name;document.getElementById('lb-desc').textContent=desc;curLBProduct={name,img,id};document.getElementById('lb-forge-btn').onclick=()=>{closeLB();oOM(id,name,img);};document.getElementById('lbm').classList.add('open');}
 function closeLB(){document.getElementById('lbm').classList.remove('open');}
-document.getElementById('lbm').addEventListener('click',e=>{if(e.target===document.getElementById('lbm'))closeLB();});
 
 let db=null,fbFns=null,allP=[],curP=null,curCat='all',curPage=1,itemsPerPage=4;
 window.addEventListener('firebaseReady',()=>{db=window._db;fbFns=window._fbFns;loadCatalog();chkQS();restAdmin();if(sessionStorage.getItem('sx_admin')==='1')loadAdminList();});
@@ -653,10 +604,8 @@ async function loadCatalog(){
   try{const s=await fbFns.getDocs(fbFns.collection(db,'products'));allP=s.docs.map(d=>({id:d.id,...d.data()}));renderCat('all');}
   catch(e){g.innerHTML='<div class="ec2"><p>Could not load catalog.</p></div>';}
 }
-function triggerWave(){const w=document.querySelector('.glitch-wrap');if(!w)return;w.classList.remove('wave-morph');void w.offsetWidth;w.classList.add('wave-morph');setTimeout(()=>w.classList.remove('wave-morph'),450);}
-function triggerGlitch(){const w=document.querySelector('.glitch-wrap');if(!w)return;w.classList.remove('glitch-fx');void w.offsetWidth;w.classList.add('glitch-fx');setTimeout(()=>w.classList.remove('glitch-fx'),350);}
 function renderCat(cat){
-  if(cat!==curCat)curPage=1;curCat=cat;
+  curCat=cat;if(cat!==curCat)curPage=1;curCat=cat;
   const g=document.getElementById('cg');
   const f=cat==='all'?allP:allP.filter(p=>p.category===cat);
   if(!f.length){g.innerHTML='<div class="ec2"><p>No products in this category yet.</p></div>';document.getElementById('pg').style.display='none';return;}
@@ -667,9 +616,9 @@ function renderCat(cat){
   document.getElementById('pg').innerHTML=`<div style="text-align:center;padding:1.5rem;"><span style="color:var(--dim);font-family:var(--orb);font-size:.7rem;letter-spacing:.1em;margin-right:1rem;">Page ${curPage} of ${totalPages}</span><button class="vb vg" onclick="prevPage('${cat}')" style="padding:.6rem 1.2rem;margin-right:.5rem;font-size:.65rem;" ${curPage===1?'disabled style="opacity:.4;cursor:not-allowed;"':''}>← Previous</button><button class="vb vg" onclick="nextPage('${cat}')" style="padding:.6rem 1.2rem;font-size:.65rem;" ${curPage===totalPages?'disabled style="opacity:.4;cursor:not-allowed;"':''}>Next →</button></div>`;
   document.getElementById('pg').style.display='block';
 }
-function nextPage(cat){const f=cat==='all'?allP:allP.filter(p=>p.category===cat);const totalPages=Math.ceil(f.length/itemsPerPage);if(curPage<totalPages){curPage++;triggerGlitch();renderCat(cat);}};
-function prevPage(cat){if(curPage>1){curPage--;triggerGlitch();renderCat(cat);}}
-document.getElementById('cf').addEventListener('click',e=>{if(!e.target.classList.contains('ct'))return;document.querySelectorAll('.ct').forEach(t=>t.classList.remove('active'));e.target.classList.add('active');triggerWave();renderCat(e.target.dataset.cat);});
+function nextPage(cat){const f=cat==='all'?allP:allP.filter(p=>p.category===cat);const totalPages=Math.ceil(f.length/itemsPerPage);if(curPage<totalPages){curPage++;renderCat(cat);}};
+function prevPage(cat){if(curPage>1){curPage--;renderCat(cat);}}
+document.getElementById('cf').addEventListener('click',e=>{if(!e.target.classList.contains('ct'))return;document.querySelectorAll('.ct').forEach(t=>t.classList.remove('active'));e.target.classList.add('active');renderCat(e.target.dataset.cat);});
 
 function oOM(id,name,img){curP={id,name,img};document.getElementById('opn').textContent='⚒ '+name;document.getElementById('on').value='';document.getElementById('ono').value='';document.getElementById('oe').style.display='none';document.getElementById('om').classList.add('open');}
 function subOrder(){const n=document.getElementById('on').value.trim();const nt=document.getElementById('ono').value.trim();if(!n){document.getElementById('oe').style.display='block';return;}document.getElementById('oe').style.display='none';const pi=curP&&curP.img?`
@@ -682,7 +631,7 @@ Name: ${n}
 Notes: ${nt||'None'}
 
 Please confirm details, colors, size and pricing!`);window.open(`https://wa.me/919845536010?text=${msg}`,'_blank');cM('om');showConf('order');}
-function showConf(type){const cm=document.getElementById('confModal');const anim=document.getElementById('confAnim');const title=document.getElementById('confTitle');const msg=document.getElementById('confMsg');if(type==='order'){title.textContent='Order Placed! 🔥';msg.textContent='We\'ll reach out within 24 hours with your custom forge details!';anim.innerHTML='<div class="conf-checkmark"><div class="conf-checkmark-circle"></div><div class="conf-checkmark-path"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div></div>';}else if(type==='contact'){title.textContent='Thanks for Reaching Out! ⚒️';msg.textContent='We\'ll get back to you within 24 hours. Your creativity matters to us!';anim.innerHTML='<div class="conf-checkmark"><div class="conf-checkmark-circle"></div><div class="conf-checkmark-path"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div></div>';}cm.classList.add('open');}
+function showConf(type){const cm=document.getElementById('confModal');const anim=document.getElementById('confAnim');const title=document.getElementById('confTitle');const msg=document.getElementById('confMsg');if(type==='order'){title.textContent='Order Placed! 🔥';msg.textContent='We\'ll reach out within 24 hours with your custom forge details!';anim.innerHTML='<div class="conf-checkmark"><div class="conf-checkmark-circle"></div><div class="conf-checkmark-path"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div></div>';}else if(type==='contact'){title.textContent='Thanks for Reaching Out! ⚒️';msg.textContent='We\'ll get back to you within 24 hours. Your creativity matters to us!';anim.innerHTML='<div class="conf-checkmark"><div class="conf-checkmark-circle"></div><div class="conf-checkmark-path"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div></div>';}cm.classList.add('open');setTimeout(()=>closeConf(),3500);}
 function closeConf(){document.getElementById('confModal').classList.remove('open');}
 function cM(id){document.getElementById(id).classList.remove('open');}
 
@@ -697,9 +646,7 @@ function restAdmin(){if(sessionStorage.getItem('sx_admin')==='1'){document.getEl
 
 async function loadAdminList(){
   const l=document.getElementById('apl');if(!db){l.innerHTML='<p style="color:var(--dim)">Firebase not connected.</p>';return;}
-  try{const s=await fbFns.getDocs(fbFns.collection(db,'products'));const ps=s.docs.map(d=>({id:d.id,...d.data()}));
-  const countEl=document.getElementById('apl-count');if(countEl)countEl.textContent=`${ps.length} item${ps.length!==1?'s':''}`;
-  if(!ps.length){l.innerHTML='<p style="color:var(--dim);font-family:var(--orb);font-size:.65rem;">No products yet.</p>';return;}l.innerHTML=ps.map(p=>`<div class="api"><img src="${p.image||''}" onerror="this.src=''" alt=""/><div style="flex:1"><strong>${p.name}</strong><small>${p.category} · ${p.description?p.description.substring(0,55)+'…':'No description'}</small></div><button class="bd" data-id="${p.id}" data-img="${(p.image||'').replace(/"/g,'&quot;')}" onclick="delProd(this.dataset.id,this.dataset.img)">Delete</button></div>`).join('');}
+  try{const s=await fbFns.getDocs(fbFns.collection(db,'products'));const ps=s.docs.map(d=>({id:d.id,...d.data()}));if(!ps.length){l.innerHTML='<p style="color:var(--dim);font-family:var(--orb);font-size:.65rem;">No products yet.</p>';return;}l.innerHTML=ps.map(p=>`<div class="api"><img src="${p.image||''}" onerror="this.src=''" alt=""/><div style="flex:1"><strong>${p.name}</strong><small>${p.category} · ${p.description?p.description.substring(0,55)+'…':'No description'}</small></div><button class="bd" data-id="${p.id}" data-img="${(p.image||'').replace(/"/g,'&quot;')}" onclick="delProd(this.dataset.id,this.dataset.img)">Delete</button></div>`).join('');}
   catch(e){l.innerHTML='<p style="color:#ff6b6b">Error loading.</p>';}
 }
 
@@ -739,23 +686,15 @@ function initBML(){const code=`javascript:(function(){var t=document.querySelect
 function chkQS(){
   const p=new URLSearchParams(window.location.search);if(p.get('action')!=='quicksave')return;
   const t=p.get('title')||'',i=p.get('img')||'',s=p.get('source')||'';
-  // Wipe page, render minimal form with big image preview
-  document.body.innerHTML='';
-  document.body.style.cssText='margin:0;padding:1.2rem;background:#0d0520;font-family:sans-serif;box-sizing:border-box;';
-  document.body.innerHTML=`
-  <div style="max-width:460px;margin:0 auto;">
-    <div style="font-family:monospace;font-size:1rem;color:#c87bff;margin-bottom:1rem;letter-spacing:.12em;">✦ SRIJANX — QUICK SAVE</div>
-    ${i?`<img src="${i}" onerror="this.style.display='none'" style="width:100%;height:220px;object-fit:cover;border:1px solid rgba(123,47,255,.4);border-radius:3px;margin-bottom:1rem;display:block;" />`:''}
-    <input id="qst" value="${t.replace(/"/g,'&quot;')}" placeholder="Product Name *" style="width:100%;box-sizing:border-box;background:rgba(123,47,255,.08);border:1px solid rgba(123,47,255,.3);color:#e8e0ff;padding:.75rem;margin-bottom:.6rem;font-size:.9rem;border-radius:3px;outline:none;">
-    <input id="qsi" value="${i.replace(/"/g,'&quot;')}" placeholder="Image URL" style="width:100%;box-sizing:border-box;background:rgba(123,47,255,.08);border:1px solid rgba(123,47,255,.3);color:#e8e0ff;padding:.75rem;margin-bottom:.6rem;font-size:.9rem;border-radius:3px;outline:none;">
-    <select id="qsc" style="width:100%;box-sizing:border-box;background:#1a0840;border:1px solid rgba(123,47,255,.3);color:#e8e0ff;padding:.75rem;margin-bottom:.6rem;font-size:.9rem;border-radius:3px;">
-      <option value="Anime">Anime</option><option value="Home Decor">Home Decor</option><option value="Custom" selected>Custom</option><option value="Chibi">Chibi</option><option value="Gift">Gift</option>
-    </select>
-    <textarea id="qsd" rows="2" placeholder="Description (optional)" style="width:100%;box-sizing:border-box;background:rgba(123,47,255,.08);border:1px solid rgba(123,47,255,.3);color:#e8e0ff;padding:.75rem;margin-bottom:.6rem;font-size:.9rem;border-radius:3px;resize:vertical;outline:none;"></textarea>
-    <input id="qss" type="hidden" value="${s.replace(/"/g,'&quot;')}">
-    <div id="qsok" style="display:none;color:#4fffaa;font-family:monospace;font-size:.8rem;margin-bottom:.6rem;">✦ Saved to forge! Closing…</div>
-    <button id="qsbtn" onclick="subQS()" style="width:100%;background:linear-gradient(135deg,#7b2fff,#a050ff);color:#fff;border:none;padding:.9rem;font-size:.9rem;cursor:pointer;border-radius:3px;letter-spacing:.08em;font-family:monospace;">✦ Save to Catalog</button>
-  </div>`;
+  document.getElementById('qst').value=t;document.getElementById('qsi').value=i;document.getElementById('qss').value=s;
+  // Show preview image if URL provided
+  if(i){const pr=document.getElementById('qsp');pr.src=i;pr.style.display='block';pr.style.height='220px';}
+  // Hide entire page, show only the quick-save form
+  document.querySelectorAll('body > *:not(#qsm):not(script)').forEach(el=>el.style.display='none');
+  document.body.style.cssText='margin:0;padding:1.2rem;background:#0d0520;box-sizing:border-box;';
+  const ov=document.getElementById('qsm');
+  ov.style.cssText='position:relative;inset:auto;display:block;background:transparent;backdrop-filter:none;padding:0;max-width:460px;margin:0 auto;';
+  const md=ov.querySelector('.md');if(md)md.style.cssText='max-width:100%;margin:0;';
 }
 
 async function subQS(){
