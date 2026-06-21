@@ -276,13 +276,8 @@ footer p{color:var(--white);opacity:.4;font-family:var(--orb);font-size:.5rem;le
 
 @keyframes wavePulse{0%{transform:scale(1);opacity:1;}20%{transform:scale(.97);opacity:.7;box-shadow:0 0 0 0 rgba(160,80,255,0);}50%{transform:scale(1.01);opacity:.85;box-shadow:0 0 40px 15px rgba(160,80,255,.22),0 0 80px 30px rgba(240,180,41,.1);}100%{transform:scale(1);opacity:1;box-shadow:0 0 0 0 rgba(160,80,255,0);}}
 .wave-morph{animation:wavePulse .4s ease-out forwards;}
-@keyframes glitchMain{0%{clip-path:none;transform:none;filter:none;}5%{clip-path:polygon(0 10%,100% 10%,100% 30%,0 30%);transform:translateX(-6px);filter:hue-rotate(90deg) brightness(1.8);}10%{clip-path:polygon(0 55%,100% 55%,100% 70%,0 70%);transform:translateX(8px);filter:hue-rotate(-120deg) brightness(2);}15%{clip-path:polygon(0 80%,100% 80%,100% 95%,0 95%);transform:translateX(-4px);filter:hue-rotate(45deg);}20%{clip-path:none;transform:translateX(3px);filter:none;}25%{clip-path:polygon(0 25%,100% 25%,100% 45%,0 45%);transform:translateX(-8px);filter:hue-rotate(180deg) brightness(1.5);}30%{clip-path:none;transform:none;filter:none;}100%{clip-path:none;transform:none;filter:none;}}
-@keyframes glitchRed{0%{opacity:0;}5%{opacity:.7;transform:translateX(6px);clip-path:polygon(0 10%,100% 10%,100% 30%,0 30%);}10%{opacity:.5;transform:translateX(-4px);clip-path:polygon(0 55%,100% 55%,100% 75%,0 75%);}20%{opacity:.6;transform:translateX(8px);clip-path:polygon(0 0,100% 0,100% 20%,0 20%);}30%{opacity:0;transform:none;}100%{opacity:0;}}
-@keyframes glitchBlue{0%{opacity:0;}8%{opacity:.6;transform:translateX(-8px);clip-path:polygon(0 40%,100% 40%,100% 60%,0 60%);}15%{opacity:.5;transform:translateX(5px);clip-path:polygon(0 70%,100% 70%,100% 90%,0 90%);}25%{opacity:.7;transform:translateX(-3px);clip-path:polygon(0 15%,100% 15%,100% 35%,0 35%);}30%{opacity:0;transform:none;}100%{opacity:0;}}
-.glitch-wrap{position:relative;}
-.glitch-wrap.glitch-fx>*{animation:glitchMain .32s steps(1) forwards;}
-.glitch-wrap.glitch-fx::before{content:'';position:absolute;inset:0;background:rgba(255,0,80,.15);animation:glitchRed .32s steps(1) forwards;pointer-events:none;z-index:10;}
-.glitch-wrap.glitch-fx::after{content:'';position:absolute;inset:0;background:rgba(0,200,255,.15);animation:glitchBlue .32s steps(1) forwards;pointer-events:none;z-index:11;}
+.forge-scan-wrap{position:relative;overflow:hidden;}
+#fcanvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:22;display:none;}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"></script>
 </head>
@@ -348,7 +343,7 @@ footer p{color:var(--white);opacity:.4;font-family:var(--orb);font-size:.5rem;le
       <button class="ct" data-cat="Chibi">Chibi</button>
       <button class="ct" data-cat="Gift">Gift</button>
     </div>
-    <div class="glitch-wrap"><div class="vg2" id="cg"><div class="ec2"><p>Loading the forge...</p></div></div></div>
+    <div class="forge-scan-wrap" id="fsw"><canvas id="fcanvas"></canvas><div class="vg2" id="cg"><div class="ec2"><p>Loading the forge...</p></div></div></div>
     <div id="pg" style="display:none;"></div>
   </div>
 </section>
@@ -612,8 +607,133 @@ async function loadCatalog(){
   try{const s=await fbFns.getDocs(fbFns.collection(db,'products'));allP=s.docs.map(d=>({id:d.id,...d.data()}));renderCat('all');}
   catch(e){g.innerHTML='<div class="ec2"><p>Could not load catalog.</p></div>';}
 }
-function triggerWave(){const w=document.querySelector('.glitch-wrap');if(!w)return;w.classList.remove('wave-morph');void w.offsetWidth;w.classList.add('wave-morph');setTimeout(()=>w.classList.remove('wave-morph'),450);}
-function triggerGlitch(){const w=document.querySelector('.glitch-wrap');if(!w)return;w.classList.remove('glitch-fx');void w.offsetWidth;w.classList.add('glitch-fx');setTimeout(()=>w.classList.remove('glitch-fx'),350);}
+const sparkColors=['#ff8c00','#ffdd00','#ff4500','#ffa500','#ffee44','#ff6600','#ffcc00'];
+function spawnSpark(box,x,y){
+  const s=document.createElement('div');
+  const color=sparkColors[Math.floor(Math.random()*sparkColors.length)];
+  const size=Math.random()*3+1.5;
+  s.style.cssText=`position:absolute;border-radius:50%;pointer-events:none;z-index:24;width:${size}px;height:${size}px;background:${color};box-shadow:0 0 ${size*2}px ${color};left:${x}px;top:${y}px;`;
+  box.appendChild(s);
+  const angle=(Math.random()*200-10)*(Math.PI/180);
+  const speed=Math.random()*5+2;
+  const vx=Math.cos(angle)*speed,vy=Math.sin(angle)*speed;
+  const gravity=0.2,life=Math.random()*35+25;
+  let frame=0,px=x,py=y;
+  function as(){frame++;px+=vx;py+=vy-(gravity*frame*0.5);const op=Math.max(0,1-(frame/life));const sz=size*op;s.style.cssText=`position:absolute;border-radius:50%;pointer-events:none;z-index:24;width:${sz}px;height:${sz}px;background:${color};box-shadow:0 0 ${sz*2}px ${color};left:${px}px;top:${py}px;opacity:${op};`;if(frame<life&&op>0)requestAnimationFrame(as);else s.remove();}
+  requestAnimationFrame(as);
+}
+
+let scanRAF=null,scanRunning=false,scanFadeRAF=null;
+function cancelScan(){
+  if(scanRAF){cancelAnimationFrame(scanRAF);scanRAF=null;}
+  if(scanFadeRAF){cancelAnimationFrame(scanFadeRAF);scanFadeRAF=null;}
+  const wrap=document.getElementById('fsw');
+  if(wrap)wrap.querySelectorAll('div[style*="z-index:24"]').forEach(s=>s.remove());
+  const fc=document.getElementById('fcanvas');
+  if(fc){fc.style.display='none';const ctx=fc.getContext('2d');if(ctx)ctx.clearRect(0,0,fc.width,fc.height);}
+  scanRunning=false;
+}
+
+function drawBurn(ctx,w,h,burnY,jagged,alpha){
+  ctx.clearRect(0,0,w,h);
+  if(burnY<=0)return;
+
+  // Char/ash area above burn line
+  const ashGrad=ctx.createLinearGradient(0,0,0,burnY);
+  ashGrad.addColorStop(0,`rgba(0,0,0,${0.95*alpha})`);
+  ashGrad.addColorStop(0.5,`rgba(8,2,0,${0.9*alpha})`);
+  ashGrad.addColorStop(0.85,`rgba(20,6,0,${0.7*alpha})`);
+  ashGrad.addColorStop(1,`rgba(40,10,0,${0.1*alpha})`);
+
+  ctx.beginPath();
+  ctx.moveTo(0,0);
+  ctx.lineTo(w,0);
+  ctx.lineTo(w,burnY);
+  // Jagged burn edge - irregular teeth like burning paper
+  for(let i=w;i>=0;i-=4){
+    const jitter=jagged[Math.floor(i/4)%jagged.length];
+    ctx.lineTo(i, burnY + jitter);
+  }
+  ctx.closePath();
+  ctx.fillStyle=ashGrad;
+  ctx.fill();
+
+  // Orange/red glow right at the burn edge
+  const glowGrad=ctx.createLinearGradient(0,burnY-14,0,burnY+8);
+  glowGrad.addColorStop(0,`rgba(255,60,0,0)`);
+  glowGrad.addColorStop(0.4,`rgba(255,100,0,${0.5*alpha})`);
+  glowGrad.addColorStop(0.7,`rgba(255,180,0,${0.8*alpha})`);
+  glowGrad.addColorStop(1,`rgba(255,220,50,${0.3*alpha})`);
+  ctx.beginPath();
+  ctx.moveTo(0,burnY-14);
+  ctx.lineTo(w,burnY-14);
+  ctx.lineTo(w,burnY+8);
+  for(let i=w;i>=0;i-=4){
+    const jitter=jagged[Math.floor(i/4)%jagged.length];
+    ctx.lineTo(i, burnY + jitter + 8);
+  }
+  ctx.closePath();
+  ctx.fillStyle=glowGrad;
+  ctx.fill();
+
+  // Hot white-yellow beam line
+  ctx.beginPath();
+  for(let i=0;i<=w;i+=4){
+    const jitter=jagged[Math.floor(i/4)%jagged.length];
+    if(i===0)ctx.moveTo(i,burnY+jitter);
+    else ctx.lineTo(i,burnY+jitter);
+  }
+  ctx.strokeStyle=`rgba(255,240,120,${alpha})`;
+  ctx.lineWidth=2.5;
+  ctx.shadowColor='rgba(255,200,0,0.9)';
+  ctx.shadowBlur=12;
+  ctx.stroke();
+  ctx.shadowBlur=0;
+}
+
+function triggerForgeScan(callback){
+  cancelScan();
+  scanRunning=true;
+  const wrap=document.getElementById('fsw');
+  const fc=document.getElementById('fcanvas');
+  if(!wrap||!fc){scanRunning=false;if(callback)callback();return;}
+
+  const h=wrap.offsetHeight;const w=wrap.offsetWidth;
+  fc.width=w;fc.height=h;fc.style.display='block';
+  const ctx=fc.getContext('2d');
+
+  // Pre-generate jagged edge profile — random teeth like burning paper
+  const jagCount=Math.ceil(w/4)+10;
+  const jagged=[];
+  for(let i=0;i<jagCount;i++){
+    // Mix of small fast teeth and bigger slower ones
+    jagged.push((Math.random()*12-6)+(Math.sin(i*0.7)*4)+(Math.random()*6-3));
+  }
+
+  let start=null;const dur=700;let lastSparkY=-999;
+  function step(ts){
+    if(!start)start=ts;
+    const prog=Math.min((ts-start)/dur,1);
+    const burnY=prog*h;
+    drawBurn(ctx,w,h,burnY,jagged,1);
+    if(burnY-lastSparkY>9){lastSparkY=burnY;const count=Math.floor(Math.random()*5)+3;for(let i=0;i<count;i++)spawnSpark(wrap,Math.random()*w,burnY);}
+    if(prog<1){scanRAF=requestAnimationFrame(step);}
+    else{
+      for(let i=0;i<22;i++)setTimeout(()=>{if(wrap.isConnected)spawnSpark(wrap,Math.random()*w,h-4);},Math.random()*200);
+      if(callback)callback();
+      // Fade out the burn canvas
+      let fadeAlpha=1;
+      function fade(){
+        fadeAlpha-=0.06;
+        if(fadeAlpha>0){drawBurn(ctx,w,h,h,jagged,fadeAlpha);scanFadeRAF=requestAnimationFrame(fade);}
+        else{fc.style.display='none';ctx.clearRect(0,0,w,h);scanRunning=false;}
+      }
+      setTimeout(()=>requestAnimationFrame(fade),80);
+    }
+  }
+  scanRAF=requestAnimationFrame(step);
+}
+function triggerWave(){const w=document.querySelector('.forge-scan-wrap');if(!w)return;w.style.animation='none';void w.offsetWidth;w.style.animation='wavePulse .4s ease-out forwards';setTimeout(()=>w.style.animation='',450);}
 function renderCat(cat){
   if(cat!==curCat)curPage=1;curCat=cat;
   const g=document.getElementById('cg');
@@ -626,8 +746,8 @@ function renderCat(cat){
   document.getElementById('pg').innerHTML=`<div style="text-align:center;padding:1.5rem;"><span style="color:var(--dim);font-family:var(--orb);font-size:.7rem;letter-spacing:.1em;margin-right:1rem;">Page ${curPage} of ${totalPages}</span><button class="vb vg" onclick="prevPage('${cat}')" style="padding:.6rem 1.2rem;margin-right:.5rem;font-size:.65rem;" ${curPage===1?'disabled style="opacity:.4;cursor:not-allowed;"':''}>← Previous</button><button class="vb vg" onclick="nextPage('${cat}')" style="padding:.6rem 1.2rem;font-size:.65rem;" ${curPage===totalPages?'disabled style="opacity:.4;cursor:not-allowed;"':''}>Next →</button></div>`;
   document.getElementById('pg').style.display='block';
 }
-function nextPage(cat){const f=cat==='all'?allP:allP.filter(p=>p.category===cat);const totalPages=Math.ceil(f.length/itemsPerPage);if(curPage<totalPages){curPage++;triggerGlitch();renderCat(cat);}};
-function prevPage(cat){if(curPage>1){curPage--;triggerGlitch();renderCat(cat);}}
+function nextPage(cat){const f=cat==='all'?allP:allP.filter(p=>p.category===cat);const totalPages=Math.ceil(f.length/itemsPerPage);if(curPage<totalPages){curPage++;triggerForgeScan(()=>renderCat(cat));}}
+function prevPage(cat){if(curPage>1){curPage--;triggerForgeScan(()=>renderCat(cat));}}
 document.getElementById('cf').addEventListener('click',e=>{if(!e.target.classList.contains('ct'))return;document.querySelectorAll('.ct').forEach(t=>t.classList.remove('active'));e.target.classList.add('active');triggerWave();renderCat(e.target.dataset.cat);});
 
 function oOM(id,name,img){curP={id,name,img};document.getElementById('opn').textContent='⚒ '+name;document.getElementById('on').value='';document.getElementById('ono').value='';document.getElementById('oe').style.display='none';document.getElementById('om').classList.add('open');}
