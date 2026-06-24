@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-BC1Y2J1SMR"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-BC1Y2J1SMR');
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SrijanX — Bringing Stories To Life</title>
@@ -426,9 +434,9 @@ footer p{color:var(--white);opacity:.4;font-family:var(--orb);font-size:.5rem;le
       <div>
         <p class="cit">Have a custom idea or want to order from the catalog? Reach out on Instagram or WhatsApp — we respond fast and love talking all things 3D print.</p>
         <div class="cls">
-          <a href="https://instagram.com/srijanx2026" target="_blank" onclick="showConf('contact')" class="cl"><span class="ic">📸</span><span>@srijanx2026 on Instagram</span></a>
-          <a href="https://wa.me/919845536010?text=Hello!%20SrijanX%20%F0%9F%91%8B%0A%0AI%27d%20like%20to%20enquire%20about%20a%20custom%20order." target="_blank" class="cl"><span class="ic">💬</span><span>WhatsApp Us</span></a>
-          <a href="mailto:support@srijanx.in" onclick="showConf('contact')" class="cl"><span class="ic">✉️</span><span>support@srijanx.in</span></a>
+          <a href="https://instagram.com/srijanx2026" target="_blank" onclick="showConf('contact');if(typeof gtag!=='undefined')gtag('event','instagram_click',{event_category:'Contact',event_label:'Instagram'});" class="cl"><span class="ic">📸</span><span>@srijanx2026 on Instagram</span></a>
+          <a href="https://wa.me/919845536010?text=Hello!%20SrijanX%20%F0%9F%91%8B%0A%0AI%27d%20like%20to%20enquire%20about%20a%20custom%20order." target="_blank" onclick="if(typeof gtag!=='undefined')gtag('event','whatsapp_contact',{event_category:'Contact',event_label:'WhatsApp'});" class="cl"><span class="ic">💬</span><span>WhatsApp Us</span></a>
+          <a href="mailto:support@srijanx.in" onclick="showConf('contact');if(typeof gtag!=='undefined')gtag('event','email_click',{event_category:'Contact',event_label:'Email'});" class="cl"><span class="ic">✉️</span><span>support@srijanx.in</span></a>
         </div>
       </div>
       <div class="ob">
@@ -634,7 +642,8 @@ const ob=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)e.targ
 revs.forEach(r=>ob.observe(r));
 
 let curLBProduct=null;
-function openLB(img,name,desc,id){document.getElementById('lb-img').src=img;document.getElementById('lb-name').textContent=name;document.getElementById('lb-desc').textContent=desc;curLBProduct={name,img,id};document.getElementById('lb-forge-btn').onclick=()=>{closeLB();oOM(id,name,img);};document.getElementById('lbm').classList.add('open');}
+function openLB(img,name,desc,id){document.getElementById('lb-img').src=img;document.getElementById('lb-name').textContent=name;document.getElementById('lb-desc').textContent=desc;curLBProduct={name,img,id};document.getElementById('lb-forge-btn').onclick=()=>{closeLB();oOM(id,name,img);};document.getElementById('lbm').classList.add('open');
+  if(typeof gtag!=='undefined')gtag('event','product_view',{event_category:'Catalog',event_label:name,product_id:id});}
 function closeLB(){document.getElementById('lbm').classList.remove('open');}
 document.getElementById('lbm').addEventListener('click',e=>{if(e.target===document.getElementById('lbm'))closeLB();});
 
@@ -800,7 +809,8 @@ I'd like to order:
 Name: ${n}
 Notes: ${nt||'None'}
 
-Please confirm details, colors, size and pricing!`);window.open(`https://wa.me/919845536010?text=${msg}`,'_blank');cM('om');showConf('order');}
+Please confirm details, colors, size and pricing!`);window.open(`https://wa.me/919845536010?text=${msg}`,'_blank');cM('om');showConf('order');
+  if(typeof gtag!=='undefined')gtag('event','whatsapp_order',{event_category:'Conversion',event_label:curP?.name||'Unknown'});}
 function showConf(type){const cm=document.getElementById('confModal');const anim=document.getElementById('confAnim');const title=document.getElementById('confTitle');const msg=document.getElementById('confMsg');if(type==='order'){title.textContent='Order Placed! 🔥';msg.textContent='We\'ll reach out within 24 hours with your custom forge details!';anim.innerHTML='<div class="conf-checkmark"><div class="conf-checkmark-circle"></div><div class="conf-checkmark-path"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div></div>';}else if(type==='contact'){title.textContent='Thanks for Reaching Out! ⚒️';msg.textContent='We\'ll get back to you within 24 hours. Your creativity matters to us!';anim.innerHTML='<div class="conf-checkmark"><div class="conf-checkmark-circle"></div><div class="conf-checkmark-path"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div><div class="conf-spark"></div></div>';}cm.classList.add('open');}
 function closeConf(){document.getElementById('confModal').classList.remove('open');}
 function cM(id){document.getElementById(id).classList.remove('open');}
