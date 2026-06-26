@@ -309,10 +309,83 @@ footer p{color:var(--white);opacity:.4;font-family:var(--orb);font-size:.5rem;le
 .wave-morph{animation:wavePulse .4s ease-out forwards;}
 .forge-scan-wrap{position:relative;overflow:hidden;}
 #fcanvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:22;display:none;}
+
+/* ── CUSTOM CURSOR ── */
+*{cursor:none!important;}
+#cursor{position:fixed;width:12px;height:12px;background:var(--pg);border-radius:50%;pointer-events:none;z-index:99999;left:0;top:0;transform:translate(-50%,-50%);transition:width .15s,height .15s,background .2s;box-shadow:0 0 8px rgba(200,123,255,.8);}
+#cursor.on-link{width:20px;height:20px;background:#fff;box-shadow:0 0 16px rgba(255,255,255,.6);}
+@media(hover:none),(max-width:768px){#cursor{display:none;}*{cursor:auto!important;}}
+
+/* ── SPARK TRAIL ── */
+.spark-trail{position:fixed;border-radius:50%;pointer-events:none;z-index:99990;transform:translate(-50%,-50%);}
+
+/* ── PAGE LOAD OVERLAY ── */
+#forge-intro{position:fixed;inset:0;z-index:999999;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+#forge-intro canvas{position:absolute;inset:0;width:100%;height:100%;}
+#forge-intro-text{position:relative;z-index:2;font-family:var(--orb);font-size:clamp(1.5rem,5vw,3rem);color:#fff;letter-spacing:.4em;text-align:center;opacity:0;transition:opacity .4s;}
+
+/* ── HERO GHOST ENTRANCE ── */
+#hero-title-wrap{opacity:0;transform:scale(2.0);filter:blur(16px);transition:opacity 1.8s cubic-bezier(.16,1,.3,1),transform 2.0s cubic-bezier(.16,1,.3,1),filter 1.8s ease;display:inline-block;position:relative;z-index:1;perspective:600px;}
+#hero-title-wrap.in{opacity:1;transform:scale(1);filter:blur(0);}
+#hero-ripple-cv{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:0;}
+.hero-letter{display:inline-block;}
+#hero-x{display:inline-block;}
+
+/* ── SECTION FADE UP ── */
+.fade-up{opacity:0;transform:translateY(40px);transition:opacity .8s ease,transform .8s cubic-bezier(.16,1,.3,1);}
+.fade-up.visible{opacity:1;transform:none;}
+
+/* ── 3D CARD TILT ── */
+.vc{transform-style:preserve-3d;transform:perspective(800px) rotateX(0) rotateY(0);}
+.vc .vci::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.12) 0%,transparent 60%);opacity:0;transition:opacity .3s;pointer-events:none;border-radius:inherit;}
+.vc:hover .vci::after{opacity:1;}
+
+/* ── STATS COUNTER ── */
+.sn{transition:none;}
+
+/* ── BUTTON PULSE ── */
+@keyframes forgePulse{0%,100%{box-shadow:0 2px 0 rgba(255,255,255,.12) inset,0 -2px 0 rgba(0,0,0,.3) inset,0 6px 35px rgba(123,47,255,.55);}50%{box-shadow:0 2px 0 rgba(255,255,255,.2) inset,0 -2px 0 rgba(0,0,0,.3) inset,0 6px 55px rgba(160,80,255,1),0 0 80px rgba(123,47,255,.4);}}
+.vm{animation:forgePulse 2.5s ease-in-out infinite;}
+@keyframes goldPulse{0%,100%{box-shadow:0 0 18px rgba(240,180,41,.08);}50%{box-shadow:0 0 40px rgba(240,180,41,.5),0 0 80px rgba(240,180,41,.2);}}
+.vg{animation:goldPulse 3s ease-in-out infinite;}
+
+/* ── SECTION DIVIDER FIRE ── */
+.fire-divider{width:100%;height:60px;position:relative;overflow:hidden;margin:0;}
+.fire-divider canvas{width:100%;height:100%;}
+
+/* ── ABOUT STICKY SCROLL-JACK ── */
+#about-scroll-space{height:380vh;position:relative;}
+#about-sticky-stage{position:sticky;top:0;height:100vh;display:flex;align-items:center;justify-content:center;width:100%;overflow:hidden;}
+.about-line{opacity:0;transform:scale(1.55) translateY(18px);filter:blur(6px);}
+.about-box{opacity:0;transform:scale(1.55) translateY(18px);filter:blur(6px);}
+
+/* ── SCROLL PROGRESS BAR ── */
+#scroll-progress{position:fixed;top:0;left:0;height:2px;width:0%;background:linear-gradient(90deg,var(--purple),var(--gold));z-index:99997;pointer-events:none;}
+
+/* ── SECTION COUNTERS ── */
+.sec-num{position:absolute;left:-3rem;top:.5rem;font-family:var(--orb);font-size:.5rem;color:rgba(200,123,255,.25);letter-spacing:.2em;writing-mode:vertical-rl;transform:rotate(180deg);user-select:none;}
+@media(max-width:900px){.sec-num{display:none;}}
+
+/* ── INK WIPE ── */
+#ink-canvas{position:fixed;inset:0;pointer-events:none;z-index:500;display:none;}
+
+/* ── TYPED CURSOR ── */
+#typed-cursor{display:inline-block;width:2px;height:.9em;background:var(--pg);margin-left:2px;vertical-align:middle;animation:blink .7s step-end infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"></script>
 </head>
 <body>
+<div id="cursor"></div>
+<canvas id="ink-canvas"></canvas>
+<div id="scroll-progress"></div>
+<!-- FORGE INTRO -->
+<div id="forge-intro">
+  <canvas id="intro-canvas"></canvas>
+  <div id="forge-intro-text">SRIJAN<span style="color:var(--pg)">X</span></div>
+</div>
 <canvas id="forge-bg"></canvas>
 <div class="smoke"></div>
 <div class="vig"></div>
@@ -332,11 +405,13 @@ footer p{color:var(--white);opacity:.4;font-family:var(--orb);font-size:.5rem;le
 <section id="home">
   <div id="evil-eye-bg" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none;"></div>
   <p class="hey" style="margin-top: 150px;">✦ &nbsp; Bringing Stories To Life &nbsp; · &nbsp; Bengaluru &nbsp; · &nbsp; Est. 2026 &nbsp; ✦</p>
-  <div>
-    <span class="hpre">The World of</span>
-    <span class="hs">SRIJAN</span>
-    <span class="hx">X</span>
-    <span class="htag">Where Legends Are Forged</span>
+  <div style="position:relative;display:inline-block;text-align:center;">
+    <canvas id="hero-ripple-cv" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:0;"></canvas>
+    <span class="hpre" id="hero-pre" style="opacity:0;display:block;">The World of</span>
+    <div id="hero-title-wrap" style="display:block;">
+      <span class="hs" id="hero-title">SRIJAN</span><span class="hx" id="hero-x">X</span>
+    </div>
+    <span class="htag" id="hero-tag" style="opacity:0;transition:opacity .3s ease;display:block;"><span id="typed-text"></span><span id="typed-cursor"></span></span>
   </div>
   <div class="hr"></div>
   <p class="hdesc">Every character you love. Every moment that moved you.<br><em>Pulled from the screen. Forged in three dimensions. Yours forever.</em></p>
@@ -350,8 +425,9 @@ footer p{color:var(--white);opacity:.4;font-family:var(--orb);font-size:.5rem;le
 
 <div class="ld"></div>
 
-<section id="stats">
-  <div class="sr">
+<section id="stats" style="position:relative;">
+  <span class="sec-num">01</span>
+  <div class="sr fade-up">
     <div class="si2"><div class="sn">3D</div><div class="sl">Printed &amp; Painted</div></div>
     <div class="si2"><div class="sn">∞</div><div class="sl">Custom Options</div></div>
     <div class="si2"><div class="sn">COD</div><div class="sl">Cash on Delivery</div></div>
@@ -360,8 +436,9 @@ footer p{color:var(--white);opacity:.4;font-family:var(--orb);font-size:.5rem;le
 </section>
 
 <div class="ld"></div>
-
-<section id="catalog">
+<div class="fire-divider"><canvas class="fdcv"></canvas></div>
+<section id="catalog" style="position:relative;">
+  <span class="sec-num">02</span>
   <div class="si">
     <p class="sp rev">From The Forge</p>
     <h2 class="st rev">THE <span>CATALOG</span></h2>
@@ -381,23 +458,34 @@ footer p{color:var(--white);opacity:.4;font-family:var(--orb);font-size:.5rem;le
 
 <div class="ld"></div>
 
-<section id="about">
-  <div class="si">
-    <p class="sp left rev">The Smithy</p>
-    <h2 class="st rev">WHO <span>WE ARE</span></h2>
-    <div class="sd rev"></div>
-    <div class="ag rev">
-      <div class="at">
-        <p><strong>SrijanX</strong> is a one-person forge operating out of Bengaluru. We take the things you love — <em>the characters, the moments, the worlds</em> — and make them real.</p>
-        <p>Every piece is <strong>3D printed, hand-finished and painted</strong> with obsessive care. No two pieces are identical. No shortcuts. <em>The forge never lies.</em></p>
-        <p>From <em>anime figures and chibi collectibles</em> to wedding keepsakes and custom fan gifts — if you can dream it, we can build it.</p>
-        <p><strong>Your faves. Our creation.</strong></p>
-      </div>
-      <div class="vs">
-        <div class="vst"><div class="big">3D</div><div class="lbl">Printed</div></div>
-        <div class="vst"><div class="big">∞</div><div class="lbl">Custom Options</div></div>
-        <div class="vst"><div class="big">100%</div><div class="lbl">Handcrafted</div></div>
-        <div class="vst"><div class="big">🔥</div><div class="lbl">Made With Love</div></div>
+<section id="about" style="position:relative;">
+  <span class="sec-num">03</span>
+  <div id="about-scroll-space">
+    <!-- Sentinel triggers at each 20% mark -->
+    <div class="about-sentinel" data-step="0" style="position:absolute;top:0;height:1px;width:100%;"></div>
+    <div class="about-sentinel" data-step="1" style="position:absolute;top:16%;height:1px;width:100%;"></div>
+    <div class="about-sentinel" data-step="2" style="position:absolute;top:32%;height:1px;width:100%;"></div>
+    <div class="about-sentinel" data-step="3" style="position:absolute;top:48%;height:1px;width:100%;"></div>
+    <div class="about-sentinel" data-step="4" style="position:absolute;top:64%;height:1px;width:100%;"></div>
+    <div id="about-sticky-stage">
+      <div class="si" id="about-inner" style="width:100%;max-width:1100px;padding:2rem;">
+        <p class="sp left rev about-line" data-step="0">The Smithy</p>
+        <h2 class="st rev about-line" data-step="0">WHO <span>WE ARE</span></h2>
+        <div class="sd rev about-line" data-step="0"></div>
+        <div class="ag rev">
+          <div class="at">
+            <p class="about-line" data-step="1">Every legend started somewhere. Ours started in a room in <strong>Bengaluru</strong> — with a 3D printer, a paintbrush, and an obsession with bringing fictional worlds to life.</p>
+            <p class="about-line" data-step="2">We don't mass-produce. We don't cut corners. Every single piece is <strong>designed, printed, and hand-finished</strong> by one person who genuinely cares about getting it right. <em>The forge never lies.</em></p>
+            <p class="about-line" data-step="3">Anime figures. Chibi collectibles. Wedding keepsakes. Custom gifts so personal they make people cry. <strong>If you can dream it — we will build it.</strong></p>
+            <p class="about-line" data-step="4" style="font-size:1.1rem;font-weight:700;color:var(--pg);letter-spacing:.05em;">Your world. Our hands. Zero compromises.</p>
+          </div>
+          <div class="vs">
+            <div class="vst about-box" data-step="1"><div class="big">3D</div><div class="lbl">Printed &amp; Painted</div></div>
+            <div class="vst about-box" data-step="2"><div class="big">∞</div><div class="lbl">Custom Options</div></div>
+            <div class="vst about-box" data-step="3"><div class="big">COD</div><div class="lbl">Cash on Delivery</div></div>
+            <div class="vst about-box" data-step="4"><div class="big">🔥</div><div class="lbl">Made With Love</div></div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -405,8 +493,9 @@ footer p{color:var(--white);opacity:.4;font-family:var(--orb);font-size:.5rem;le
 
 <div class="ld"></div>
 
-<section id="faq">
-  <div class="si">
+<section id="faq" style="position:relative;">
+  <span class="sec-num">04</span>
+  <div class="si fade-up">
     <p class="sp rev">Got Questions?</p>
     <h2 class="st rev">FORGE <span>FAQ</span></h2>
     <div class="sd rev"></div>
@@ -425,8 +514,9 @@ footer p{color:var(--white);opacity:.4;font-family:var(--orb);font-size:.5rem;le
 
 <div class="ld"></div>
 
-<section id="contact">
-  <div class="si">
+<section id="contact" style="position:relative;">
+  <span class="sec-num">05</span>
+  <div class="si fade-up">
     <p class="sp rev">Get In Touch</p>
     <h2 class="st rev">CONTACT <span>US</span></h2>
     <div class="sd rev"></div>
@@ -1181,6 +1271,500 @@ function initEvilEye(){
 }
 
 window.addEventListener('DOMContentLoaded', initEvilEye);
+</script>
+<script>
+/* ═══════════════════════════════════════════════
+   SRIJANX — FULL CINEMATIC ANIMATION ENGINE
+═══════════════════════════════════════════════ */
+
+// ── NOISE HELPER ─────────────────────────────
+function noise(x,y,t){
+  return Math.sin(x*2.1+t)*Math.cos(y*1.7+t*.8)+
+         Math.sin(x*.9+y*1.3+t*1.2)*.5+
+         Math.cos(x*3.1-y*.7+t*.6)*.3;
+}
+
+// ── FORGE SOUND (Web Audio) ───────────────────
+function playForgeSound(){
+  try{
+    const ac=new(window.AudioContext||window.webkitAudioContext)();
+    // Low rumble
+    const buf=ac.createBuffer(1,ac.sampleRate*2,ac.sampleRate);
+    const d=buf.getChannelData(0);
+    for(let i=0;i<d.length;i++){
+      d[i]=(Math.random()*2-1)*Math.exp(-i/(ac.sampleRate*.6))*.35;
+      d[i]+=Math.sin(i*.08)*Math.exp(-i/(ac.sampleRate*.8))*.2;
+      d[i]+=Math.sin(i*.03)*Math.exp(-i/(ac.sampleRate*1.2))*.15;
+    }
+    const src=ac.createBufferSource();
+    src.buffer=buf;
+    const gain=ac.createGain();
+    gain.gain.setValueAtTime(.4,ac.currentTime);
+    gain.gain.linearRampToValueAtTime(0,ac.currentTime+2);
+    const filt=ac.createBiquadFilter();
+    filt.type='lowpass';filt.frequency.value=400;
+    src.connect(filt);filt.connect(gain);gain.connect(ac.destination);
+    src.start();
+  }catch(e){}
+}
+
+// ── 1. INK BLEED INTRO ───────────────────────
+(function(){
+  const intro=document.getElementById('forge-intro');
+  if(!intro)return;
+  if(sessionStorage.getItem('sx_intro')){
+    intro.style.display='none';
+    document.body.style.overflow='';
+    setTimeout(animHeroLetters,100);
+    return;
+  }
+  const cv=document.getElementById('intro-canvas');
+  const txt=document.getElementById('forge-intro-text');
+  cv.width=window.innerWidth; cv.height=window.innerHeight;
+  const ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height,cx=W/2,cy=H/2;
+  document.body.style.overflow='hidden';
+
+  // Phase 1: ink drop falls from top
+  let dropY=-40,dropPhase=0,t=0;
+  const maxR=Math.sqrt(cx*cx+cy*cy)*1.35;
+
+  function drawInk(progress,retract){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);
+    const r=progress*maxR;
+    if(r<=0)return;
+    const steps=180;
+    ctx.beginPath();
+    for(let i=0;i<=steps;i++){
+      const angle=(i/steps)*Math.PI*2;
+      const n=noise(Math.cos(angle)*2,Math.sin(angle)*2,t*.03);
+      const n2=noise(Math.cos(angle)*5,Math.sin(angle)*5,t*.05);
+      const n3=noise(Math.cos(angle)*8+2,Math.sin(angle)*8+2,t*.07);
+      let warp=1+n*.2+n2*.1+n3*.05;
+      if(!retract){
+        const tendril=Math.max(0,n3)*.2*(1-progress*.6);
+        warp+=tendril;
+      }
+      const fr=r*Math.max(.1,warp);
+      i===0?ctx.moveTo(cx+Math.cos(angle)*fr,cy+Math.sin(angle)*fr):
+            ctx.lineTo(cx+Math.cos(angle)*fr,cy+Math.sin(angle)*fr);
+    }
+    ctx.closePath();
+    const grd=ctx.createRadialGradient(cx,cy,0,cx,cy,r*1.1);
+    grd.addColorStop(0,'rgba(8,0,30,1)');
+    grd.addColorStop(.3,'rgba(25,0,70,1)');
+    grd.addColorStop(.65,'rgba(60,0,150,.97)');
+    grd.addColorStop(.85,'rgba(100,30,220,.85)');
+    grd.addColorStop(.95,'rgba(150,70,255,.5)');
+    grd.addColorStop(1,'rgba(180,100,255,0)');
+    ctx.fillStyle=grd;ctx.fill();
+    // Shimmer
+    const sg=ctx.createRadialGradient(cx-r*.15,cy-r*.1,0,cx,cy,r*.5);
+    sg.addColorStop(0,'rgba(200,150,255,.08)');
+    sg.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=sg;ctx.fill();
+    // Edge tendrils
+    if(!retract){
+      for(let d=0;d<12;d++){
+        const da=(d/12)*Math.PI*2+t*.01;
+        const dn=noise(Math.cos(da)*4,Math.sin(da)*4,t*.04);
+        if(dn<.05)continue;
+        const dr=r*(1.05+dn*.3);
+        const dg=ctx.createRadialGradient(
+          cx+Math.cos(da)*dr,cy+Math.sin(da)*dr,0,
+          cx+Math.cos(da)*dr,cy+Math.sin(da)*dr,r*.07);
+        dg.addColorStop(0,'rgba(100,30,220,.45)');
+        dg.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.fillStyle=dg;
+        ctx.beginPath();
+        ctx.arc(cx+Math.cos(da)*dr,cy+Math.sin(da)*dr,r*.07,0,Math.PI*2);
+        ctx.fill();
+      }
+    }
+    t++;
+  }
+
+  // Drop animation
+  let prog=0;
+  function expand(){
+    prog+=.018; t++;
+    drawInk(prog,false);
+    if(prog<.3&&dropPhase===0){
+      // Show falling drop
+      ctx.fillStyle='rgba(80,0,180,.8)';
+      ctx.beginPath();
+      dropY=cy*(prog/.3);
+      ctx.ellipse(cx,dropY,8,12,0,0,Math.PI*2);
+      ctx.fill();
+    }
+    if(prog>=.45&&txt.style.opacity==='0'){
+      txt.style.opacity='1';
+      playForgeSound();
+    }
+    if(prog<1)requestAnimationFrame(expand);
+    else{
+      setTimeout(()=>{
+        let rp=1;
+        function retract(){
+          rp-=.022; t++;
+          drawInk(rp,true);
+          if(rp>.02)requestAnimationFrame(retract);
+          else{
+            ctx.clearRect(0,0,W,H);
+            intro.style.transition='opacity .5s ease';
+            intro.style.opacity='0';
+            setTimeout(()=>{
+              intro.style.display='none';
+              document.body.style.overflow='';
+              sessionStorage.setItem('sx_intro','1');
+              animHeroLetters();
+            },500);
+          }
+        }
+        requestAnimationFrame(retract);
+      },700);
+    }
+  }
+  setTimeout(()=>requestAnimationFrame(expand),300);
+})();
+
+// ── 2. HERO LETTER ANIMATION ─────────────────
+function animHeroLetters(){
+  const titleWrap=document.getElementById('hero-title-wrap');
+  const pre=document.getElementById('hero-pre');
+  const tag=document.getElementById('hero-tag');
+  const typedTxt=document.getElementById('typed-text');
+  const hdesc=document.querySelector('.hdesc');
+  const hnote=document.querySelector('.hnote');
+  const fbtns=document.querySelector('.fbtns');
+  const rCv=document.getElementById('hero-ripple-cv');
+
+  // Start ripple canvas immediately
+  if(rCv){
+    const heroWrap=rCv.parentElement;
+    const rW=Math.max(heroWrap.offsetWidth*3,900);
+    const rH=Math.max(heroWrap.offsetHeight*4,600);
+    rCv.width=rW;rCv.height=rH;
+    const rCtx=rCv.getContext('2d');
+    const rings=[];
+    let rT=0;
+    function spawnRing(){
+      rings.push({r:10,maxR:Math.max(rW,rH)*.75,op:.3,speed:Math.random()*.8+.5,gold:Math.random()>.5});
+    }
+    [0,300,600,900,1300,1700].forEach(d=>setTimeout(spawnRing,d));
+    const rippleIv=setInterval(spawnRing,500);
+    function drawRipples(){
+      rCtx.clearRect(0,0,rW,rH);
+      const cx2=rW/2,cy2=rH/2;
+      for(let i=rings.length-1;i>=0;i--){
+        const ring=rings[i];
+        ring.r+=ring.speed*2;
+        ring.op*=.975;
+        if(ring.op<.005){rings.splice(i,1);continue;}
+        rCtx.beginPath();
+        rCtx.ellipse(cx2,cy2,ring.r,ring.r*.38,0,0,Math.PI*2);
+        rCtx.strokeStyle=ring.gold?`rgba(240,180,41,${ring.op*.5})`:`rgba(160,80,255,${ring.op*.6})`;
+        rCtx.lineWidth=ring.gold?1:1.5;
+        rCtx.stroke();
+      }
+      rT++;requestAnimationFrame(drawRipples);
+    }
+    drawRipples();
+    setTimeout(()=>clearInterval(rippleIv),4000);
+  }
+
+  // "The World of" fades in first
+  setTimeout(()=>{if(pre){pre.style.opacity='1';pre.style.transition='opacity 1s ease';}},200);
+
+  // Whole SRIJANX block emerges from background as one unit
+  setTimeout(()=>{if(titleWrap)titleWrap.classList.add('in');},400);
+
+  // Typed tagline after word lands
+  setTimeout(()=>{
+    if(!tag||!typedTxt)return;
+    tag.style.opacity='1';
+    const str='Where Legends Are Forged';
+    let i=0;
+    const iv=setInterval(()=>{typedTxt.textContent=str.slice(0,++i);if(i>=str.length)clearInterval(iv);},55);
+  },1800);
+
+  const show=(el,delay)=>{
+    if(!el)return;
+    el.style.opacity='0';el.style.transform='translateY(16px)';
+    el.style.transition='opacity .7s ease,transform .7s ease';
+    setTimeout(()=>{el.style.opacity='1';el.style.transform='none';},delay);
+  };
+  show(hdesc,2100);show(hnote,2300);show(fbtns,2500);
+}
+
+// ── 3. CUSTOM CURSOR + SPARK TRAIL ───────────
+const cur=document.getElementById('cursor');
+let cmx=window.innerWidth/2,cmy=window.innerHeight/2,tc=0;
+const sColors=['#ff8c00','#ffdd00','#ff4500','#ffa500','#ffcc00','#ffee44'];
+document.addEventListener('mousemove',e=>{
+  cmx=e.clientX;cmy=e.clientY;
+  cur.style.left=cmx+'px';cur.style.top=cmy+'px';
+  if(++tc%3!==0)return;
+  for(let i=0;i<2;i++){
+    const s=document.createElement('div');
+    const c=sColors[Math.floor(Math.random()*sColors.length)];
+    const sz=Math.random()*3.5+1.5;
+    s.style.cssText=`position:fixed;border-radius:50%;pointer-events:none;z-index:99990;width:${sz}px;height:${sz}px;background:${c};box-shadow:0 0 ${sz*2}px ${c};left:${cmx}px;top:${cmy}px;transform:translate(-50%,-50%);`;
+    document.body.appendChild(s);
+    const vx=(Math.random()-.5)*3.5,vy=(Math.random()-1)*3;
+    let px=cmx,py=cmy,op=1,fr=0;
+    (function anim(){
+      fr++;px+=vx;py+=vy+fr*.07;op-=.045;
+      if(op<=0){s.remove();return;}
+      s.style.left=px+'px';s.style.top=py+'px';s.style.opacity=op;
+      requestAnimationFrame(anim);
+    })();
+  }
+});
+document.addEventListener('mousedown',()=>cur.classList.add('on-link'));
+document.addEventListener('mouseup',()=>cur.classList.remove('on-link'));
+document.querySelectorAll('a,button,.vb,.ct,.cl,.fq,.vc,.vcbt,.cat-pill').forEach(el=>{
+  el.addEventListener('mouseenter',()=>cur.classList.add('on-link'));
+  el.addEventListener('mouseleave',()=>cur.classList.remove('on-link'));
+});
+
+// ── 4. MAGNETIC BUTTONS ──────────────────────
+document.querySelectorAll('.vb').forEach(btn=>{
+  btn.addEventListener('mousemove',e=>{
+    const r=btn.getBoundingClientRect();
+    const dx=e.clientX-(r.left+r.width/2);
+    const dy=e.clientY-(r.top+r.height/2);
+    btn.style.transform=`translate(${dx*.22}px,${dy*.28}px)`;
+  });
+  btn.addEventListener('mouseleave',()=>btn.style.transform='');
+});
+
+// ── 5. SCROLL PROGRESS BAR ───────────────────
+const progBar=document.getElementById('scroll-progress');
+window.addEventListener('scroll',()=>{
+  const s=window.scrollY;
+  const h=document.documentElement.scrollHeight-window.innerHeight;
+  if(progBar)progBar.style.width=(s/h*100)+'%';
+},{ passive:true });
+
+// ── 6. ABOUT SCROLL-DRIVEN ANIMATION ─────────
+(function(){
+  const aboutSec=document.getElementById('about');
+  const scrollSpace=document.getElementById('about-scroll-space');
+  if(!aboutSec||!scrollSpace)return;
+
+  // Steps occupy first 70% of scroll space (sentinels at 0,14,28,42,56%)
+  // Each step animates over 14% of total scroll space
+  const TOTAL_STEPS=5;
+  const STEP_PCT=0.16; // each step = 16% of scroll space
+
+  function getItems(step){
+    return[
+      ...aboutSec.querySelectorAll(`.about-line[data-step="${step}"]`),
+      ...aboutSec.querySelectorAll(`.about-box[data-step="${step}"]`)
+    ];
+  }
+
+  function applyProgress(el,progress){
+    // progress: 0 = fully hidden (big+blurry), 1 = fully landed (normal)
+    const p=Math.max(0,Math.min(1,progress));
+    const scale=1.55-(p*0.55);   // 1.55 → 1.0
+    const blur=(1-p)*6;           // 6px → 0
+    const opacity=p;              // 0 → 1
+    const translateY=(1-p)*18;    // 18px → 0
+    el.style.opacity=opacity;
+    el.style.transform=`scale(${scale}) translateY(${translateY}px)`;
+    el.style.filter=`blur(${blur}px)`;
+    el.style.transition='none'; // driven by scroll, not CSS transition
+  }
+
+  function onScroll(){
+    const rect=scrollSpace.getBoundingClientRect();
+    const spaceH=scrollSpace.offsetHeight;
+    const scrolled=-rect.top;
+    const stepH=spaceH*STEP_PCT;
+
+    for(let s=0;s<TOTAL_STEPS;s++){
+      const stepStart=s*stepH;
+      const raw=(scrolled-stepStart)/stepH;
+      const progress=Math.max(0,Math.min(1,raw));
+      const eased=progress<0.5?2*progress*progress:(4-2*progress)*progress-1;
+      getItems(s).forEach(el=>{
+        el.style.transition='none';
+        applyProgress(el,eased);
+      });
+    }
+  }
+
+  window.addEventListener('scroll',onScroll,{passive:true});
+  requestAnimationFrame(onScroll);
+})();
+
+// ── 7. SCROLL FADE-UP ────────────────────────
+const scrollObs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{ if(e.isIntersecting){e.target.classList.add('visible');scrollObs.unobserve(e.target);} });
+},{threshold:.1});
+document.querySelectorAll('.fade-up').forEach(el=>scrollObs.observe(el));
+
+// ── 8. STATS SCRAMBLE ────────────────────────
+const statsObs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(!e.isIntersecting)return;
+    e.target.querySelectorAll('.sn').forEach((sn,i)=>{
+      const orig=sn.textContent;
+      const chars='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#@!';
+      let fr=0;const total=22;
+      setTimeout(()=>{
+        const iv=setInterval(()=>{
+          fr++;
+          sn.textContent=orig.split('').map((c,j)=>
+            fr/total>j/orig.length?c:chars[Math.floor(Math.random()*chars.length)]).join('');
+          if(fr>=total){sn.textContent=orig;clearInterval(iv);}
+        },40);
+      },i*140);
+    });
+    statsObs.unobserve(e.target);
+  });
+},{threshold:.3});
+const statsSec=document.querySelector('#stats .sr');
+if(statsSec)statsObs.observe(statsSec);
+
+// ── 9. 3D CARD TILT ──────────────────────────
+function initCardTilt(){
+  document.querySelectorAll('.vc').forEach(card=>{
+    if(card._tilt)return;
+    card._tilt=true;
+    card.addEventListener('mousemove',e=>{
+      const r=card.getBoundingClientRect();
+      const dx=((e.clientX-r.left)/r.width-.5)*2;
+      const dy=((e.clientY-r.top)/r.height-.5)*2;
+      card.style.transform=`perspective(900px) rotateY(${dx*9}deg) rotateX(${-dy*6}deg) scale(1.025)`;
+      card.style.transition='transform .08s ease';
+    });
+    card.addEventListener('mouseleave',()=>{
+      card.style.transform='perspective(900px) rotateX(0) rotateY(0) scale(1)';
+      card.style.transition='transform .45s ease';
+    });
+  });
+}
+initCardTilt();
+const cgEl=document.getElementById('cg');
+if(cgEl)new MutationObserver(()=>setTimeout(initCardTilt,50)).observe(cgEl,{childList:true});
+
+// ── 10. INK WIPE PAGE NAV ────────────────────
+const inkCv=document.getElementById('ink-canvas');
+let inkRunning=false,inkRAF=null;
+function inkWipe(callback){
+  if(inkRunning){if(callback)callback();return;}
+  inkRunning=true;
+  inkCv.width=window.innerWidth;inkCv.height=window.innerHeight;
+  inkCv.style.display='block';
+  const ctx=inkCv.getContext('2d');
+  const W=inkCv.width,H=inkCv.height,cx=W/2,cy=H/2;
+  const maxR=Math.sqrt(cx*cx+cy*cy)*1.35;
+  let prog=0,t=0,cbCalled=false;
+  function drawInkWipe(p,retracting){
+    ctx.clearRect(0,0,W,H);
+    const r=p*maxR;if(r<=0)return;
+    const steps=160;
+    ctx.beginPath();
+    for(let i=0;i<=steps;i++){
+      const angle=(i/steps)*Math.PI*2;
+      const n=noise(Math.cos(angle)*2,Math.sin(angle)*2,t*.04);
+      const n2=noise(Math.cos(angle)*5,Math.sin(angle)*5,t*.06);
+      const warp=1+n*.18+n2*.09+(retracting?0:Math.max(0,n2)*.12*(1-p*.5));
+      const fr=r*Math.max(.1,warp);
+      i===0?ctx.moveTo(cx+Math.cos(angle)*fr,cy+Math.sin(angle)*fr):
+            ctx.lineTo(cx+Math.cos(angle)*fr,cy+Math.sin(angle)*fr);
+    }
+    ctx.closePath();
+    const grd=ctx.createRadialGradient(cx,cy,0,cx,cy,r*1.1);
+    grd.addColorStop(0,'rgba(8,0,30,1)');
+    grd.addColorStop(.4,'rgba(30,0,90,1)');
+    grd.addColorStop(.75,'rgba(80,10,200,.95)');
+    grd.addColorStop(.9,'rgba(130,50,255,.7)');
+    grd.addColorStop(1,'rgba(180,100,255,0)');
+    ctx.fillStyle=grd;ctx.fill();
+    t++;
+  }
+  function expand(){
+    prog+=.028;t++;
+    drawInkWipe(prog,false);
+    if(prog>=.55&&!cbCalled){cbCalled=true;if(callback)callback();}
+    if(prog<1)inkRAF=requestAnimationFrame(expand);
+    else fadeOut();
+  }
+  function fadeOut(){
+    let alpha=1;
+    function fade(){
+      alpha-=.04;
+      ctx.clearRect(0,0,W,H);
+      if(alpha>0){
+        ctx.globalAlpha=alpha;
+        drawInkWipe(1,false);
+        ctx.globalAlpha=1;
+        inkRAF=requestAnimationFrame(fade);
+      } else {
+        ctx.clearRect(0,0,W,H);
+        inkCv.style.display='none';
+        inkRunning=false;
+      }
+    }
+    requestAnimationFrame(fade);
+  }
+  requestAnimationFrame(expand);
+}
+// Hook into nextPage/prevPage
+const _origNext=window.nextPage,_origPrev=window.prevPage;
+window.nextPage=function(cat){
+  const f=cat==='all'?allP:allP.filter(p=>p.category===cat);
+  const total=Math.ceil(f.length/itemsPerPage);
+  if(curPage<total){curPage++;inkWipe(()=>renderCat(cat));}
+};
+window.prevPage=function(cat){
+  if(curPage>1){curPage--;inkWipe(()=>renderCat(cat));}
+};
+
+// ── 11. FIRE DIVIDERS ────────────────────────
+document.querySelectorAll('.fdcv').forEach(cv=>{
+  const wrap=cv.parentElement;
+  cv.width=wrap.offsetWidth||window.innerWidth;cv.height=60;
+  const ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height;let t2=0;
+  (function drawFire(){
+    ctx.clearRect(0,0,W,H);
+    for(let x=0;x<W;x+=3){
+      const fl=Math.sin(x*.05+t2*.08)*8+Math.sin(x*.02+t2*.05)*6;
+      const by=H*.7+fl;
+      const g=ctx.createLinearGradient(0,by-20,0,H);
+      g.addColorStop(0,'rgba(255,200,50,0)');g.addColorStop(.2,'rgba(255,120,0,.6)');
+      g.addColorStop(.6,'rgba(180,40,0,.4)');g.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=g;ctx.fillRect(x,by-20,3,H-by+20);
+    }
+    const lg=ctx.createLinearGradient(0,0,W,0);
+    lg.addColorStop(0,'rgba(255,150,0,0)');lg.addColorStop(.2,'rgba(255,220,50,.9)');
+    lg.addColorStop(.5,'rgba(255,255,180,1)');lg.addColorStop(.8,'rgba(255,220,50,.9)');
+    lg.addColorStop(1,'rgba(255,150,0,0)');
+    ctx.strokeStyle=lg;ctx.lineWidth=2;ctx.beginPath();
+    for(let x=0;x<W;x+=2){
+      const y=H*.7+Math.sin(x*.05+t2*.08)*6+Math.sin(x*.02+t2*.05)*4;
+      x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    }
+    ctx.stroke();t2++;requestAnimationFrame(drawFire);
+  })();
+});
+
+// ── 12. HERO PARALLAX ────────────────────────
+const heroSec=document.getElementById('home');
+window.addEventListener('scroll',()=>{
+  if(!heroSec)return;
+  const s=window.scrollY,h=heroSec.offsetHeight;
+  if(s<h*1.2){
+    heroSec.style.transform=`translateY(${s*.32}px)`;
+    heroSec.style.opacity=Math.max(0,1-(s/(h*.85)))+'';
+  }
+},{ passive:true });
 </script>
 </body>
 </html>
