@@ -305,6 +305,21 @@ footer p{color:var(--white);opacity:.4;font-family:var(--orb);font-size:.5rem;le
 
 @media(max-width:768px){nav{padding:1rem 1.5rem;}.nav-links{display:none;}.ag,.cg{grid-template-columns:1fr;gap:2rem;}.vs{grid-template-columns:1fr 1fr;}.afg{grid-template-columns:1fr;}.ah{padding:1rem 1.5rem;}.sr{gap:2.5rem;}}
 
+@media(max-width:768px){
+  #about-sticky-stage{align-items:flex-start;padding:1rem;overflow-y:visible;}
+  #about-inner{padding:1rem!important;}
+  #about-inner .ag{grid-template-columns:1fr;gap:1rem;}
+  #about-inner .at p{font-size:.78rem;line-height:1.6;margin-bottom:.6rem;}
+  #about-inner .at p:last-child{margin-bottom:0;}
+  #about-inner .sp{font-size:.55rem;}
+  #about-inner .st{font-size:clamp(1.4rem,6vw,2rem);}
+  #about-inner .vs{grid-template-columns:1fr 1fr;}
+  #about-inner .vst{padding:.8rem .5rem;}
+  #about-inner .vst .big{font-size:1.2rem;}
+  #about-inner .vst .lbl{font-size:.38rem;}
+  #about-inner .sd{margin:.4rem 0;}
+}
+
 @keyframes wavePulse{0%{transform:scale(1);opacity:1;}20%{transform:scale(.97);opacity:.7;box-shadow:0 0 0 0 rgba(160,80,255,0);}50%{transform:scale(1.01);opacity:.85;box-shadow:0 0 40px 15px rgba(160,80,255,.22),0 0 80px 30px rgba(240,180,41,.1);}100%{transform:scale(1);opacity:1;box-shadow:0 0 0 0 rgba(160,80,255,0);}}
 .wave-morph{animation:wavePulse .4s ease-out forwards;}
 .forge-scan-wrap{position:relative;overflow:hidden;}
@@ -358,6 +373,10 @@ footer p{color:var(--white);opacity:.4;font-family:var(--orb);font-size:.5rem;le
 #about-sticky-stage{position:sticky;top:0;height:100vh;display:flex;align-items:center;justify-content:center;width:100%;overflow:hidden;}
 .about-line{opacity:0;transform:scale(1.55) translateY(18px);filter:blur(6px);}
 .about-box{opacity:0;transform:scale(1.55) translateY(18px);filter:blur(6px);}
+@media(max-width:768px){
+  .about-line{transform:scale(1.2) translateY(12px);filter:blur(4px);}
+  .about-box{transform:scale(1.2) translateY(12px);filter:blur(4px);}
+}
 
 /* ── SCROLL PROGRESS BAR ── */
 #scroll-progress{position:fixed;top:0;left:0;height:2px;width:0%;background:linear-gradient(90deg,var(--purple),var(--gold));z-index:99997;pointer-events:none;}
@@ -1567,16 +1586,17 @@ window.addEventListener('scroll',()=>{
   }
 
   function applyProgress(el,progress){
-    // progress: 0 = fully hidden (big+blurry), 1 = fully landed (normal)
     const p=Math.max(0,Math.min(1,progress));
-    const scale=1.55-(p*0.55);   // 1.55 → 1.0
-    const blur=(1-p)*6;           // 6px → 0
-    const opacity=p;              // 0 → 1
-    const translateY=(1-p)*18;    // 18px → 0
+    const isMobile=window.innerWidth<=768;
+    const maxScale=isMobile?1.2:1.55;
+    const scale=maxScale-(p*(maxScale-1));
+    const blur=(1-p)*(isMobile?4:6);
+    const opacity=p;
+    const translateY=(1-p)*(isMobile?12:18);
     el.style.opacity=opacity;
     el.style.transform=`scale(${scale}) translateY(${translateY}px)`;
     el.style.filter=`blur(${blur}px)`;
-    el.style.transition='none'; // driven by scroll, not CSS transition
+    el.style.transition='none';
   }
 
   function onScroll(){
