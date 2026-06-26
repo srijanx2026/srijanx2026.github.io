@@ -374,8 +374,20 @@ footer p{color:var(--white);opacity:.4;font-family:var(--orb);font-size:.5rem;le
 .about-line{opacity:0;transform:scale(1.55) translateY(18px);filter:blur(6px);}
 .about-box{opacity:0;transform:scale(1.55) translateY(18px);filter:blur(6px);}
 @media(max-width:768px){
-  .about-line{transform:scale(1.2) translateY(12px);filter:blur(4px);}
-  .about-box{transform:scale(1.2) translateY(12px);filter:blur(4px);}
+  .about-line{transform:translateY(20px);filter:blur(3px);}
+  .about-box{transform:translateY(20px);filter:blur(3px);}
+  #about-sticky-stage{align-items:flex-start;padding:1rem;overflow:hidden;}
+  #about-inner{padding:1rem!important;width:100%;box-sizing:border-box;}
+  #about-inner .ag{grid-template-columns:1fr;gap:1rem;}
+  #about-inner .at p{font-size:.78rem;line-height:1.6;margin-bottom:.6rem;}
+  #about-inner .sp{font-size:.55rem;}
+  #about-inner .st{font-size:clamp(1.4rem,6vw,2rem);}
+  #about-inner .vs{grid-template-columns:1fr 1fr;}
+  #about-inner .vst{padding:.8rem .5rem;}
+  #about-inner .vst .big{font-size:1.2rem;}
+  #about-inner .vst .lbl{font-size:.38rem;}
+  #about-inner .sd{margin:.4rem 0;}
+  #about-scroll-space{overflow:hidden;}
 }
 
 /* ── SCROLL PROGRESS BAR ── */
@@ -1588,14 +1600,21 @@ window.addEventListener('scroll',()=>{
   function applyProgress(el,progress){
     const p=Math.max(0,Math.min(1,progress));
     const isMobile=window.innerWidth<=768;
-    const maxScale=isMobile?1.2:1.55;
-    const scale=maxScale-(p*(maxScale-1));
-    const blur=(1-p)*(isMobile?4:6);
     const opacity=p;
-    const translateY=(1-p)*(isMobile?12:18);
-    el.style.opacity=opacity;
-    el.style.transform=`scale(${scale}) translateY(${translateY}px)`;
-    el.style.filter=`blur(${blur}px)`;
+    const blur=(1-p)*(isMobile?3:6);
+    if(isMobile){
+      // Mobile: no scale (causes overflow), just fade + slide up
+      const translateY=(1-p)*20;
+      el.style.opacity=opacity;
+      el.style.transform=`translateY(${translateY}px)`;
+      el.style.filter=`blur(${blur}px)`;
+    } else {
+      const scale=1.55-(p*0.55);
+      const translateY=(1-p)*18;
+      el.style.opacity=opacity;
+      el.style.transform=`scale(${scale}) translateY(${translateY}px)`;
+      el.style.filter=`blur(${blur}px)`;
+    }
     el.style.transition='none';
   }
 
